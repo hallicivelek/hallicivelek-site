@@ -130,7 +130,7 @@ async def main(base):
         check('no script errors (grid)', not errs, '; '.join(errs)[:200])
         await page.close()
 
-        # ---- the short Custom HTML: the same add-ons as script files (as served from GitHub Pages) ----
+        # ---- the short Custom HTML: its loader adds the same add-ons as script files (as served from GitHub Pages) ----
         page = await b.new_page(viewport={'width': 1300, 'height': 760}); errs = []
         page.on('pageerror', lambda e: errs.append(str(e)))
         await page.goto(base + '/short/blob-pond/'); await page.wait_for_timeout(1200)
@@ -179,7 +179,8 @@ if __name__ == '__main__':
         (site / d).mkdir(); (site / d / 'index.html').write_text(PAGE.replace('ADDONS', addons))
     grid = PAGE.replace('ADDONS', (ROOT / 'dist' / 'hc-columns.html').read_text() + addons).replace('<p>PAGE CONTENT</p>', GRID)
     (site / 'filter' / 'artdirection').mkdir(parents=True); (site / 'filter' / 'artdirection' / 'index.html').write_text(grid)
-    tags = ''.join(f'<script src="/js/{n}.js"></script>' for n in ['hc-columns', 'hc-nav-active', 'hc-blobs', 'hc-pond'])
+    sys.path.insert(0, str(ROOT / 'tools')); import build_scripts
+    tags = build_scripts.loader('/js/')   # the same loader as dist/custom-html-short.html, pointed at the local copies
     (site / 'js').mkdir()
     for f in (ROOT / 'dist' / 'js').glob('*.js'): (site / 'js' / f.name).write_text(f.read_text())
     for d, html in [('short/blob-pond', PAGE.replace('ADDONS', tags)),

@@ -1,6 +1,8 @@
 """The short version of Cargo's Custom HTML, with the add-ons served from GitHub Pages:
   dist/js/hc-*.js            each add-on as a plain script file (its <style>, if any, is added by the script)
-  dist/custom-html-short.html  Halli's own parts around four <script src> lines
+  dist/custom-html-short.html  Halli's own parts around a small inline loader for those files
+The loader is plain inline JavaScript (inline scripts are what Cargo is known to run) and has no backslashes,
+so it survives being copied in and out of Cargo's editor, which has stripped backslashes before.
 Run build_facts.py and build_pond_module.py first (build.py does all of it)."""
 import json, re, sys
 from pathlib import Path
@@ -14,7 +16,7 @@ HEADER = """<!-- ===============================================================
      2. Current page in nav  blue + aria-current on every page
      3. Floating blobs      the background blobs, faces, pause button (not on the blob-pond page)
      4. The blob-pond       builds the pond on the page whose address contains "blob-pond"
-     Each is its own script, so if one ever breaks (or GitHub is down) the others and the site keep working.
+     Each is its own script file, so if one ever breaks (or GitHub is down) the others and the site keep working.
      ================================================================ -->
 """
 TOP_NOTE = """<!-- Complete Custom HTML for hallicivelek.com (short version: the add-ons load from GitHub Pages).
@@ -36,15 +38,31 @@ def to_js(path):
     return js + '\n'.join(s.strip('\n') for s in scripts) + '\n'
 
 
+def loader(base):
+    """Adds the four script files in order (async = false keeps the order, like plain script tags)."""
+    names = ', '.join(f"'{p.stem}'" for p in ADDONS)
+    js = f"""<script>
+(function () {{
+  var base = '{base}';
+  [{names}].forEach(function (name) {{
+    var s = document.createElement('script');
+    s.src = base + name + '.js';
+    s.async = false;
+    document.head.appendChild(s);
+  }});
+}})();
+</script>"""
+    assert chr(92) not in js
+    return js
+
+
 def build(base=BASE):
     out_dir = ROOT / 'dist' / 'js'
     out_dir.mkdir(exist_ok=True)
-    tags = []
     for p in ADDONS:
         (out_dir / (p.stem + '.js')).write_text(to_js(p))
-        tags.append(f'<script src="{base}{p.stem}.js"></script>')
     out = (TOP_NOTE + (ROOT / 'src' / 'parts' / 'before.html').read_text().rstrip() + '\n\n'
-           + HEADER + '\n'.join(tags) + '\n\n'
+           + HEADER + loader(base) + '\n\n'
            + (ROOT / 'src' / 'parts' / 'after.html').read_text().rstrip() + '\n')
     (ROOT / 'dist' / 'custom-html-short.html').write_text(out)
     print(f'dist/custom-html-short.html: {len(out.encode())} bytes, scripts in dist/js/')
