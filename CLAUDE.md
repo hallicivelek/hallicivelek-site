@@ -32,7 +32,7 @@ Everything reaches the live site through Cargo's **Custom HTML** setting. Two wa
 ## Build and test
 ```
 python3 build.py              # src/ → dist/hc-columns.html, dist/hc-pond.html, dist/custom-html.html; syntax-checks every script
-python3 tests/test_site.py    # 32 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, phone)
+python3 tests/test_site.py    # 33 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, phone)
 ```
 Tests need `python3 -m pip install --user playwright` (this Mac has no bare `pip`) and `python3 -m playwright install chromium`.
 The build was verified to reproduce the installed files byte-for-byte when this project was set up.
