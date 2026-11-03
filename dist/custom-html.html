@@ -1705,11 +1705,25 @@ StatCounter"></a></div></noscript>
      the two irises, and the portrait with transparent eyeholes (eyelids.png). Stacked face -> irises ->
      eyelids, the irises slide under Halli's real eyelids as they look around. They look at the cursor (or the last tap);
      when nobody moves for a while they watch the nearest background blob. With reduced motion they
-     simply look at you. If the layers can't be loaded, the original portrait stays as it is. -->
+     simply look at you. If the layers can't be loaded, the original portrait stays as it is.
+     Halli's pencil (pencil.png) lies to the right of the photo. Click or tap it to pick it up, then draw black
+     lines on the face; Esc or a click/tap outside the photo puts it back. The drawing is not saved: it is gone
+     when you leave the page. -->
 <style>
   .hc-eyes { position: absolute; pointer-events: none; }
   .hc-eyes img { position: absolute; display: block; max-width: none; margin: 0; padding: 0; border: 0; }
-  .hc-eyes .hc-lids { left: 0; top: 0; width: 100%; height: 100%; }
+  .hc-eyes .hc-lids, .hc-eyes .hc-ink { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }
+  .hc-eyes .hc-ink { pointer-events: none; }
+  .hc-eyes.hc-drawing .hc-ink { pointer-events: auto; touch-action: none; cursor: none; }
+  .hc-pencil { position: absolute; left: calc(100% + 18px); top: 30%; width: 30px; padding: 0; margin: 0; border: 0;
+    background: none; cursor: pointer; pointer-events: auto; transform: rotate(8deg); transition: transform .25s ease; }
+  .hc-pencil img { position: static !important; width: 100%; height: auto; }
+  .hc-pencil:hover, .hc-pencil:focus-visible { transform: rotate(16deg) translateY(-4px); }
+  .hc-pencil:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 4px; }
+  .hc-drawing .hc-pencil { visibility: hidden; }
+  @media (max-width: 600px) { .hc-pencil { left: calc(100% + 6px); width: 24px; } }
+  .hc-pencil-held { position: fixed; z-index: 10002; width: 30px; height: auto; pointer-events: none; display: none;
+    transform: rotate(14deg); }
 </style>
 <script>
 (function () {
@@ -1767,9 +1781,112 @@ StatCounter"></a></div></noscript>
       box.appendChild(top);
       var l = { img: img, box: box, eyes: eyes };
       live.push(l);
+      addPencil(l);
       fit(l); place(eyes[0]); place(eyes[1]);
       if (!calm.matches) requestAnimationFrame(tick);
     }
+  }
+
+  /* ---------- the pencil: draw on the face (not saved) ---------- */
+  var TIP = [15 / 59, 191 / 200];   // where the tip is in pencil.png, as a share of its width and height
+  var INK = 2;                      // line width, in photo pixels
+  var FINGER = [-14, -46];          // on touch screens the tip is held this far from the finger, so you can see it
+
+  function addPencil(l) {
+    var ink = document.createElement('canvas');
+    ink.className = 'hc-ink';
+    l.box.appendChild(ink);
+    var btn = document.createElement('button');
+    btn.type = 'button'; btn.className = 'hc-pencil';
+    btn.setAttribute('aria-label', 'pencil: draw on Halli’s face');
+    btn.setAttribute('aria-pressed', 'false');
+    btn.innerHTML = '<img alt="" src="' + BASE + 'pencil.png">';
+    l.box.appendChild(btn);
+    var held = document.createElement('img');
+    held.className = 'hc-pencil-held'; held.alt = ''; held.src = BASE + 'pencil.png';
+    document.body.appendChild(held);
+    l.ink = ink; l.held = held; l.strokes = []; l.size = '';
+    var holding = false, stroke = null;
+
+    // the pencil's tip is where it draws: under the mouse, or just above and left of a finger
+    function tipOf(e) {
+      var off = e.pointerType === 'touch' ? FINGER : [0, 0];
+      return [e.clientX + off[0], e.clientY + off[1]];
+    }
+    function follow(x, y) {
+      var w = held.offsetWidth || 30, h = held.offsetHeight || w * 200 / 59;
+      held.style.transformOrigin = (TIP[0] * w) + 'px ' + (TIP[1] * h) + 'px';
+      held.style.left = (x - TIP[0] * w) + 'px';
+      held.style.top = (y - TIP[1] * h) + 'px';
+    }
+    function pickUp(x, y) {
+      holding = true;
+      l.box.classList.add('hc-drawing'); btn.setAttribute('aria-pressed', 'true');
+      held.style.display = 'block'; follow(x, y);
+    }
+    function putDown() {
+      holding = false; stroke = null;
+      l.box.classList.remove('hc-drawing'); btn.setAttribute('aria-pressed', 'false');
+      held.style.display = 'none';
+    }
+    l.putDown = putDown;
+
+    btn.addEventListener('click', function (e) {
+      var r = btn.getBoundingClientRect(), t = e.clientX ? tipOf(e) : [r.left + r.width / 2, r.top + r.height / 2];
+      pickUp(t[0], t[1]);
+      e.stopPropagation();
+    });
+    function photoPoint(e) {
+      var r = ink.getBoundingClientRect(), t = tipOf(e);
+      return [(t[0] - r.left) / r.width * W, (t[1] - r.top) / r.height * H];
+    }
+    ink.addEventListener('pointerdown', function (e) {
+      if (!holding) return;
+      e.preventDefault();
+      try { ink.setPointerCapture(e.pointerId); } catch (err) {}
+      var t = tipOf(e); follow(t[0], t[1]);
+      stroke = [photoPoint(e)];
+      l.strokes.push(stroke);
+      draw(l, stroke, 0);
+    });
+    ink.addEventListener('pointermove', function (e) {
+      if (!holding) return;
+      var t = tipOf(e); follow(t[0], t[1]);
+      target = t; lastMove = Date.now();   // the eyes watch the pencil tip
+      if (!stroke) return;
+      stroke.push(photoPoint(e));
+      draw(l, stroke, stroke.length - 2);
+    });
+    function endStroke() { stroke = null; }
+    ink.addEventListener('pointerup', endStroke);
+    ink.addEventListener('pointercancel', endStroke);
+    // the held pencil follows the mouse anywhere; a click or tap outside the photo puts it back
+    addEventListener('pointermove', function (e) { if (holding) { var t = tipOf(e); follow(t[0], t[1]); } }, { passive: true });
+    addEventListener('pointerdown', function (e) { if (holding && e.target !== ink) putDown(); }, true);
+    // Esc puts the pencil down; Cargo also closes the page on Esc, so it doesn't get this one
+    addEventListener('keydown', function (e) {
+      if (holding && e.key === 'Escape') { e.stopImmediatePropagation(); e.preventDefault(); putDown(); btn.focus(); }
+    }, true);
+  }
+
+  // draw a stroke from point i onwards (all strokes are kept in photo pixels, so they survive a resize)
+  function draw(l, s, i) {
+    var c = l.ink.getContext('2d');
+    c.lineWidth = INK; c.lineCap = 'round'; c.lineJoin = 'round'; c.strokeStyle = '#111';
+    c.beginPath();
+    var a = s[Math.max(0, i)];
+    c.moveTo(a[0], a[1]);
+    if (s.length === 1) c.lineTo(a[0] + 0.01, a[1]);
+    for (var k = Math.max(0, i) + 1; k < s.length; k++) c.lineTo(s[k][0], s[k][1]);
+    c.stroke();
+  }
+  function sizeInk(l, r) {
+    var dpr = window.devicePixelRatio || 1, size = Math.round(r.width * dpr) + 'x' + Math.round(r.height * dpr);
+    if (size === l.size) return;
+    l.size = size;
+    l.ink.width = Math.round(r.width * dpr); l.ink.height = Math.round(r.height * dpr);
+    l.ink.getContext('2d').setTransform(l.ink.width / W, 0, 0, l.ink.height / H, 0, 0);
+    l.strokes.forEach(function (s) { draw(l, s, 0); });
   }
 
   function place(o) {
@@ -1785,6 +1902,7 @@ StatCounter"></a></div></noscript>
     if (st.left !== left) st.left = left;
     if (st.top !== top) st.top = top;
     if (st.width !== r.width + 'px') { st.width = r.width + 'px'; st.height = r.height + 'px'; }
+    if (l.ink) sizeInk(l, r);
   }
 
   function nearestBlob(cx, cy) {
@@ -1798,7 +1916,11 @@ StatCounter"></a></div></noscript>
 
   var running = false;
   function tick() {
-    live = live.filter(function (l) { return l.img.isConnected; });
+    live = live.filter(function (l) {
+      if (l.img.isConnected) return true;
+      if (l.held) l.held.remove();   // Cargo changed page: the drawing goes with it
+      return false;
+    });
     if (!live.length) { running = false; return; }
     running = true;
     live.forEach(function (l) {

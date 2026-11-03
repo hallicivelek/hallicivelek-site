@@ -32,7 +32,7 @@ Everything reaches the live site through Cargo's **Custom HTML** setting. Two wa
 ## Build and test
 ```
 python3 build.py              # src/ → dist/hc-columns.html, dist/hc-pond.html, dist/custom-html.html; syntax-checks every script
-python3 tests/test_site.py    # 33 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, phone)
+python3 tests/test_site.py    # 34 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, phone)
 ```
 Tests need `python3 -m pip install --user playwright` (this Mac has no bare `pip`) and `python3 -m playwright install chromium`.
 The build was verified to reproduce the installed files byte-for-byte when this project was set up.
@@ -52,6 +52,10 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   `NEAR` (80 px) of the nose bridge each eye turns fully towards the point, so they go cross-eyed. Cursor or last tap;
   after 4 s idle the eyes watch the nearest blob; reduced motion = looking straight ahead. Numbers are in the
   photo's 300 × 359 pixels.
+  **Pencil** (Halli's `pencil.png`, tip at 15,191 of 59×200): lies right of the photo; click/tap picks it up, the
+  pencil's tip draws black lines on a canvas over the face (strokes kept in photo pixels, redrawn on resize, not
+  saved). On touch the tip is held 14 px left / 46 px above the finger so you can see it. Esc or a click/tap outside
+  the photo puts it back; Esc is stopped from reaching Cargo, which would otherwise close the page.
 - `src/parts/before.html`, `src/parts/after.html` — **Halli's own** Custom HTML (Cargo filter script, StatCounter,
   Typekit link that loads the site font Pacaembu; mobile menu fixes). Keep as he gives them.
 - `tools/build_pond_module.py` — converts `src/pond.html` into the Cargo-safe `dist/hc-pond.html` (see Fencing).
