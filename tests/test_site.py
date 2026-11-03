@@ -42,14 +42,15 @@ GRID_SLUGS = ['Herbergi-i-odrum-heimi', 'Smite-The-World', 'Millilending', 'Retr
 GRID = ('<div class="thumbnails clear" data-columnize=".thumbnail">' + ''.join(
     '<div class="column" style="float:left;width:30%">' + ''.join(
         f'<div class="padding_helper"><div class="thumbnail" name="{i + 1}"><a href="/filter/artdirection/{s}">'
-        f'<div style="height:{120 + 37 * (i % 4)}px;background:#fff">{s}</div></a></div></div>'
+        f'<div class="thumb_image" style="height:{120 + 37 * (i % 4)}px;background:#fff">{s}</div></a>'
+        f'<div class="thumb_info"><a href="/filter/artdirection/{s}"><div class="thumb_title"><span>{s}</span></div></a></div></div></div>'
         for i, s in enumerate(GRID_SLUGS) if i % 3 == c) + '</div>' for c in range(3)) + '</div>'
         + '<script>window.Cargo = { View: { Thumbnail: { collection: { models: '
         + str([{'id': i + 1, 'attributes': {'project_url': s}} for i, s in enumerate(GRID_SLUGS)]).replace("'", '"')
         + ' } } } };</script>')
 GRID_DUMP = """() => ({ label: document.querySelector('#hc-sort .hc-sort-label') ? document.querySelector('#hc-sort .hc-sort-label').textContent : null,
   cols: [...document.querySelectorAll('.thumbnails .column')].filter(c => getComputedStyle(c).display !== 'none').map(c =>
-    [...c.querySelectorAll('.thumbnail[name]')].map(t => { const b = t.closest('.padding_helper').querySelector('.hc-sort-badge');
+    [...c.querySelectorAll('.thumbnail[name]')].map(t => { const b = t.closest('.padding_helper').querySelector('.hc-sort-fact');
       return t.querySelector('a').getAttribute('href').split('/').pop() + (b ? ' [' + b.textContent + ']' : ''); })) })"""
 FIRST_BY_HANDS = ['Cheerios [28 hands]', 'Retro-Stefson-Kimbabwe [14 hands]', 'Smite-The-World [2 hands]', 'Automysophobia [2 hands]',
                   'Uppskriftabok-skaldverk [1 hand]', 'FM-Belfast-how-to-make-friends [1 hand]']
@@ -119,7 +120,12 @@ async def main(base):
         firsts = [x.split(' [')[0] for x in FIRST_BY_HANDS]
         check('grid: most hands first, top to bottom', order[:6] == firsts, ', '.join(order[:6]))
         badges = sorted(x for c in r['cols'] for x in c if '[' in x)
-        check('grid: badges on exactly the hands cards, "1 hand" singular', badges == sorted(FIRST_BY_HANDS), '; '.join(badges))
+        check('grid: facts on exactly the hands cards, "1 hand" singular', badges == sorted(FIRST_BY_HANDS), '; '.join(badges))
+        await page.mouse.move(5, 300); await page.wait_for_timeout(400)
+        hidden = await page.evaluate("getComputedStyle(document.querySelector('.hc-sort-fact')).opacity")
+        await page.hover('.hc-sort-card .thumb_image'); await page.wait_for_timeout(400)
+        shown = await page.evaluate("getComputedStyle(document.querySelector('.hc-sort-card .hc-sort-fact')).opacity")
+        check('grid: a fact only shows on hover, like the title', hidden == '0' and shown == '1', f'{hidden} -> {shown}')
         await page.click('#hc-sort button'); await page.wait_for_timeout(1000)
         r2 = await page.evaluate(GRID_DUMP)
         check('grid: shuffle picks another sort and keeps every card', r2['label'] != r['label'] and sum(len(c) for c in r2['cols']) == len(GRID_SLUGS), r2['label'])

@@ -62,8 +62,9 @@ won't be prefixed and the Cargo version will look for an element that doesn't ex
 
 ## The random sort
 Each page load picks one sort from `facts.txt` that matches at least 2 projects on the current grid, deals the
-matching projects first (numbers: most first, or `order: lowest first`), puts a badge on each, and names the sort in a
-line above the grid. Clicking that line picks another (the usual order is one of the options); cards glide to their
+matching projects first (numbers: most first, or `order: lowest first`) and names the sort in a line above the grid
+("sorted by: number of hands"). **Design rule from Halli:** the work stands on its own, titles only on hover. A card's
+fact ("28 hands") is therefore only shown on hover, under Cargo's hover title (`.thumb_title`), never as a permanent tag. Clicking that line picks another (the usual order is one of the options); cards glide to their
 new places (skipped with reduced motion). A filter change keeps the sort if it still matches 2+, else picks again.
 `?hc-sort=<name>` previews one sort. On phones Cargo's own columns are kept, only re-ordered.
 Project addresses come from Cargo's models (`project_url`); all addresses in facts.txt were checked against the 70
@@ -97,6 +98,8 @@ Accessibility: pause button (WCAG 2.2.2), reduced-motion respected, screen-reade
 ## Open items and ideas
 - Not tested anywhere but Halli's own devices: real Safari on iPhone, and whether Cargo limits Custom HTML size
   (the file is ~119 KB since the random sort; ~98 KB is the largest size Halli has confirmed working).
+- Titles: Halli wanted them white; white on the site pink is 1.3:1 (fails WCAG). The current title blue is 1.7:1 (also
+  fails); plum #492E46 is 9.1:1. Title size is 20px via hc-columns' CSS. Colour decision pending.
 - Random sort: still waiting for Halli's lists for gaze (looking at you / right), faces, colours, Halli-blue and
   visual tags. Speed values are Claude's guesses from the titles, to be checked. Once gaze is complete, the
   separate [looking left] sort is redundant.

@@ -4,7 +4,7 @@
 #
 #   [name]                  starts a sort (the name is only for you, and for ?hc-sort=name)
 #   label:                  what the line above the grid says after "sorted by: "
-#   badge:                  the tag above each matching card; {n} is the number
+#   badge:                  the fact under the card's title on hover; {n} is the number
 #   badge 1:                (optional) the tag when the number is 1
 #   Project-address: 14     a project and its number: most first
 #   Project-address         a project with no number: matching ones first, in your usual order

@@ -11,16 +11,21 @@
      so the third column ended up under the other two. This re-deals the cards
      into two columns in Cargo's own project order.
      Random sort: each visit picks one of Halli's facts (src/facts.txt, filled in by the build)
-     and puts the matching projects first, with a tag above each matching card and a line above the
-     grid naming the sort ("sorted by: hands"). Clicking the line picks another. ?hc-sort=hands previews one. -->
+     and puts the matching projects first, with a line above the grid naming the sort ("sorted by: hands").
+     Clicking the line picks another. ?hc-sort=hands previews one.
+     The work stands on its own: a card's fact ("28 hands") only appears on hover, under Cargo's own
+     hover title, and takes no space in the layout. -->
 <style>
   .hc-sort { margin: 0 0 28px; }
   .hc-sort button { font: inherit; font-size: 18px; color: rgb(73, 46, 70); background: none; border: 0; padding: 4px 0; cursor: pointer; text-align: inherit; }
   .hc-sort-again { color: rgb(59, 191, 201); margin-left: .6em; white-space: nowrap; }
   .hc-sort button:hover .hc-sort-again, .hc-sort button:focus-visible .hc-sort-again { text-decoration: underline; }
-  .hc-sort-card { position: relative; }
-  .hc-sort-badge { position: absolute; bottom: calc(100% + 6px); left: 0; z-index: 2; padding: 1px 11px; border-radius: 999px; white-space: nowrap;
-    background: #fff; color: rgb(73, 46, 70); font-size: 14px; line-height: 1.7; pointer-events: none; }
+  .thumbnails .thumb_title { font-size: 20px; line-height: 1.4; }
+  .hc-sort-card .thumb_info { position: relative; }
+  .hc-sort-fact { position: absolute; top: 100%; left: 0; right: 0; margin-top: 2px; text-align: center;
+    font-size: 15px; line-height: 1.5; color: rgba(73, 46, 70, .78); pointer-events: none;   /* 5.1:1 on the site pink */
+    opacity: 0; transition: opacity .25s; }
+  .thumbnail:hover .hc-sort-fact, .thumbnail:focus-within .hc-sort-fact { opacity: 1; }
 </style>
 <script>
 (function () {
@@ -154,14 +159,15 @@
     });
     extra.forEach(function (c) { c.style.setProperty('display', 'none', 'important'); });
 
-    // Badges on the matching cards
-    [].slice.call(th.querySelectorAll('.hc-sort-badge')).forEach(function (b) { b.remove(); });
+    // The fact under each matching card's hover title
+    [].slice.call(th.querySelectorAll('.hc-sort-fact')).forEach(function (b) { b.remove(); });
     seq.forEach(function (g) {
       var v = current.items[g.slug], text = v === undefined ? '' : badgeText(current, v, g.slug);
-      if (!text) return;
-      var b = document.createElement('span');
-      b.className = 'hc-sort-badge'; b.textContent = text;
-      g.els[0].classList.add('hc-sort-card'); g.els[0].appendChild(b);
+      var info = g.els[0].querySelector('.thumb_info');
+      if (!text || !info) return;
+      var b = document.createElement('div');
+      b.className = 'hc-sort-fact'; b.textContent = text;
+      g.els[0].classList.add('hc-sort-card'); info.appendChild(b);
     });
 
     seq.forEach(function (g) {

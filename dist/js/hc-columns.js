@@ -1,5 +1,5 @@
 /* hc-columns for hallicivelek.com: built from dist/hc-columns.html by build.py, do not edit here */
-(function () { var s = document.createElement("style"); s.textContent = "\n  .hc-sort { margin: 0 0 28px; }\n  .hc-sort button { font: inherit; font-size: 18px; color: rgb(73, 46, 70); background: none; border: 0; padding: 4px 0; cursor: pointer; text-align: inherit; }\n  .hc-sort-again { color: rgb(59, 191, 201); margin-left: .6em; white-space: nowrap; }\n  .hc-sort button:hover .hc-sort-again, .hc-sort button:focus-visible .hc-sort-again { text-decoration: underline; }\n  .hc-sort-card { position: relative; }\n  .hc-sort-badge { position: absolute; bottom: calc(100% + 6px); left: 0; z-index: 2; padding: 1px 11px; border-radius: 999px; white-space: nowrap;\n    background: #fff; color: rgb(73, 46, 70); font-size: 14px; line-height: 1.7; pointer-events: none; }\n"; document.head.appendChild(s); })();
+(function () { var s = document.createElement("style"); s.textContent = "\n  .hc-sort { margin: 0 0 28px; }\n  .hc-sort button { font: inherit; font-size: 18px; color: rgb(73, 46, 70); background: none; border: 0; padding: 4px 0; cursor: pointer; text-align: inherit; }\n  .hc-sort-again { color: rgb(59, 191, 201); margin-left: .6em; white-space: nowrap; }\n  .hc-sort button:hover .hc-sort-again, .hc-sort button:focus-visible .hc-sort-again { text-decoration: underline; }\n  .thumbnails .thumb_title { font-size: 20px; line-height: 1.4; }\n  .hc-sort-card .thumb_info { position: relative; }\n  .hc-sort-fact { position: absolute; top: 100%; left: 0; right: 0; margin-top: 2px; text-align: center;\n    font-size: 15px; line-height: 1.5; color: rgba(73, 46, 70, .78); pointer-events: none;   /* 5.1:1 on the site pink */\n    opacity: 0; transition: opacity .25s; }\n  .thumbnail:hover .hc-sort-fact, .thumbnail:focus-within .hc-sort-fact { opacity: 1; }\n"; document.head.appendChild(s); })();
 (function () {
   if (window.__hcCols) return;
   window.__hcCols = true;
@@ -131,14 +131,15 @@
     });
     extra.forEach(function (c) { c.style.setProperty('display', 'none', 'important'); });
 
-    // Badges on the matching cards
-    [].slice.call(th.querySelectorAll('.hc-sort-badge')).forEach(function (b) { b.remove(); });
+    // The fact under each matching card's hover title
+    [].slice.call(th.querySelectorAll('.hc-sort-fact')).forEach(function (b) { b.remove(); });
     seq.forEach(function (g) {
       var v = current.items[g.slug], text = v === undefined ? '' : badgeText(current, v, g.slug);
-      if (!text) return;
-      var b = document.createElement('span');
-      b.className = 'hc-sort-badge'; b.textContent = text;
-      g.els[0].classList.add('hc-sort-card'); g.els[0].appendChild(b);
+      var info = g.els[0].querySelector('.thumb_info');
+      if (!text || !info) return;
+      var b = document.createElement('div');
+      b.className = 'hc-sort-fact'; b.textContent = text;
+      g.els[0].classList.add('hc-sort-card'); info.appendChild(b);
     });
 
     seq.forEach(function (g) {
