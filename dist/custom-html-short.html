@@ -66,12 +66,13 @@ StatCounter"></a></div></noscript>
      2. Current page in nav  blue + aria-current on every page
      3. Floating blobs      the background blobs, faces, pause button (not on the blob-pond page)
      4. The blob-pond       builds the pond on the page whose address contains "blob-pond"
+     5. Eyes                Halli's portrait on the info + contact page looks at you
      Each is its own script file, so if one ever breaks (or GitHub is down) the others and the site keep working.
      ================================================================ -->
 <script>
 (function () {
   var base = 'https://hallicivelek.github.io/hallicivelek-site/dist/js/';
-  ['hc-columns', 'hc-nav-active', 'hc-blobs', 'hc-pond'].forEach(function (name) {
+  ['hc-columns', 'hc-nav-active', 'hc-blobs', 'hc-pond', 'hc-eyes'].forEach(function (name) {
     var s = document.createElement('script');
     s.src = base + name + '.js';
     s.async = false;

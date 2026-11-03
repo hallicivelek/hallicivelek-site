@@ -146,6 +146,16 @@ async def main(base):
         n = await page.evaluate("document.querySelectorAll('.hc-blob').length")
         check('script files: pond, background blobs and sorted grid all work', pond and n == 9 and r['label'] == "sorted by: number of hands"
               and len(r['cols']) == 2, f"pond {pond}, {n} blobs, {r['label']}")
+        await page.goto(base + '/short/info-contact/'); await page.wait_for_timeout(1200)
+        eyes = await page.evaluate("[document.querySelectorAll('.hc-eye').length, (document.querySelector('img[data-hc-eyes]') || {}).src || '']")
+        async def iris_x():
+            return await page.evaluate("parseFloat(document.querySelector('.hc-eye img').style.left)")
+        r = await page.evaluate("(() => { const r = document.querySelector('img[data-hc-eyes]').getBoundingClientRect(); return [r.left, r.top, r.width]; })()")
+        await page.mouse.move(r[0] + 147 * r[2] / 300, r[1] + 167 * r[2] / 300); await page.wait_for_timeout(700); mid = await iris_x()
+        await page.mouse.move(2, r[1] + 167 * r[2] / 300); await page.wait_for_timeout(700); left = await iris_x()
+        await page.mouse.move(1298, r[1] + 167 * r[2] / 300); await page.wait_for_timeout(700); right = await iris_x()
+        check('eyes: portrait swapped for the eyeless one, two irises', eyes[0] == 2 and eyes[1].endswith('/assets/portrait/face-no-irises.jpg'), str(eyes))
+        check('eyes: irises follow the cursor left and right', left < mid < right, f'{left:.1f} < {mid:.1f} < {right:.1f}')
         check('no script errors (script files)', not errs, '; '.join(errs)[:200])
         await page.close()
 
@@ -189,7 +199,11 @@ if __name__ == '__main__':
     tags = build_scripts.loader('/js/')   # the same loader as dist/custom-html-short.html, pointed at the local copies
     (site / 'js').mkdir()
     for f in (ROOT / 'dist' / 'js').glob('*.js'): (site / 'js' / f.name).write_text(f.read_text())
+    (site / 'assets' / 'portrait').mkdir(parents=True)
+    for f in (ROOT / 'assets' / 'portrait').iterdir(): (site / 'assets' / 'portrait' / f.name).write_bytes(f.read_bytes())
+    (site / 'Halli-Civelek-artist-portrait_300.jpg').write_bytes((ROOT / 'assets' / 'portrait' / 'face-no-irises.jpg').read_bytes())   # stand-in for Cargo's photo
     for d, html in [('short/blob-pond', PAGE.replace('ADDONS', tags)),
+                    ('short/info-contact', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', '<div class="project_content"><img src="/Halli-Civelek-artist-portrait_300.jpg" width="300" height="359"></div>')),
                     ('short/filter/artdirection', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID))]:
         (site / d).mkdir(parents=True); (site / d / 'index.html').write_text(html)
     class Quiet(http.server.SimpleHTTPRequestHandler):

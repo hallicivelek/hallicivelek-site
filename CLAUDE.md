@@ -10,6 +10,9 @@ Everything reaches the live site through Cargo's **Custom HTML** setting. Two wa
 - **Live since 2026-11-03: the short version.** Plain `<script src>` tags in Custom HTML did *not* work on Cargo
   (the blobs disappeared; cause not pinned down — local and swapped-in tests passed). The short file therefore uses a
   small **inline loader** that adds the four scripts with `async = false`. Verified on the live site after Halli pasted it.
+  **New add-ons need no paste:** `IN_CARGO` in `tools/build_scripts.py` lists the four files Cargo's loader names; the
+  last of them (`hc-pond.js`) loads any later add-on (e.g. `hc-eyes.js`) from the same folder. Each add-on guards
+  against running twice, so a future re-paste with a newer loader is harmless.
 - **Text copied out of Cargo's editor loses its backslashes** (confirmed again 2026-11-03: `\n` → `n`). Never use it as
   source or paste it back; the loader and Halli's parts contain no backslashes, so the short file survives it.
 
@@ -29,7 +32,7 @@ Everything reaches the live site through Cargo's **Custom HTML** setting. Two wa
 ## Build and test
 ```
 python3 build.py              # src/ → dist/hc-columns.html, dist/hc-pond.html, dist/custom-html.html; syntax-checks every script
-python3 tests/test_site.py    # 29 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, phone)
+python3 tests/test_site.py    # 32 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, phone)
 ```
 Tests need `python3 -m pip install --user playwright` (this Mac has no bare `pip`) and `python3 -m playwright install chromium`.
 The build was verified to reproduce the installed files byte-for-byte when this project was set up.
@@ -42,6 +45,11 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   is explained at the top of the file. `tools/build_facts.py` puts them into `dist/hc-columns.html` and refuses to build
   on a line it can't read.
 - `src/hc-nav-active.html` — marks the current page in the nav (`link_active` + `aria-current`).
+- `src/hc-eyes.html` — **eyes that follow you** on Halli's portrait (info + contact): swaps Cargo's photo for
+  `assets/portrait/face-no-irises.jpg` (Halli's layer) and lays `iris-left.png` / `iris-right.png` over it in an
+  overlay that is measured onto the photo every frame (wrapping the img broke Cargo's layout). Cursor or last tap;
+  after 4 s idle the eyes watch the nearest blob; reduced motion = looking straight ahead. Numbers are in the
+  photo's 300 × 359 pixels.
 - `src/parts/before.html`, `src/parts/after.html` — **Halli's own** Custom HTML (Cargo filter script, StatCounter,
   Typekit link that loads the site font Pacaembu; mobile menu fixes). Keep as he gives them.
 - `tools/build_pond_module.py` — converts `src/pond.html` into the Cargo-safe `dist/hc-pond.html` (see Fencing).

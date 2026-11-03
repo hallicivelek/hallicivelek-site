@@ -10,13 +10,14 @@ Also writes dist/hc-site.html: just the four add-ons, for reference."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-ADDONS = [ROOT / 'dist' / 'hc-columns.html', ROOT / 'src' / 'hc-nav-active.html', ROOT / 'src' / 'hc-blobs.html', ROOT / 'dist' / 'hc-pond.html']
+ADDONS = [ROOT / 'dist' / 'hc-columns.html', ROOT / 'src' / 'hc-nav-active.html', ROOT / 'src' / 'hc-blobs.html', ROOT / 'dist' / 'hc-pond.html', ROOT / 'src' / 'hc-eyes.html']
 MIDDLE_HEADER = """<!-- ================================================================
      hallicivelek.com — custom add-ons
      1. Two-column fix      projects across two columns, in a random order of the day (facts.txt)
      2. Current page in nav  blue + aria-current on every page
      3. Floating blobs      the background blobs, faces, pause button (not on the blob-pond page)
      4. The blob-pond       builds the pond on the page whose address contains "blob-pond"
+     5. Eyes                Halli's portrait on the info + contact page looks at you
      Each is its own script block, so if one ever breaks the others keep working.
      ================================================================ -->
 """

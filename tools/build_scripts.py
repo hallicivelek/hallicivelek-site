@@ -9,13 +9,18 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 BASE = 'https://hallicivelek.github.io/hallicivelek-site/dist/js/'
-ADDONS = [ROOT / 'dist' / 'hc-columns.html', ROOT / 'src' / 'hc-nav-active.html', ROOT / 'src' / 'hc-blobs.html', ROOT / 'dist' / 'hc-pond.html']
+ADDONS = [ROOT / 'dist' / 'hc-columns.html', ROOT / 'src' / 'hc-nav-active.html', ROOT / 'src' / 'hc-blobs.html', ROOT / 'dist' / 'hc-pond.html',
+          ROOT / 'src' / 'hc-eyes.html']
+# The files the loader in Cargo's Custom HTML names (pasted 2026-11-03). Add-ons added later are loaded by the last
+# of these, so a new add-on never needs a new paste. A newer loader may name them too: each add-on runs only once.
+IN_CARGO = ['hc-columns', 'hc-nav-active', 'hc-blobs', 'hc-pond']
 HEADER = """<!-- ================================================================
      hallicivelek.com — custom add-ons, loaded from GitHub (github.com/hallicivelek/hallicivelek-site)
      1. Two-column fix      projects across two columns, in a random order of the day
      2. Current page in nav  blue + aria-current on every page
      3. Floating blobs      the background blobs, faces, pause button (not on the blob-pond page)
      4. The blob-pond       builds the pond on the page whose address contains "blob-pond"
+     5. Eyes                Halli's portrait on the info + contact page looks at you
      Each is its own script file, so if one ever breaks (or GitHub is down) the others and the site keep working.
      ================================================================ -->
 """
@@ -56,11 +61,24 @@ def loader(base):
     return js
 
 
+def later_loader(names):
+    """Appended to the last file Cargo's loader names: loads the add-ons added since, from the same folder."""
+    return ('/* add-ons added after the Custom HTML was pasted, loaded from the same folder */\n'
+            '(function () { var me = document.currentScript; if (!me || !me.src) return;\n'
+            '  ' + json.dumps(names) + '.forEach(function (name) {\n'
+            '    var s = document.createElement("script"); s.src = new URL(name + ".js", me.src).href; s.async = false;\n'
+            '    document.head.appendChild(s); }); })();\n')
+
+
 def build(base=BASE):
     out_dir = ROOT / 'dist' / 'js'
     out_dir.mkdir(exist_ok=True)
+    later = [p.stem for p in ADDONS if p.stem not in IN_CARGO]
     for p in ADDONS:
-        (out_dir / (p.stem + '.js')).write_text(to_js(p))
+        js = to_js(p)
+        if p.stem == IN_CARGO[-1] and later:
+            js += later_loader(later)
+        (out_dir / (p.stem + '.js')).write_text(js)
     out = (TOP_NOTE + (ROOT / 'src' / 'parts' / 'before.html').read_text().rstrip() + '\n\n'
            + HEADER + loader(base) + '\n\n'
            + (ROOT / 'src' / 'parts' / 'after.html').read_text().rstrip() + '\n')
