@@ -98,8 +98,8 @@ Accessibility: pause button (WCAG 2.2.2), reduced-motion respected, screen-reade
 ## Open items and ideas
 - Not tested anywhere but Halli's own devices: real Safari on iPhone, and whether Cargo limits Custom HTML size
   (the file is ~119 KB since the random sort; ~98 KB is the largest size Halli has confirmed working).
-- Titles: Halli wanted them white; white on the site pink is 1.3:1 (fails WCAG). The current title blue is 1.7:1 (also
-  fails); plum #492E46 is 9.1:1. Title size is 20px via hc-columns' CSS. Colour decision pending.
+- Titles are 20px and plum #492E46 (9.1:1 on the pink), set in hc-columns' CSS. White was ruled out (1.3:1), and
+  Cargo's own title blue was 1.7:1.
 - Random sort: still waiting for Halli's lists for gaze (looking at you / right), faces, colours, Halli-blue and
   visual tags. Speed values are Claude's guesses from the titles, to be checked. Once gaze is complete, the
   separate [looking left] sort is redundant.
