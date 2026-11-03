@@ -1726,6 +1726,7 @@ StatCounter"></a></div></noscript>
   ];
   var REACH = [5, 3.5];     // how far an iris can move from the centre
   var IDLE = 4000;          // ms without a pointer before the eyes go blob-watching
+  var NEAR = 80;            // within this distance of the nose bridge the eyes start to cross
 
   // the layers live next to this script on GitHub Pages: dist/js/hc-eyes.js -> assets/portrait/
   var here = document.currentScript && document.currentScript.src;
@@ -1805,11 +1806,14 @@ StatCounter"></a></div></noscript>
       var r = l.img.getBoundingClientRect(), s = r.width / W;
       var face = [r.left + W / 2 * s, r.top + 167 * s];
       var look = (target && Date.now() - lastMove < IDLE) ? target : (nearestBlob(face[0], face[1]) || target);
+      // close to the nose each eye turns hard towards the point: cross-eyed
+      var cross = look ? Math.max(0, 1 - Math.hypot(look[0] - face[0], look[1] - face[1]) / (NEAR * s)) : 0;
       l.eyes.forEach(function (o) {
         var gx = 0, gy = 0;
         if (look) {
           var cx = r.left + o.e.c[0] * s, cy = r.top + o.e.c[1] * s;
-          var dx = look[0] - cx, dy = look[1] - cy, dist = Math.hypot(dx, dy) || 1, k = Math.min(1, dist / 260);
+          var dx = look[0] - cx, dy = look[1] - cy, dist = Math.hypot(dx, dy) || 1;
+          var k = Math.max(Math.min(1, dist / 260), Math.min(1, cross * 1.6));
           gx = dx / dist * REACH[0] * k; gy = dy / dist * REACH[1] * k;
         }
         o.x += (gx - o.x) * 0.18; o.y += (gy - o.y) * 0.18;
