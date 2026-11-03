@@ -57,6 +57,7 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   saved). On touch the tip is held 14 px left / 46 px above the finger so you can see it. Esc or a click/tap outside
   the photo puts it back. Cargo leaves the page on Esc (to `/`, a document keydown listener); our window-capture
   listener keeps Esc from Cargo while the pencil is held **or a drawing exists** (Halli lost a drawing to a second Esc).
+- `src/hc-debug.html` — screen measurements overlay, **only with `?hc-debug`** in the address (for diagnosing phones).
 - `src/parts/before.html`, `src/parts/after.html` — **Halli's own** Custom HTML (Cargo filter script, StatCounter,
   Typekit link that loads the site font Pacaembu; mobile menu fixes). Keep as he gives them.
 - `tools/build_pond_module.py` — converts `src/pond.html` into the Cargo-safe `dist/hc-pond.html` (see Fencing).
@@ -111,6 +112,11 @@ picker and "surprise me" (weighted towards unfamiliar scales: slendro, pelog, ha
 Accessibility: pause button (WCAG 2.2.2), reduced-motion respected, screen-reader labels, keyboard-reachable controls.
 
 ## Open items and ideas
+- **Open (2026-11-03): on Halli's iPhone the fixed blob layer and the pause button end ~2/3 down the screen**
+  (blobs clipped there, button floats mid-screen once scrolling); the held pencil drifted by about the scroll distance
+  for the same reason (fixed: now positioned inside the photo overlay). Not reproduced in Chromium or WebKit with an
+  iPhone viewport. Waiting for a `?hc-debug` screenshot from his phone before changing how the blobs measure the screen.
+- Pond test "evening plays hirajoshi" retries when it hits the pond's secret 1-in-30 "something strange" visit.
 - Not tested anywhere but Halli's own devices: real Safari on iPhone, and whether Cargo limits Custom HTML size
   (the file is ~119 KB since the random sort; ~98 KB is the largest size Halli has confirmed working).
 - Titles are 20px and plum #492E46 (9.1:1 on the pink), set in hc-columns' CSS. White was ruled out (1.3:1), and

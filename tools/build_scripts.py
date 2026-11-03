@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 BASE = 'https://hallicivelek.github.io/hallicivelek-site/dist/js/'
 ADDONS = [ROOT / 'dist' / 'hc-columns.html', ROOT / 'src' / 'hc-nav-active.html', ROOT / 'src' / 'hc-blobs.html', ROOT / 'dist' / 'hc-pond.html',
-          ROOT / 'src' / 'hc-eyes.html']
+          ROOT / 'src' / 'hc-eyes.html', ROOT / 'src' / 'hc-debug.html']
 # The files the loader in Cargo's Custom HTML names (pasted 2026-11-03). Add-ons added later are loaded by the last
 # of these, so a new add-on never needs a new paste. A newer loader may name them too: each add-on runs only once.
 IN_CARGO = ['hc-columns', 'hc-nav-active', 'hc-blobs', 'hc-pond']

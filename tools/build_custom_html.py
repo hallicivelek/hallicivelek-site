@@ -10,7 +10,7 @@ Also writes dist/hc-site.html: just the four add-ons, for reference."""
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-ADDONS = [ROOT / 'dist' / 'hc-columns.html', ROOT / 'src' / 'hc-nav-active.html', ROOT / 'src' / 'hc-blobs.html', ROOT / 'dist' / 'hc-pond.html', ROOT / 'src' / 'hc-eyes.html']
+ADDONS = [ROOT / 'dist' / 'hc-columns.html', ROOT / 'src' / 'hc-nav-active.html', ROOT / 'src' / 'hc-blobs.html', ROOT / 'dist' / 'hc-pond.html', ROOT / 'src' / 'hc-eyes.html', ROOT / 'src' / 'hc-debug.html']
 MIDDLE_HEADER = """<!-- ================================================================
      hallicivelek.com — custom add-ons
      1. Two-column fix      projects across two columns, in a random order of the day (facts.txt)

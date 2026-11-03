@@ -692,6 +692,6 @@
 })();
 /* add-ons added after the Custom HTML was pasted, loaded from the same folder */
 (function () { var me = document.currentScript; if (!me || !me.src) return;
-  ["hc-eyes"].forEach(function (name) {
+  ["hc-eyes", "hc-debug"].forEach(function (name) {
     var s = document.createElement("script"); s.src = new URL(name + ".js", me.src).href; s.async = false;
     document.head.appendChild(s); }); })();
