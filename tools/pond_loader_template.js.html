@@ -1,0 +1,52 @@
+<!-- The blob-pond for hallicivelek.com: builds the pond on the page whose address contains "blob-pond".
+     Everything is fenced inside #hc-pond so it can't collide with Cargo's own styles. -->
+<script>
+(function () {
+  if (window.__hcPondLoader) return;
+  window.__hcPondLoader = true;
+  var POND_PAGE = /blob-?pond/i;
+  var mounted = false, hidden = false;
+
+  function headerHeight() {
+    var h = document.querySelector('.site_header');
+    var m = document.querySelector('.mobile_site_header');
+    var hh = h ? h.getBoundingClientRect().height : 0, mh = m ? m.getBoundingClientRect().height : 0;
+    return Math.max(hh, mh);
+  }
+  function mount() {
+    mounted = true;
+    // no font to load: the pond uses the site's own typeface (pacaembu), already on the page
+    var style = document.createElement('style');
+    style.textContent = POND_CSS;
+    document.head.appendChild(style);
+    var root = document.createElement('div');
+    root.id = 'hc-pond';
+    root.innerHTML = POND_MARKUP;
+    document.body.appendChild(root);
+    document.documentElement.classList.add('hc-pond-on');
+    var setTop = function () { root.style.setProperty('--hdr', headerHeight() + 'px'); };
+    setTop(); addEventListener('resize', setTop); document.addEventListener('DOMContentLoaded', setTop);
+    POND_JS();
+  }
+  function check() {
+    var here = POND_PAGE.test(location.pathname) || window.__hcPondForce;
+    if (here && !mounted) mount();
+    else if (mounted && !here && !hidden) {          // left without a reload: put it to sleep and hide it
+      hidden = true; document.getElementById('hc-pond').style.display = 'none';
+      document.documentElement.classList.remove('hc-pond-on');
+      if (window.__hcPondSleep) window.__hcPondSleep();
+    } else if (mounted && here && hidden) {          // came back
+      hidden = false; document.getElementById('hc-pond').style.display = '';
+      document.documentElement.classList.add('hc-pond-on');
+      if (window.__hcPondWake) window.__hcPondWake();
+    }
+  }
+  var POND_CSS = <<CSS>>;
+  var POND_MARKUP = <<MARKUP>>;
+  function POND_JS() {<<JS>>}
+  var pending = null;
+  new MutationObserver(function () { clearTimeout(pending); pending = setTimeout(check, 120); }).observe(document.documentElement, { childList: true, subtree: true });
+  addEventListener('popstate', check);
+  check();
+})();
+</script>

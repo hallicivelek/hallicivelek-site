@@ -1,0 +1,1944 @@
+<!-- Complete Custom HTML for hallicivelek.com.
+     Replace everything in Custom HTML with this whole file. -->
+<script type="text/javascript">
+/**
+* Add a filter to your project navigation
+*/
+function addFilterActive(selector, remove_on_page, active_class) {
+   if(typeof Cargo.Helper == "object") {
+       var filter = Cargo.Helper.GetActiveFilter();
+   } else {
+       var filter = Cargo.Location.GetUserFilter();
+   }
+
+   var el_selector = (selector) ? $(selector) : $('.link_link');
+       active_class = (active_class) ? active_class : "link_active";
+
+   if( $('[href$="filter/'+filter+'"]',el_selector).parent() == selector) {
+       $('[href$="filter/'+filter+'"]',el_selector).addClass(active_class);
+   } else {
+       $('[href$="filter/'+filter+'"]',el_selector).parent().addClass(active_class);
+   }
+
+   if(remove_on_page) {
+       $(document).bind("projectLoadComplete", function() {
+           $("."+active_class).removeClass(active_class);
+       });
+       $(document).bind("projectCloseComplete", function() {
+           addFilterActive(selector, false);
+       });
+   }
+}
+
+$(function() {
+   var selector = ".link_link";
+   var remove_on_page = false;
+   var active_class = "link_active";
+
+   addFilterActive(selector, remove_on_page, active_class);
+});
+</script>
+
+
+<!-- Statcounter code for hallicivelek.com
+http://hallicivelek.com on Cargo Collective -->
+<script type="text/javascript">
+var sc_project=11932360;
+var sc_invisible=1;
+var sc_security="8612abcb";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics
+Made Easy - StatCounter" href="https:/statcounter.com/"
+target="_blank"><img class="statcounter"
+src="https://c.statcounter.com/11932360/0/8612abcb/1/"
+alt="Web Analytics Made Easy -
+StatCounter"></a></div></noscript>
+<!-- End of Statcounter Code -->
+
+<link rel="stylesheet" href="https://use.typekit.net/yhc8ger.css">
+
+<!-- ================================================================
+     hallicivelek.com — custom add-ons
+     1. Two-column fix      projects across two columns, in a random order of the day (facts.txt)
+     2. Current page in nav  blue + aria-current on every page
+     3. Floating blobs      the background blobs, faces, pause button (not on the blob-pond page)
+     4. The blob-pond       builds the pond on the page whose address contains "blob-pond"
+     Each is its own script block, so if one ever breaks the others keep working.
+     ================================================================ -->
+<!-- Two-column fix and random sort for hallicivelek.com — part of Cargo's Custom HTML.
+     Cargo builds three thumbnail columns; the site's CSS shows two side by side,
+     so the third column ended up under the other two. This re-deals the cards
+     into two columns in Cargo's own project order.
+     Random sort: each visit picks one of Halli's facts (src/facts.txt, filled in by the build)
+     and puts the matching projects first, with a badge on each card and a line above the
+     grid naming the sort. Clicking the line picks another. ?hc-sort=hands previews one. -->
+<style>
+  .hc-sort { margin: 0 0 28px; }
+  .hc-sort button { font: inherit; font-size: 18px; color: rgb(73, 46, 70); background: none; border: 0; padding: 4px 0; cursor: pointer; text-align: inherit; }
+  .hc-sort-again { color: rgb(59, 191, 201); margin-left: .6em; white-space: nowrap; }
+  .hc-sort button:hover .hc-sort-again, .hc-sort button:focus-visible .hc-sort-again { text-decoration: underline; }
+  .hc-sort-card { position: relative; }
+  .hc-sort-badge { position: absolute; top: 12px; left: 12px; z-index: 2; padding: 1px 11px; border-radius: 999px;
+    background: rgb(243, 220, 223); color: rgb(73, 46, 70); font-size: 14px; line-height: 1.7; pointer-events: none; }
+</style>
+<script>
+(function () {
+  if (window.__hcCols) return;
+  window.__hcCols = true;
+
+  var MIN_WIDTH = 768;   // below this width Cargo's own columns are kept (only re-ordered)
+  var SORTS = [{"name":"hands","label":"today's order: most hands first","badge":"{n} hands","badge1":"1 hand","low":false,"items":{"Cheerios":28,"Retro-Stefson-Kimbabwe":14,"Retro-Stefson-Montana":12,"Smite-The-World":2,"Automysophobia":2,"Uppskriftabok-skaldverk":1,"FM-Belfast-how-to-make-friends":1},"badges":{},"count":true},{"name":"stripes","label":"today's order: stripes first","badge":"stripes","badge1":"","low":false,"items":{"FM-Belfast-how-to-make-friends":true,"Retro-Stefson-Kimbabwe":true},"badges":{},"count":false},{"name":"looking left","label":"today's order: everyone looking left goes first","badge":"looking left","badge1":"","low":false,"items":{"Icelandsmites":true,"Cheerios":true,"Sesar-A-Stormurinn-a-undan-logninu":true,"Retro-Stefson-Qween":true},"badges":{},"count":false},{"name":"black and white","label":"today's order: black and white first","badge":"black and white","badge1":"","low":false,"items":{"Smite-The-World":true,"Uppskriftabok-skaldverk":true,"Retro-Stefson-Qween":true,"Icelandsmites":true,"Grapewaves":true,"Nothing-Ekkert":true,"Sesar-A-Gerdutadsjalfur-Doityourself":true,"Apparat-Organ-Quartet":true},"badges":{},"count":false},{"name":"lots of yellow","label":"today's order: lots of yellow first","badge":"yellow","badge1":"","low":false,"items":{"Cheerios":true,"Apparat-Organ-Quartet-Romantika":true,"Unicef-Christmas-Card":true,"Pedro-Pilatus-album-artwork":true,"Retro-Stefson-Kimbabwe":true},"badges":{},"count":false},{"name":"halli-blue","label":"today's order: Halli-blue first","badge":"Halli-blue","badge1":"","low":false,"items":{},"badges":{},"count":false},{"name":"speed","label":"today's order: from sitting still to full speed","badge":"{n}","badge1":"","low":true,"items":{"Sitjikall":1,"Krjupandi-blomakona":1,"Blue-walker":2,"Strollin-Into-The-Club-Like":3,"Skokkikona":4,"Fartrunner":5,"Swimbert-1":6,"Toasterman-On-The-Move":6},"badges":{"Sitjikall":"sitting","Krjupandi-blomakona":"kneeling","Blue-walker":"walking","Strollin-Into-The-Club-Like":"strolling","Skokkikona":"jogging","Fartrunner":"running","Swimbert-1":"swimming","Toasterman-On-The-Move":"on the move!"},"count":true},{"name":"gaze","label":"today's order: looking left, looking at you, looking right","badge":"{n}","badge1":"","low":true,"items":{"Icelandsmites":1,"Cheerios":1,"Sesar-A-Stormurinn-a-undan-logninu":1,"Retro-Stefson-Qween":1},"badges":{"Icelandsmites":"looking left","Cheerios":"looking left","Sesar-A-Stormurinn-a-undan-logninu":"looking left","Retro-Stefson-Qween":"looking left"},"count":true},{"name":"faces","label":"today's order: most faces first","badge":"{n} faces","badge1":"1 face","low":false,"items":{},"badges":{},"count":false},{"name":"colours","label":"today's order: from black and white to Cheerios","badge":"{n} colours","badge1":"1 colour","low":true,"items":{},"badges":{},"count":false},{"name":"hair","label":"today's order: hair is the main event","badge":"hair","badge1":"","low":false,"items":{"Firehair-1":true,"hairtower":true,"Fluffyhead":true,"Bluefluffy":true,"Beardgrumphead":true},"badges":{},"count":false},{"name":"food","label":"today's order: food involved","badge":"food","badge1":"","low":false,"items":{"Cheerios":true,"Pumpkinator":true,"Grapewaves":true,"Uppskriftabok-skaldverk":true,"Toasterman-On-The-Move":true,"Kronan":true},"badges":{},"count":false},{"name":"cats","label":"today's order: cats first","badge":"cat","badge1":"","low":false,"items":{"Cat-family":true,"Adopt-this-cat":true},"badges":{},"count":false},{"name":"halli in it","label":"today's order: Halli is in these","badge":"Halli","badge1":"","low":false,"items":{"Selfie-1":true,"The-Future-Selfie":true,"Halli-lettering":true},"badges":{},"count":false},{"name":"drops","label":"today's order: drops, squirts and crumbs first","badge":"drops, squirts, crumbs","badge1":"","low":false,"items":{"Smite-The-World":true,"Uppskriftabok-skaldverk":true,"Millilending":true,"Retro-Stefson-Retro-Stefson":true,"FM-Belfast-how-to-make-friends":true,"Icelandsmites":true,"Grapewaves":true,"Automysophobia":true,"Pedro-Pilatus-album-artwork":true,"Unicef-Christmas-Card":true,"Halli-lettering":true,"Pungstoppuslayer":true,"Sitjikall":true,"Skokkikona":true,"Blue-sinker":true,"Beardgrumphead":true,"Swimbert-1":true,"Phuture-Joga":true},"badges":{},"count":false}];
+  var USUAL = { name: 'usual', label: "today's order: the usual", badge: '', items: {} };
+  var current = null;    // the sort in use
+  var gridIds = '';      // which projects the grid shows, to notice a filter change
+  var dealt = '';        // the layout we last made, to tell our own changes from Cargo's
+  var lastSeq = [];
+  var glide = false;     // true after a click: cards glide to their new places
+  var calm = matchMedia('(prefers-reduced-motion: reduce)');
+
+  function models() {
+    try { return Cargo.View.Thumbnail.collection.models; } catch (e) { return []; }
+  }
+  function projectOrder() { return models().map(function (m) { return String(m.id); }); }
+  function addresses() {
+    var a = {};
+    models().forEach(function (m) { a[String(m.id)] = (m.attributes || {}).project_url; });
+    return a;
+  }
+
+  function matching(sort, seq) {
+    return seq.filter(function (g) { return sort.items[g.slug] !== undefined; }).length;
+  }
+  function wanted() {
+    var m = /[?&]hc-sort=([^&]*)/.exec(location.search);
+    if (!m) return null;
+    var name = decodeURIComponent(m[1].replace(/\+/g, ' ')).toLowerCase();
+    return SORTS.concat(USUAL).filter(function (s) { return s.name.toLowerCase() === name; })[0] || null;
+  }
+  // a random sort with at least 2 projects on this page; clicking the line also offers the usual order
+  function pick(seq, avoid) {
+    var ok = SORTS.filter(function (s) { return s !== avoid && matching(s, seq) >= 2; });
+    if (avoid && avoid !== USUAL) ok.push(USUAL);
+    return ok.length ? ok[Math.floor(Math.random() * ok.length)] : USUAL;
+  }
+  function sorted(seq, sort) {
+    return seq.map(function (g, i) {
+      var v = sort.items[g.slug];
+      return { g: g, k: [v === undefined ? 1 : 0, typeof v === 'number' ? (sort.low ? v : -v) : 0, i] };
+    }).sort(function (a, b) { return a.k[0] - b.k[0] || a.k[1] - b.k[1] || a.k[2] - b.k[2]; })
+      .map(function (x) { return x.g; });
+  }
+  function badgeText(sort, v, slug) {
+    if (sort.badges && sort.badges[slug]) return sort.badges[slug];
+    if (typeof v === 'number') return (v === 1 && sort.badge1) ? sort.badge1 : sort.badge.replace('{n}', v);
+    return sort.badge;
+  }
+
+  function label(th) {
+    var box = document.getElementById('hc-sort');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'hc-sort'; box.className = 'hc-sort'; box.setAttribute('aria-live', 'polite');
+      box.innerHTML = '<button type="button"><span class="hc-sort-label"></span><span class="hc-sort-again">↻ shuffle</span></button>';
+      box.firstChild.addEventListener('click', function () {
+        current = pick(lastSeq, current); dealt = ''; glide = true; fix();
+      });
+    }
+    if (box.nextSibling !== th) th.parentNode.insertBefore(box, th);
+    var text = box.querySelector('.hc-sort-label');
+    if (text.textContent !== current.label) text.textContent = current.label;
+  }
+
+  function layoutOf(cols) {
+    return current.name + ':' + cols.map(function (c) {
+      return [].slice.call(c.querySelectorAll('.thumbnail[name]')).map(function (t) { return t.getAttribute('name'); }).join(',');
+    }).join('|');
+  }
+
+  function fix() {
+    var th = document.querySelector('.thumbnails[data-columnize]');
+    if (!th) return;
+    var cols = [].slice.call(th.children).filter(function (c) { return c.classList.contains('column'); });
+    if (!cols.length) return;
+    var use = innerWidth >= MIN_WIDTH ? cols.slice(0, 2) : cols;
+    var extra = cols.slice(use.length);
+    var settled = !extra.some(function (c) { return c.children.length; });
+    if (current && settled && dealt === layoutOf(use) && document.getElementById('hc-sort')) return;   // nothing to fix
+
+    // Group the cards. A card without a project id (like a blob self-portrait)
+    // travels with the project card just before it.
+    var groups = [], byId = {}, loose = [], where = addresses();
+    cols.forEach(function (col) {
+      var current = null;
+      [].slice.call(col.children).forEach(function (card) {
+        var t = card.querySelector('.thumbnail[name]');
+        if (t) {
+          var id = t.getAttribute('name'), a = t.querySelector('a[href]');
+          current = { id: id, els: [card], h: 0,
+            slug: where[id] || (a ? a.getAttribute('href').replace(/[?#].*$/, '').replace(/\/+$/, '').split('/').pop() : '') };
+          groups.push(current); byId[current.id] = current;
+        } else if (current) current.els.push(card);
+        else loose.push(card);
+      });
+    });
+    groups.forEach(function (g) { g.els.forEach(function (el) { g.h += el.offsetHeight; }); });
+
+    // Cargo's order first; anything it doesn't know about keeps its place at the end
+    var seq = [];
+    projectOrder().forEach(function (id) { if (byId[id]) { seq.push(byId[id]); byId[id] = null; } });
+    groups.forEach(function (g) { if (byId[g.id]) seq.push(g); });
+    lastSeq = seq;
+
+    // A new grid (first visit or another filter): keep today's sort if it still fits, else pick again
+    var ids = seq.map(function (g) { return g.id; }).sort().join();
+    if (ids !== gridIds) {
+      gridIds = ids;
+      current = wanted() || (current && current !== USUAL && matching(current, seq) >= 2 ? current : pick(seq));
+    }
+    seq = sorted(seq, current);
+    label(th);
+
+    // Remember where each card was, so it can glide to its new place
+    var before = {};
+    if (glide && !calm.matches) seq.forEach(function (g) { before[g.id] = g.els[0].getBoundingClientRect(); });
+
+    // Deal into the shorter column, like Cargo does
+    var heights = use.map(function () { return 0; });
+    loose.forEach(function (el) { use[0].appendChild(el); heights[0] += el.offsetHeight; });
+    seq.forEach(function (g) {
+      var c = heights.indexOf(Math.min.apply(null, heights));
+      g.els.forEach(function (el) { use[c].appendChild(el); });
+      heights[c] += g.h;
+    });
+    extra.forEach(function (c) { c.style.setProperty('display', 'none', 'important'); });
+
+    // Badges on the matching cards
+    [].slice.call(th.querySelectorAll('.hc-sort-badge')).forEach(function (b) { b.remove(); });
+    seq.forEach(function (g) {
+      var v = current.items[g.slug], text = v === undefined ? '' : badgeText(current, v, g.slug);
+      if (!text) return;
+      var b = document.createElement('span');
+      b.className = 'hc-sort-badge'; b.textContent = text;
+      g.els[0].classList.add('hc-sort-card'); g.els[0].appendChild(b);
+    });
+
+    seq.forEach(function (g) {
+      var was = before[g.id];
+      if (!was) return;
+      var now = g.els[0].getBoundingClientRect(), dx = was.left - now.left, dy = was.top - now.top;
+      if (!dx && !dy) return;
+      g.els.forEach(function (el) {
+        el.style.transition = 'none';
+        el.style.transform = 'translate(' + dx + 'px,' + dy + 'px)';
+      });
+    });
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        seq.forEach(function (g) {
+          if (!before[g.id]) return;
+          g.els.forEach(function (el) {
+            el.style.transition = 'transform .7s cubic-bezier(.3, .7, .2, 1)';
+            el.style.transform = '';
+          });
+        });
+      });
+    });
+    dealt = layoutOf(use);
+    glide = false;
+  }
+
+  // Cargo redraws the grid when you change filter, load more or resize: fix again each time
+  var pending = null;
+  new MutationObserver(function () {
+    clearTimeout(pending);
+    pending = setTimeout(fix, 120);
+  }).observe(document.body, { childList: true, subtree: true });
+  addEventListener('resize', function () { clearTimeout(pending); pending = setTimeout(fix, 200); });
+  fix();
+})();
+</script>
+
+<!-- Current page in the nav for hallicivelek.com — paste into Cargo's Custom HTML.
+     Cargo marks filter pages (art direction, illustration) as active itself, but not
+     the "music / mixes" and "info + contact" pages. This marks whichever nav link
+     matches the page you're on, using Cargo's own link_active class (so your existing
+     blue style applies), and adds aria-current="page" for screen readers on every page. -->
+<script>
+(function () {
+  if (window.__hcNav) return;
+  window.__hcNav = true;
+
+  function clean(path) { return path.replace(/\/+$/, '') || '/'; }
+
+  function mark() {
+    var links = [].slice.call(document.querySelectorAll('.site_header .navigation a'));
+    if (!links.length) return;
+    var here = clean(location.pathname);
+
+    // undo our own marking from the previous page
+    links.forEach(function (a) {
+      if (a.parentElement.hasAttribute('data-hc-active')) {
+        a.parentElement.classList.remove('link_active');
+        a.parentElement.removeAttribute('data-hc-active');
+      }
+      a.removeAttribute('aria-current');
+    });
+
+    var active = links.filter(function (a) { return a.parentElement.classList.contains('link_active'); })[0];
+    if (!active) {
+      // Cargo didn't mark anything: find the link for this page (or a page inside it)
+      active = links.filter(function (a) {
+        var p;
+        try { p = clean(new URL(a.href, location.href).pathname); } catch (e) { return false; }
+        return p !== '/' && (here === p || here.indexOf(p + '/') === 0);
+      })[0];
+      if (active) {
+        active.parentElement.classList.add('link_active');
+        active.parentElement.setAttribute('data-hc-active', '');
+      }
+    }
+    if (active) active.setAttribute('aria-current', 'page');
+  }
+
+  // Cargo changes pages without reloading, so check again whenever the page changes
+  var lastPath = null, pending = null;
+  function check() {
+    clearTimeout(pending);
+    pending = setTimeout(function () {
+      if (location.pathname !== lastPath || !document.querySelector('.site_header [aria-current]')) {
+        lastPath = location.pathname;
+        mark();
+      }
+    }, 80);
+  }
+  new MutationObserver(check).observe(document.body, { childList: true, subtree: true });
+  addEventListener('popstate', check);
+  document.addEventListener('DOMContentLoaded', check);
+  check();
+})();
+</script>
+
+<!-- Floating blobs for hallicivelek.com — paste into Cargo's Custom HTML -->
+<script>
+(function () {
+  if (window.__hcBlobs) return;
+  if (/blob-?pond/i.test(location.pathname)) return;   // the blob-pond page has its own blobs
+  window.__hcBlobs = true;
+
+  /* ---------- settings to play with ---------- */
+  var CFG = {
+    countDesktop: 9,
+    countMobile: 6,
+    minSize: 36,          // px diameter
+    maxSize: 130,
+    minSpeed: 9,          // px per second
+    maxSpeed: 22,
+    depth: [0.15, 0.45],  // scroll speed vs the page: smallest blob → biggest blob (1 = moves with content, 0 = fixed)
+    opacity: 0.9,
+    look: 'soft',         // 'solid' or 'soft' (coloured core that fades towards the edge)
+    wobble: 1,            // how much the shape shifts: 0 = frozen, 1 = default, 1.5 = restless
+    colors: ['#2BA6CF', '#B4533C', '#E2B23A', '#EE9BB4', '#3B3563', '#7FC2A0'],
+    background: '#F3DCDF', // the site's default background (the pink blob's tint); paint blobs change it, clicking the same one again comes back here
+    tint: 0.24,           // how much of a blob's colour goes into the page background
+    curiousAfter: 3,      // seconds the cursor must rest before blobs come to look (0 = never)
+    swellStep: 1.15,      // growth per click
+    swellMax: 1.7,
+    vowels: 'aeiouyáéíóúýæö',          // babble alphabet (Icelandic on purpose)
+    consonants: 'bcdfghjklmnprstvxzþð',
+    portraitTitle: 'Self-portrait as a blob',
+    faceInk: 'auto',      // 'auto': white, but dark ink on blobs lighter than the pink the faces were drawn on; 'white': always white
+    pauseLabel: 'pause blobs',   // the pause button's words (WCAG 2.2.2)
+    playLabel: 'wake blobs',
+    // clicks on these never reach the blobs
+    skip: 'a, button, input, textarea, select, label, img, video, iframe, p, h1, h2, h3, h4, li, .thumb_image, .site_header, .mobile_site_header'
+  };
+
+  /* ---------- Halli's blob faces (from blob-faces-02…07.svg) ----------
+     ref = bounding box of the blob each face was drawn on; box = the face's own bounds.
+     INK = the face colour, BODY = the blob's colour (used for the hollow smiles). */
+  var FACES = [
+    { ref: [38.4, 35.3, 261.6, 268.5], box: [145.1, 61.0, 195.3, 88.2],
+      svg: '<path d="M164.06,83.46s2.02,3.41,5.54,3.41c4.09,0,6.84-3.41,6.84-3.41" fill="none" stroke="INK" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.66px"/><ellipse cx="187.34" cy="71.27" rx="6.12" ry="8.46" stroke-width="3.62px" fill="none" stroke="INK" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="153.06" cy="71.27" rx="6.12" ry="8.46" stroke-width="3.62px" fill="none" stroke="INK" stroke-linecap="round" stroke-linejoin="round"/>' },
+    { ref: [38.4, 35.3, 261.6, 268.5], box: [92.3, 96.8, 158.9, 125.0],
+      svg: '<path d="M112.49,114.16s3.12,9.4,13.06,9.4,16.75-10.33,16.75-10.33l-29.8.93Z" fill="INK" stroke-width="2.8px" stroke="INK" stroke-linecap="round" stroke-linejoin="round"/><path d="M93.48,106.78s1.66-7.03,6.44-7.58,9.2,3.49,9.2,3.49" stroke="INK" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="2.38px"/><path d="M142.29,101.08s5.72-4.58,10.08-2.61,5.33,7.1,5.33,7.1" stroke="INK" stroke-linecap="round" stroke-linejoin="round" fill="none" stroke-width="2.38px"/>' },
+    { ref: [38.4, 33.4, 261.6, 266.6], box: [96.1, 114.7, 179.3, 132.9],
+      svg: '<path d="M129.73,127.89s1.56,2.64,4.28,2.64c3.16,0,5.29-2.64,5.29-2.64" stroke-width="2.06px" fill="none" stroke="INK" stroke-linecap="round" stroke-linejoin="round"/><ellipse cx="173.15" cy="122.67" rx="4.73" ry="6.54" fill="none" stroke="INK" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8px"/><ellipse cx="102.22" cy="125.01" rx="4.73" ry="6.54" fill="none" stroke="INK" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8px"/>' },
+    { ref: [38.4, 33.4, 261.6, 266.6], box: [93.9, 119.0, 151.4, 149.3],
+      svg: '<circle cx="98.85" cy="123.95" r="4.99" fill="INK"/><circle cx="146.46" cy="124.96" r="4.99" fill="INK"/><path d="M108.9,137.4s4.37,5.64,12.7,5.93,14.39-4.8,14.39-4.8" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="INK" stroke-width="12px"/><path d="M108.9,136.48s4.37,5.64,12.7,5.93c8.32.28,14.39-4.8,14.39-4.8" stroke="BODY" stroke-width="2px" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' },
+    { ref: [38.4, 33.4, 261.6, 266.6], box: [124.5, 91.4, 195.6, 114.9],
+      svg: '<circle cx="129.52" cy="96.43" r="4.99" fill="INK"/><circle cx="190.57" cy="96.43" r="4.99" fill="INK"/><rect x="144.31" y="104.28" width="31.28" height="9.52" rx="4.76" ry="4.76" stroke-width="2.19px" fill="none" stroke="INK" stroke-linecap="round" stroke-linejoin="round"/><line x1="159.95" y1="104.28" x2="159.95" y2="113.8" fill="none" stroke="INK" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.57px"/><line x1="167.51" y1="104.28" x2="167.51" y2="113.8" fill="none" stroke="INK" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.57px"/><line x1="152.4" y1="104.28" x2="152.4" y2="113.8" fill="none" stroke="INK" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.57px"/>' },
+    { ref: [38.4, 33.4, 261.6, 266.6], box: [74.8, 159.3, 155.9, 190.7],
+      svg: '<circle cx="79.8" cy="164.31" r="4.99" fill="INK"/><circle cx="150.94" cy="164.31" r="4.99" fill="INK"/><path d="M127.71,179.89s-6.07,5.08-14.39,4.8-12.7-5.93-12.7-5.93" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="INK" stroke-width="12px"/><path d="M100.63,177.54s4.37,5.64,12.7,5.93c8.32.28,14.39-4.8,14.39-4.8" stroke="BODY" stroke-width="2px" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' }
+  ];
+
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var drift = reduce ? 0.2 : 1;
+  // paused (WCAG 2.2.2): remembered across pages and visits; starts paused for people who ask for reduced motion
+  var paused = reduce;
+  try { var saved = localStorage.getItem('hc-blobs-paused'); if (saved !== null) paused = saved === '1'; } catch (e) {}
+
+  /* ---------- styles ---------- */
+  var css = document.createElement('style');
+  css.textContent =
+    '.hc-blobs{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;overflow:hidden}' +
+    '.hc-blob{position:absolute;left:0;top:0;will-change:transform}' +
+    'body,.site_header,.link_active a{transition:background-color 1.4s ease}' +
+    'html.hc-tinted body,html.hc-tinted .site_header,html.hc-tinted .link_active a{background-color:var(--hc-bg)!important}' +
+    'html.hc-instant body,html.hc-instant .site_header,html.hc-instant .link_active a{transition:none!important}' +
+    'html.hc-hover,html.hc-hover body{cursor:pointer}' +
+    'html.hc-print .thumbnails img{filter:url(#hc-print)}' +
+    '.hc-pause{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:1001;' +
+      'display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 16px;border-radius:999px;' +
+      'border:1px solid rgba(41,39,42,.18);background:rgba(255,255,255,.88);color:#29272A;font:inherit;font-size:15px;line-height:1;cursor:pointer}' +
+    '.hc-pause:hover{background:#fff}' +
+    '.hc-pause:focus-visible{outline:3px solid #2BA6CF;outline-offset:2px}' +
+    '.hc-pause svg{width:14px;height:14px;flex:none}' +
+    '.hc-new{transition:opacity .5s ease,transform .7s cubic-bezier(.3,1.6,.5,1)}' +
+    '.hc-new.hc-hidden{opacity:0;transform:scale(.85)}' +
+    '@keyframes hc-wobble{0%,100%{transform:rotate(0)}25%{transform:rotate(-2deg)}75%{transform:rotate(2deg)}}' +
+    '.hc-new.hc-wobble{animation:hc-wobble .45s ease}';
+  document.head.appendChild(css);
+
+  var layer = document.createElement('div');
+  layer.className = 'hc-blobs';
+  layer.setAttribute('aria-hidden', 'true');
+  document.body.appendChild(layer);
+
+  /* ---------- helpers ---------- */
+  var W = innerWidth, H = innerHeight;
+  function rand(a, b) { return a + Math.random() * (b - a); }
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  var base = (getComputedStyle(document.body).backgroundColor.match(/\d+/g) || [244, 241, 236]).map(Number);
+  // start on the default background straight away (no fade from Cargo's cream on every page load)
+  var root = document.documentElement;
+  root.classList.add('hc-instant', 'hc-tinted');
+  root.style.setProperty('--hc-bg', CFG.background);
+  requestAnimationFrame(function () { requestAnimationFrame(function () { root.classList.remove('hc-instant'); }); });
+  function tint(hex) {
+    var n = parseInt(hex.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255];
+    return 'rgb(' + c.map(function (v, i) { return Math.round(base[i] + (v - base[i]) * CFG.tint); }).join(',') + ')';
+  }
+  function radius(b) { return b.d / 2 * (b.sx + b.sy) / 2; }
+  // b.y is the blob's position in its own (deeper) space; this is where it shows on screen
+  function viewY(b) { return b.y - scrollY * dep(b); }
+  function dep(b) { return paused ? 0 : b.depth; }   // paused: no parallax either, the blobs stay put on screen
+
+  var NS = 'http://www.w3.org/2000/svg';
+  // The outline: 28 points round a circle, each pushed in or out by the blob's waves and
+  // its lobe, then joined with a smooth closed curve (Catmull-Rom → cubic Bézier).
+  function shape(b, time) { return pathFrom(outline(b, time)); }
+  function outline(b, time) {
+    var N = 28, pts = [], w = CFG.wobble, pod = b.pod;
+    var podAng = pod.ang + time * pod.drift;
+    var reach = 0.16 * Math.pow(Math.max(0, Math.sin(time * pod.sp + pod.ph)), 2);
+    for (var j = 0; j < N; j++) {
+      var th = j / N * Math.PI * 2, r = 1;
+      for (var h = 0; h < b.waves.length; h++) {
+        var o = b.waves[h];
+        r += w * o.a * (0.6 + 0.4 * Math.sin(time * o.am + o.amPh)) * Math.sin(o.k * th + o.ph + time * o.sp);
+      }
+      var dd = Math.atan2(Math.sin(th - podAng), Math.cos(th - podAng));
+      r += w * reach * Math.exp(-dd * dd / 0.25);
+      pts.push([Math.cos(th) * r * 45, Math.sin(th) * r * 45]);
+    }
+    return pts;
+  }
+  function pathFrom(pts) {
+    var N = pts.length;
+    var f = function (v) { return v.toFixed(1); };
+    var d = 'M' + f(pts[0][0]) + ' ' + f(pts[0][1]);
+    for (var k = 0; k < N; k++) {
+      var p0 = pts[(k - 1 + N) % N], p1 = pts[k], p2 = pts[(k + 1) % N], p3 = pts[(k + 2) % N];
+      d += 'C' + f(p1[0] + (p2[0] - p0[0]) / 6) + ' ' + f(p1[1] + (p2[1] - p0[1]) / 6) + ' ' +
+                 f(p2[0] - (p3[0] - p1[0]) / 6) + ' ' + f(p2[1] - (p3[1] - p1[1]) / 6) + ' ' +
+                 f(p2[0]) + ' ' + f(p2[1]);
+    }
+    return d + 'Z';
+  }
+
+  /* ---------- make the blobs ---------- */
+  var n = W < 700 ? CFG.countMobile : CFG.countDesktop;
+  var ALL = ['shy', 'swell', 'drop', 'paint', 'babble', 'portrait', 'watcher', 'print', 'hungry'];
+  var kinds = [];
+  // shuffle before cutting, so phones (fewer blobs) get a random selection, not always the same few
+  while (kinds.length < n) kinds = kinds.concat(shuffle(ALL.slice()));
+  kinds = shuffle(kinds.slice(0, n));
+  var colors = shuffle(CFG.colors.slice());
+  var sizes = [];
+  for (var s = 0; s < n; s++) sizes.push(CFG.minSize + (CFG.maxSize - CFG.minSize) * (s / Math.max(n - 1, 1)) * rand(0.85, 1));
+  // the face-wearer gets the biggest body (room for a face), the hungry one the next (room for a belly)
+  sizes.sort(function (a, b) { return b - a; });
+  var pri = function (k) { return k === 'watcher' ? 2 : k === 'hungry' ? 1 : 0; };
+  var order = shuffle(kinds.map(function (k, i) { return i; })).sort(function (a, b) { return pri(kinds[b]) - pri(kinds[a]); });
+  var sized = [];
+  order.forEach(function (idx, r) { sized[idx] = sizes[r]; });
+  sizes = sized;
+
+  function aim(b) {
+    var ang = rand(0, Math.PI * 2), sp = rand(CFG.minSpeed, CFG.maxSpeed);
+    b.vx = Math.cos(ang) * sp; b.vy = Math.sin(ang) * sp;
+  }
+
+  var blobs = [];
+  for (var i = 0; i < n; i++) {
+    // drawn in a -60..60 box with a base radius of 45, so reaching lobes have room
+    var S = sizes[i] * 4 / 3, fill = colors[i % colors.length];
+    var el = document.createElementNS(NS, 'svg');
+    el.setAttribute('class', 'hc-blob');
+    el.setAttribute('viewBox', '-60 -60 120 120');
+    el.setAttribute('width', S); el.setAttribute('height', S);
+    el.style.overflow = 'visible';
+    el.style.opacity = CFG.opacity;
+    if (CFG.look === 'soft') {
+      el.innerHTML = '<defs><radialGradient id="hc-g' + i + '" cx="0" cy="0" r="60" gradientUnits="userSpaceOnUse">' +
+        '<stop offset="0" stop-color="' + fill + '" stop-opacity="1"/>' +
+        '<stop offset="0.45" stop-color="' + fill + '" stop-opacity="0.75"/>' +
+        '<stop offset="1" stop-color="' + fill + '" stop-opacity="0"/></radialGradient></defs>';
+      fill = 'url(#hc-g' + i + ')';
+    }
+    var path = document.createElementNS(NS, 'path');
+    path.setAttribute('fill', fill);
+    el.appendChild(path);
+    layer.appendChild(el);
+    // bigger = closer = scrolls a bit faster; reduced motion: no parallax at all
+    var depth = reduce ? 0 : CFG.depth[0] + (CFG.depth[1] - CFG.depth[0]) * (sizes[i] - CFG.minSize) / (CFG.maxSize - CFG.minSize);
+    var b = {
+      el: el, path: path, S: S, kind: kinds[i], color: colors[i % colors.length], d: sizes[i], depth: depth,
+      x: rand(0, W), y: rand(0, H) + scrollY * (paused ? 0 : depth), vx: 0, vy: 0, ox: 0, oy: 0,
+      sx: 1, sy: 1, svx: 0, svy: 0, tx: 1, ty: 1, grow: 1,
+      rot: rand(0, 360), vr: rand(-6, 6), fall: 0, state: 'float', wait: 0,
+      // overlapping slow waves around the outline: big gentle ones, smaller faint ones
+      waves: [[2, 0.10], [3, 0.07], [4, 0.045], [5, 0.025]].map(function (w) {
+        return { k: w[0], a: w[1] * rand(0.5, 1), ph: rand(0, 6.3), sp: rand(0.08, 0.25) * (Math.random() < 0.5 ? -1 : 1),
+                 am: rand(0.1, 0.3), amPh: rand(0, 6.3) };
+      }),
+      // one lobe that slowly reaches out, pulls back, and wanders round the body
+      pod: { ang: rand(0, 6.3), drift: rand(-0.15, 0.15), sp: rand(0.12, 0.25), ph: rand(0, 6.3) }
+    };
+    b.personal = rand(0, 90);          // how close it dares to come when curious
+    b.circle = (Math.random() < 0.5 ? -1 : 1) * rand(0.5, 1);   // which way, and how keenly, it circles when curious
+    if (b.kind === 'watcher') { b.rot = 0; b.vr = 0; wearFace(b); }   // a face shouldn't spin upside down
+    aim(b);
+    blobs.push(b);
+  }
+
+  function respawn(b) {
+    var r = b.d / 2 + 10, edge = Math.floor(rand(0, 4));
+    b.x = edge === 0 ? -r : edge === 1 ? W + r : rand(0, W);
+    b.y = edge === 2 ? -r : edge === 3 ? H + r : rand(0, H);
+    var tx = rand(W * 0.2, W * 0.8), ty = rand(H * 0.2, H * 0.8);
+    var dx = tx - b.x, dy = ty - b.y, len = Math.sqrt(dx * dx + dy * dy) || 1, sp = rand(CFG.minSpeed, CFG.maxSpeed);
+    b.vx = dx / len * sp; b.vy = dy / len * sp;
+    b.y += scrollY * dep(b);
+    b.ox = b.oy = b.svx = b.svy = 0;
+    b.sx = b.sy = b.tx = b.ty = b.grow = 1;
+    b.vr = rand(-6, 6); b.state = 'float';
+    b.el.style.display = '';
+  }
+
+  /* ---------- behaviours ---------- */
+  var tinted = null;
+  function paint(b) {
+    if (tinted === b.color) {
+      root.style.setProperty('--hc-bg', CFG.background); tinted = null;
+    } else {
+      root.style.setProperty('--hc-bg', tint(b.color)); tinted = b.color;
+    }
+  }
+  function flee(b, px, py, power) {
+    var dx = b.x - px, dy = viewY(b) - py, len = Math.sqrt(dx * dx + dy * dy);
+    if (len < 1) { dx = rand(-1, 1); dy = rand(-1, 1); len = Math.sqrt(dx * dx + dy * dy) || 1; }
+    b.ox += dx / len * power; b.oy += dy / len * power;
+  }
+
+  // babble: nav text turns to gibberish; the same blob turns it back
+  var babbling = null, babbleTimer = null;
+  function gibber(s) {
+    return s.replace(/[a-záéíóúýæöþð]/gi, function (ch) {
+      var low = ch.toLowerCase(), pool = CFG.vowels.indexOf(low) > -1 ? CFG.vowels : CFG.consonants;
+      var r = pool.charAt(Math.floor(Math.random() * pool.length));
+      return ch === low ? r : r.toUpperCase();
+    });
+  }
+  function babble(b) {
+    var on = babbling !== b;
+    babbling = on ? b : null;
+    var links = [].slice.call(document.querySelectorAll('.site_header a')).filter(function (a) { return !a.querySelector('img'); });
+    var nodes = [];
+    links.forEach(function (a) {
+      var w = document.createTreeWalker(a, NodeFilter.SHOW_TEXT), t, label = '';
+      while ((t = w.nextNode())) {
+        if (!t.nodeValue.trim()) continue;
+        if (t.__hcOrig === undefined) t.__hcOrig = t.nodeValue;
+        label += t.__hcOrig;
+        nodes.push(t);
+      }
+      // screen readers keep the real link names
+      if (on) a.setAttribute('aria-label', label.trim()); else a.removeAttribute('aria-label');
+    });
+    var finals = nodes.map(function (t) { return on ? gibber(t.__hcOrig) : t.__hcOrig; });
+    var ticks = 0;
+    clearInterval(babbleTimer);
+    babbleTimer = setInterval(function () {
+      ticks++;
+      nodes.forEach(function (t, i) { t.nodeValue = ticks < 8 ? gibber(t.__hcOrig) : finals[i]; });
+      if (ticks >= 8) clearInterval(babbleTimer);
+    }, 60);
+  }
+
+  // portrait: a new work appears in the grid nearest to where you are
+  var portraits = 0;
+  // distance from the blob's centre to its edge in a given direction
+  function edgeAt(pts, ang) {
+    var N = pts.length, u = (((ang / (Math.PI * 2)) % 1) + 1) % 1 * N;
+    var j = Math.floor(u) % N, k = (j + 1) % N, f = u - Math.floor(u);
+    var r1 = Math.hypot(pts[j][0], pts[j][1]), r2 = Math.hypot(pts[k][0], pts[k][1]);
+    return r1 + (r2 - r1) * f;
+  }
+  function brightness(hex) {
+    var n = parseInt(hex.slice(1), 16);
+    return ((n >> 16) * 0.299 + ((n >> 8) & 255) * 0.587 + (n & 255) * 0.114) / 255;
+  }
+  function portraitSrc(b) {
+    // the blob sits for its portrait in whatever shape it's in right now
+    var pts = outline(b, t), face = FACES[Math.floor(Math.random() * FACES.length)];
+    var x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    pts.forEach(function (p) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]); });
+
+    // map the face from the blob it was drawn on to this blob (bounding box to bounding box)
+    var R = face.ref, B = face.box;
+    var s = ((x1 - x0) / (R[2] - R[0]) + (y1 - y0) / (R[3] - R[1])) / 2;
+    var rcx = (R[0] + R[2]) / 2, rcy = (R[1] + R[3]) / 2, ncx = (x0 + x1) / 2, ncy = (y0 + y1) / 2;
+    var fcx = (B[0] + B[2]) / 2, fcy = (B[1] + B[3]) / 2;
+    var corners = [[B[0], B[1]], [B[2], B[1]], [B[0], B[3]], [B[2], B[3]]];
+
+    // keep the face where it was drawn, unless that would put part of it off the edge: then ease it inwards
+    var pull = 1, mx, my;
+    for (var tries = 0; tries < 15; tries++) {
+      mx = ncx + (fcx - rcx) * s * pull; my = ncy + (fcy - rcy) * s * pull;
+      var inside = corners.every(function (c) {
+        var x = mx + (c[0] - fcx) * s, y = my + (c[1] - fcy) * s;
+        return Math.hypot(x, y) < edgeAt(pts, Math.atan2(y, x)) * 0.9;
+      });
+      if (inside) break;
+      pull *= 0.9;
+    }
+
+    var ink = CFG.faceInk === 'white' || brightness(b.color) <= 0.69 ? '#fff' : '#29272A';
+    var faceSvg = face.svg.replace(/INK/g, ink).replace(/BODY/g, b.color);
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400"><rect width="400" height="400" fill="#fff"/>' +
+      '<g transform="translate(200 205) scale(2.7)"><path d="' + pathFrom(pts) + '" fill="' + b.color + '"/>' +
+      '<g transform="translate(' + mx.toFixed(2) + ' ' + my.toFixed(2) + ') scale(' + s.toFixed(4) + ') translate(' +
+      (-fcx).toFixed(2) + ' ' + (-fcy).toFixed(2) + ')">' + faceSvg + '</g></g></svg>';
+    return 'data:image/svg+xml,' + encodeURIComponent(svg);
+  }
+  function addPortrait(b) {
+    var cards = [].slice.call(document.querySelectorAll('.thumbnails .padding_helper'));
+    var best = null, bestD = Infinity, mid = H / 2;
+    cards.forEach(function (c) {
+      var r = c.getBoundingClientRect();
+      if (!r.height) return;
+      var d = Math.abs(r.top + r.height / 2 - mid);
+      if (d < bestD) { bestD = d; best = c; }
+    });
+    if (!best) return null;
+
+    var srcImg = best.querySelector('img'), h = srcImg ? srcImg.offsetHeight : 300;
+    var card = best.cloneNode(true);
+    [].slice.call(card.querySelectorAll('[data-loading]')).forEach(function (el) { el.parentNode.removeChild(el); });
+    // strip Cargo's ids/data so its scripts treat this as a stranger
+    [card].concat([].slice.call(card.querySelectorAll('*'))).forEach(function (el) {
+      [].slice.call(el.attributes).forEach(function (at) {
+        if (/^(data-|rel$|id$|name$|srcset$|sizes$|width$|height$)/.test(at.name)) el.removeAttribute(at.name);
+      });
+    });
+    [].slice.call(card.querySelectorAll('a')).forEach(function (a) { a.setAttribute('href', '#'); });
+    portraits++;
+    var title = CFG.portraitTitle + (portraits > 1 ? ' no. ' + portraits : '');
+    var img = card.querySelector('img');
+    if (img) {
+      img.src = portraitSrc(b);
+      img.alt = title;
+      img.style.cssText = 'height:' + h + 'px;width:auto;max-width:100%';
+    }
+    var span = card.querySelector('.thumb_title span') || card.querySelector('.thumb_title');
+    if (span) span.textContent = title;
+    card.classList.add('hc-new', 'hc-hidden');
+    card.addEventListener('click', function (e) {
+      e.preventDefault(); e.stopPropagation();
+      card.classList.remove('hc-wobble'); void card.offsetWidth; card.classList.add('hc-wobble');
+    }, true);
+
+    var r = best.getBoundingClientRect();
+    best.parentNode.insertBefore(card, r.top + r.height / 2 < mid ? best.nextSibling : best);
+    return card;
+  }
+
+  // watcher: wears one of Halli's faces; its eyes follow the cursor and it blinks now and then
+  function wearFace(b) {
+    // faces whose eyes are dots or rings (the squinting face has no pupils to move)
+    var withEyes = FACES.filter(function (f) { return /<(circle|ellipse)/.test(f.svg); });
+    var face = withEyes[Math.floor(Math.random() * withEyes.length)];
+    var R = face.ref, B = face.box;
+    var s = 90 / (((R[2] - R[0]) + (R[3] - R[1])) / 2);          // drawn blob → this blob's 90-unit body
+    var fcx = (B[0] + B[2]) / 2, fcy = (B[1] + B[3]) / 2;
+    var ox = (fcx - (R[0] + R[2]) / 2) * s * 0.75, oy = (fcy - (R[1] + R[3]) / 2) * s * 0.75;   // a little inwards: the body morphs
+    var ink = CFG.faceInk === 'white' || brightness(b.color) <= 0.69 ? '#fff' : '#29272A';
+    var g = document.createElementNS(NS, 'g');
+    g.innerHTML = face.svg.replace(/INK/g, ink).replace(/BODY/g, b.color);
+    // place it on the body straight away: when the page starts paused, the gaze update never runs
+    g.setAttribute('transform', 'translate(' + ox.toFixed(2) + ' ' + oy.toFixed(2) + ') scale(' + s.toFixed(4) + ') translate(' +
+      (-fcx).toFixed(2) + ' ' + (-fcy).toFixed(2) + ')');
+    b.el.appendChild(g);
+    b.face = { g: g, s: s, fcx: fcx, fcy: fcy, ox: ox, oy: oy, lx: 0, ly: 0, blink: 0, nextBlink: rand(2, 6),
+      eyes: [].slice.call(g.querySelectorAll('circle, ellipse')).map(function (e) {
+        return { el: e, cx: +e.getAttribute('cx'), cy: +e.getAttribute('cy') };
+      }) };
+  }
+  function lookAround(b, dt) {
+    var f = b.face, tx = 0, ty = 0;
+    if (ptr) {
+      var dx = ptr.x - b.x, dy = ptr.y - viewY(b), d = Math.sqrt(dx * dx + dy * dy) || 1, k = Math.min(1, d / 250);
+      tx = dx / d * k; ty = dy / d * k;
+    } else {                                   // no cursor (touch screens): let the gaze wander
+      tx = Math.sin(t * 0.37 + b.pod.ph) * 0.6; ty = Math.sin(t * 0.23 + b.pod.ang) * 0.4;
+    }
+    f.lx += (tx - f.lx) * Math.min(1, dt * 6); f.ly += (ty - f.ly) * Math.min(1, dt * 6);
+    f.nextBlink -= dt;
+    if (f.nextBlink <= 0) { f.blink = 0.16; f.nextBlink = rand(2.5, 7); }
+    var squint = 1;
+    if (f.blink > 0) { f.blink -= dt; squint = 0.12; }
+    // whole face leans a little towards the cursor, eyes move further
+    f.g.setAttribute('transform', 'translate(' + (f.ox + f.lx * 4).toFixed(2) + ' ' + (f.oy + f.ly * 4).toFixed(2) + ') scale(' +
+      f.s.toFixed(4) + ') translate(' + (-f.fcx).toFixed(2) + ' ' + (-f.fcy).toFixed(2) + ')');
+    var ex = f.lx * 3.2, ey = f.ly * 3.2;
+    f.eyes.forEach(function (e) {
+      e.el.setAttribute('transform', 'translate(' + (e.cx + ex).toFixed(2) + ' ' + (e.cy + ey).toFixed(2) + ') scale(1 ' + squint +
+        ') translate(' + (-e.cx) + ' ' + (-e.cy) + ')');
+    });
+  }
+
+  // print-shop: every thumbnail becomes a print in dark ink + this blob's colour on white paper
+  var printing = null, printDefs = null;
+  function hexRGB(hex) { var n = parseInt(hex.slice(1), 16); return [(n >> 16) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255]; }
+  function print(b) {
+    if (!printDefs) {
+      printDefs = document.createElementNS(NS, 'svg');
+      printDefs.setAttribute('aria-hidden', 'true');
+      printDefs.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+      printDefs.innerHTML = '<filter id="hc-print" color-interpolation-filters="sRGB">' +
+        '<feColorMatrix type="saturate" values="0"/>' +
+        '<feComponentTransfer><feFuncR type="table"/><feFuncG type="table"/><feFuncB type="table"/></feComponentTransfer></filter>';
+      document.body.appendChild(printDefs);
+    }
+    if (printing === b) { root.classList.remove('hc-print'); printing = null; return; }
+    // shadows → dark ink, midtones → the blob's colour, highlights → paper
+    var dark = hexRGB('#29272A'), ink = hexRGB(b.color);
+    ['R', 'G', 'B'].forEach(function (ch, i) {
+      printDefs.querySelector('feFunc' + ch).setAttribute('tableValues', dark[i].toFixed(3) + ' ' + ink[i].toFixed(3) + ' 1');
+    });
+    root.classList.add('hc-print'); printing = b;
+  }
+
+  // hungry: swallows the nearest blob, carries it around in its belly, spits it out when clicked again
+  function eat(b) {
+    if (b.prey) {                                              // full: spit it out
+      var p = b.prey, a = rand(0, Math.PI * 2);
+      p.state = 'float'; p.el.style.opacity = CFG.opacity; p.tx = p.ty = p.grow = 1;
+      p.ox = Math.cos(a) * 320; p.oy = Math.sin(a) * 320;
+      b.prey = null; b.tx = b.ty = b.grow; b.svx -= 2; b.svy += 2.4;
+      return;
+    }
+    var best = null, bestD = Infinity, by = viewY(b);
+    blobs.forEach(function (o) {
+      if (o === b || o.state !== 'float') return;
+      var dx = o.x - b.x, dy = viewY(o) - by, d = dx * dx + dy * dy;
+      if (d < bestD) { bestD = d; best = o; }
+    });
+    if (!best) { b.svx += 2; b.svy += 2; return; }
+    b.prey = best; best.state = 'swallowed'; best.host = b; best.gulp = 0; best.orbit = rand(0, 6.3);
+    best.tx = best.ty = Math.min(0.55, (b.d * 0.42) / best.d);  // shrink to fit inside
+    layer.appendChild(best.el);                                 // drawn over the host, so it shows through
+    b.tx = b.ty = b.grow * 1.12; b.svx += 1.5; b.svy += 1.5;    // a satisfied swell
+  }
+
+  /* ---------- pause button (WCAG 2.2.2 Pause, Stop, Hide) ---------- */
+  // The words change with the state, so no aria-pressed: the visible label is the accessible name.
+  var ICON_PAUSE = '<svg viewBox="0 0 14 14" aria-hidden="true" focusable="false"><rect x="2" y="1.5" width="3.5" height="11" rx="1" fill="currentColor"/><rect x="8.5" y="1.5" width="3.5" height="11" rx="1" fill="currentColor"/></svg>';
+  var ICON_PLAY = '<svg viewBox="0 0 14 14" aria-hidden="true" focusable="false"><path d="M3 1.8v10.4c0 .6.6 1 1.1.7l8.4-5.2c.5-.3.5-1.1 0-1.4L4.1 1.1C3.6.8 3 1.2 3 1.8z" fill="currentColor"/></svg>';
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'hc-pause';
+  btn.innerHTML = '<span class="hc-pause-icon"></span><span class="hc-pause-text"></span>';
+  document.body.insertBefore(btn, document.body.firstChild);      // first stop for keyboard users
+  function drawButton() {
+    btn.querySelector('.hc-pause-icon').innerHTML = paused ? ICON_PLAY : ICON_PAUSE;
+    btn.querySelector('.hc-pause-text').textContent = paused ? CFG.playLabel : CFG.pauseLabel;
+  }
+  function setPaused(p) {
+    blobs.forEach(function (b) { b.y = viewY(b); });                // keep every blob where it is on screen…
+    paused = p;
+    blobs.forEach(function (b) { b.y += scrollY * dep(b); });       // …while parallax switches off or on
+    if (paused && babbling) babble(babbling);                       // nav goes back to real words
+    if (paused) blobs.forEach(function (b) {                        // don't freeze a face mid-blink
+      if (b.face) { b.face.blink = 0; lookAround(b, 0); }
+    });
+    try { localStorage.setItem('hc-blobs-paused', paused ? '1' : '0'); } catch (e) {}
+    drawButton();
+  }
+  btn.addEventListener('click', function () { setPaused(!paused); });
+  drawButton();
+  // use the nav's typeface once the header exists (this script runs before it does)
+  function matchNavFont() {
+    var a = document.querySelector('.site_header .navigation a');
+    if (a) btn.style.fontFamily = getComputedStyle(a).fontFamily;
+  }
+  matchNavFont();
+  document.addEventListener('DOMContentLoaded', matchNavFont);
+
+  /* ---------- pointer ---------- */
+  var ptr = null, held = null;
+  function skipped(t) { return t && t.closest && t.closest(CFG.skip); }
+  function hit(x, y) {
+    for (var i = blobs.length - 1; i >= 0; i--) {
+      var b = blobs[i];
+      if (b.state !== 'float') continue;
+      var dx = x - b.x, dy = y - viewY(b), r = radius(b) * 0.92;
+      if (dx * dx + dy * dy < r * r) return b;
+    }
+    return null;
+  }
+
+  var lastMove = performance.now(), curious = false;
+  document.addEventListener('pointermove', function (e) {
+    ptr = { x: e.clientX, y: e.clientY };
+    lastMove = performance.now();
+    if (curious) {                         // caught looking: scatter
+      curious = false;
+      blobs.forEach(function (b) {
+        if (b.state !== 'float') return;
+        var dx = b.x - e.clientX, dy = viewY(b) - e.clientY, d = Math.sqrt(dx * dx + dy * dy);
+        if (d < 350) flee(b, e.clientX, e.clientY, 300 * (1 - d / 350));
+      });
+    }
+    if (e.pointerType === 'mouse') {
+      var b = !skipped(e.target) && hit(e.clientX, e.clientY);
+      document.documentElement.classList.toggle('hc-hover', !!(b && b.kind !== 'shy'));
+    }
+  }, { passive: true });
+
+  document.addEventListener('pointerout', function (e) { if (!e.relatedTarget) ptr = null; });
+
+  document.addEventListener('pointerdown', function (e) {
+    if (e.button) return;
+    ptr = { x: e.clientX, y: e.clientY };
+    if (skipped(e.target)) return;
+    var b = hit(e.clientX, e.clientY);
+    if (!b) return;
+    if (b.kind === 'shy') { flee(b, e.clientX, e.clientY, 420); return; }
+    e.preventDefault();
+    if (b.kind === 'swell') {
+      if (b.grow < CFG.swellMax) { b.vx *= 0.88; b.vy *= 0.88; }
+      b.grow = Math.min(b.grow * CFG.swellStep, CFG.swellMax);
+      b.tx = b.ty = b.grow; b.svx += 2; b.svy += 2.6;
+    } else if (b.kind === 'drop') {
+      b.state = 'held'; held = b;
+      b.tx = b.grow * 0.92; b.ty = b.grow * 0.6;
+    } else if (b.kind === 'paint') {
+      paint(b); b.svx += 2.2; b.svy -= 1.4;
+    } else if (b.kind === 'babble') {
+      if (!paused) babble(b);                                       // paused: the nav stays readable
+      b.svx -= 1.6; b.svy += 2.2;
+    } else if (b.kind === 'portrait') {
+      var card = addPortrait(b);
+      if (card) { b.state = 'absorb'; b.target = card; b.absorbT = 0; b.tx = b.ty = 0.15; }
+      else { b.svx += 2; b.svy += 2; }   // no grid on this page: just a wobble
+    } else if (b.kind === 'watcher') {
+      b.face.blink = 0.3; b.face.nextBlink = rand(2.5, 7); b.svx += 1.4; b.svy -= 1.8;   // startled blink
+    } else if (b.kind === 'print') {
+      print(b); b.svx += 2.4; b.svy -= 2;
+    } else if (b.kind === 'hungry') {
+      eat(b);
+    }
+  }, { passive: false });
+
+  function release(e) {
+    if (e.pointerType !== 'mouse') ptr = null;
+    if (!held) return;
+    held.state = 'falling'; held.fall = 0;
+    held.vx *= 0.5; held.vr = rand(-80, 80);
+    held = null;
+  }
+  document.addEventListener('pointerup', release);
+  document.addEventListener('pointercancel', release);
+  // Checked every frame: on phones Cargo switches to the real screen width only after this script has started,
+  // and Safari doesn't always announce it. Measure the blob layer itself and rescale when it changes.
+  function fitToScreen() {
+    var r = layer.getBoundingClientRect(), nw = Math.round(r.width), nh = Math.round(r.height);
+    if (!nw || !nh || (nw === W && nh === H)) return;
+    var fx = nw / W, fy = nh / H, wasWide = W >= 700;
+    blobs.forEach(function (b) { var sy = viewY(b) * fy; b.x *= fx; b.y = sy + scrollY * dep(b); });
+    W = nw; H = nh;
+    if (wasWide && W < 700) {        // started out thinking it was a desktop: trim to the phone count
+      for (var i = blobs.length - 1; i >= 0 && blobs.length > CFG.countMobile; i--) {
+        var b = blobs[i];
+        if (b.state !== 'float' || b.prey || b === babbling || b === printing || b === held) continue;
+        b.el.parentNode.removeChild(b.el); blobs.splice(i, 1);
+      }
+    }
+  }
+  addEventListener('resize', fitToScreen);
+
+  /* ---------- animation loop ---------- */
+  var last = performance.now(), t = 0;
+  function frame(now) {
+    var dt = Math.min((now - last) / 1000, 0.05);
+    fitToScreen();
+    last = now; t += paused ? 0 : dt * drift;                    // paused: shapes stop changing
+    curious = !paused && CFG.curiousAfter > 0 && !!ptr && now - lastMove > CFG.curiousAfter * 1000;
+    if (curious) {
+      // gathered blobs nudge each other apart rather than piling on top of one another
+      for (var a = 0; a < blobs.length; a++) for (var c = a + 1; c < blobs.length; c++) {
+        var A = blobs[a], C = blobs[c];
+        if (A.state !== 'float' || C.state !== 'float') continue;
+        var sx = C.x - A.x, sy = viewY(C) - viewY(A), sd = Math.sqrt(sx * sx + sy * sy) || 1, room = (radius(A) + radius(C)) * 0.85;
+        if (sd < room) {
+          var nudge = (1 - sd / room) * 120 * dt;
+          A.ox -= sx / sd * nudge; A.oy -= sy / sd * nudge; C.ox += sx / sd * nudge; C.oy += sy / sd * nudge;
+        }
+      }
+    }
+
+    for (var i = 0; i < blobs.length; i++) {
+      var b = blobs[i];
+
+      if (b.state === 'gone') {
+        b.wait -= dt;
+        if (b.wait <= 0) respawn(b);
+        continue;
+      }
+
+      // springy scale
+      b.svx += ((b.tx - b.sx) * 170 - b.svx * 9) * dt; b.sx += b.svx * dt;
+      b.svy += ((b.ty - b.sy) * 170 - b.svy * 9) * dt; b.sy += b.svy * dt;
+
+      if (b.state === 'float' && !paused) {                       // paused: no drifting, dodging or gathering
+        if (b.kind === 'shy' && ptr) {
+          var dx = b.x - ptr.x, dy = viewY(b) - ptr.y, dist = Math.sqrt(dx * dx + dy * dy) || 1, reach = radius(b) + 70;
+          if (dist < reach) {
+            var push = (1 - dist / reach) * 2600 * dt;
+            b.ox += dx / dist * push; b.oy += dy / dist * push;
+          }
+        }
+        if (curious) {
+          // come and look, but each keeps its own distance (shy ones stay further back)
+          var cx = ptr.x - b.x, cy = ptr.y - viewY(b), cd = Math.sqrt(cx * cx + cy * cy) || 1;
+          var ring = radius(b) + (b.kind === 'shy' ? 110 : 45) + b.personal;
+          var pull = cd > ring ? Math.min(1, (cd - ring) / 200) : -0.5;
+          b.ox += cx / cd * pull * 140 * dt; b.oy += cy / cd * pull * 140 * dt;
+          // and slowly circle round it, each in its own direction, so they spread out instead of clumping
+          b.ox += -cy / cd * b.circle * 90 * dt; b.oy += cx / cd * b.circle * 90 * dt;
+        }
+        b.ox *= Math.exp(-3 * dt); b.oy *= Math.exp(-3 * dt);
+        var pace = drift * (b.prey ? 0.5 : 1) * (curious ? 0.4 : 1);   // a full belly slows you down
+        b.x += (b.vx * pace + b.ox) * dt;
+        b.y += (b.vy * pace + b.oy) * dt;
+        b.rot += b.vr * drift * dt;
+        var m = radius(b) + 10;
+        if (b.x < -m) b.x = W + m; else if (b.x > W + m) b.x = -m;
+        var vy = viewY(b);
+        if (vy < -m) b.y += H + 2 * m; else if (vy > H + m) b.y -= H + 2 * m;
+      } else if (b.state === 'absorb') {
+        var tr = b.target.getBoundingClientRect(), k = Math.min(1, dt * 6);
+        b.x += (tr.left + tr.width / 2 - b.x) * k;
+        b.y += (tr.top + Math.min(tr.height, 300) / 2 - viewY(b)) * k;
+        b.absorbT += dt;
+        if (b.absorbT > 0.7) {
+          b.target.classList.remove('hc-hidden'); b.target = null;
+          b.state = 'gone'; b.wait = rand(4, 8); b.el.style.display = 'none';
+          continue;
+        }
+      } else if (b.state === 'swallowed') {
+        // drawn into the belly, then drifts slowly round inside it
+        var host = b.host, orb = radius(host) * 0.16;
+        b.gulp = Math.min(1, b.gulp + dt * 2.5); b.orbit += paused ? 0 : dt * 0.5;
+        var hx = host.x + Math.cos(b.orbit) * orb, hy = viewY(host) + Math.sin(b.orbit * 1.3) * orb;
+        var follow = b.gulp < 1 ? Math.min(1, dt * 8) : 1;
+        b.x += (hx - b.x) * follow;
+        b.y += (hy + scrollY * dep(b) - b.y) * follow;
+        b.rot += 8 * dt;
+        b.el.style.opacity = (CFG.opacity * (1 - 0.65 * b.gulp)).toFixed(3);
+      } else if (b.state === 'falling') {
+        b.fall += 1500 * dt;
+        b.y += b.fall * dt; b.x += b.vx * dt; b.rot += b.vr * dt;
+        if (viewY(b) - radius(b) > H + 20) {
+          b.state = 'gone'; b.wait = rand(3, 7); b.el.style.display = 'none';
+          continue;
+        }
+      }
+
+      if (b.face && !paused) lookAround(b, dt);                    // paused: the eyes rest too
+      b.path.setAttribute('d', shape(b, t));
+      b.el.style.transform = 'translate3d(' + (b.x - b.S / 2) + 'px,' + (viewY(b) - b.S / 2) + 'px,0) scale(' +
+        b.sx + ',' + b.sy + ') rotate(' + b.rot + 'deg)';
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+
+<!-- The blob-pond for hallicivelek.com: builds the pond on the page whose address contains "blob-pond".
+     Everything is fenced inside #hc-pond so it can't collide with Cargo's own styles. -->
+<script>
+(function () {
+  if (window.__hcPondLoader) return;
+  window.__hcPondLoader = true;
+  var POND_PAGE = /blob-?pond/i;
+  var mounted = false, hidden = false;
+
+  function headerHeight() {
+    var h = document.querySelector('.site_header');
+    var m = document.querySelector('.mobile_site_header');
+    var hh = h ? h.getBoundingClientRect().height : 0, mh = m ? m.getBoundingClientRect().height : 0;
+    return Math.max(hh, mh);
+  }
+  function mount() {
+    mounted = true;
+    // no font to load: the pond uses the site's own typeface (pacaembu), already on the page
+    var style = document.createElement('style');
+    style.textContent = POND_CSS;
+    document.head.appendChild(style);
+    var root = document.createElement('div');
+    root.id = 'hc-pond';
+    root.innerHTML = POND_MARKUP;
+    document.body.appendChild(root);
+    document.documentElement.classList.add('hc-pond-on');
+    var setTop = function () { root.style.setProperty('--hdr', headerHeight() + 'px'); };
+    setTop(); addEventListener('resize', setTop); document.addEventListener('DOMContentLoaded', setTop);
+    POND_JS();
+  }
+  function check() {
+    var here = POND_PAGE.test(location.pathname) || window.__hcPondForce;
+    if (here && !mounted) mount();
+    else if (mounted && !here && !hidden) {          // left without a reload: put it to sleep and hide it
+      hidden = true; document.getElementById('hc-pond').style.display = 'none';
+      document.documentElement.classList.remove('hc-pond-on');
+      if (window.__hcPondSleep) window.__hcPondSleep();
+    } else if (mounted && here && hidden) {          // came back
+      hidden = false; document.getElementById('hc-pond').style.display = '';
+      document.documentElement.classList.add('hc-pond-on');
+      if (window.__hcPondWake) window.__hcPondWake();
+    }
+  }
+  var POND_CSS = '#hc-pond {\n    --bg: #F3DCDF; --ink: #492E46; --soft: rgba(73, 46, 70, .62); --line: rgba(73, 46, 70, .24);\n    --card: #fff; --edge: rgba(73, 46, 70, .16); --focus: #3BBFC9;\n    box-sizing: border-box;\n    }\n@media (prefers-color-scheme: dark) { #hc-pond {\n      --bg: #241B28; --ink: #F1E6EE; --soft: rgba(241, 230, 238, .62); --line: rgba(241, 230, 238, .2);\n      --card: rgba(46, 35, 52, .92); --edge: rgba(241, 230, 238, .18);\n    } }\n#hc-pond.night {\n    --bg: #241B28; --ink: #F1E6EE; --soft: rgba(241, 230, 238, .62); --line: rgba(241, 230, 238, .2);\n    --card: rgba(46, 35, 52, .92); --edge: rgba(241, 230, 238, .18);\n  }\nhtml.hc-pond-on, html.hc-pond-on body { overflow: hidden; }\n#hc-pond { position: fixed; top: 0; left: 0; right: 0; height: 100vh; height: 100lvh; z-index: 999; text-align: left; line-height: normal;\n    background: var(--bg); color: var(--ink); overflow: hidden;\n    font-family: pacaembu, "Nunito", ui-rounded, system-ui, sans-serif; font-size: 15px; letter-spacing: .04em;   \n    transition: background-color 2s ease;\n  }\n#hc-pond #hcp-pond { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; height: 100lvh; display: block; touch-action: none; }\n#hc-pond .hcp-caption {\n    position: fixed; left: 20px; top: calc(var(--hdr, 0px) + 14px); margin: 0;\n    font-size: 14px; color: var(--soft); pointer-events: none; max-width: calc(100% - 40px);\n  }\n#hc-pond .hcp-caption strong { color: var(--ink); font-weight: 700; }\n#hc-pond .hcp-caption .hcp-scaleLink {          \n    pointer-events: auto; font: inherit; letter-spacing: inherit; color: inherit; background: none; border: 0; padding: 0; margin: 0;\n    cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }\n#hc-pond .hcp-caption .hcp-scaleLink:hover { color: var(--ink); }\n#hc-pond .hcp-tray {\n    position: fixed; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);\n    display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; width: max-content; max-width: calc(100% - 24px);\n  }\n#hc-pond .hcp-chip, #hc-pond .hcp-tool {\n    display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 999px;\n    border: 0; background: var(--card); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer;\n  }\n#hc-pond .hcp-chip .hcp-dot { width: 12px; height: 12px; border-radius: 50%; flex: none; }\n#hc-pond .hcp-chip[aria-pressed="false"] { color: var(--soft); }\n#hc-pond .hcp-chip[aria-pressed="false"] .hcp-dot { background: transparent !important; box-shadow: inset 0 0 0 2px currentColor; }\n#hc-pond .hcp-chip .hcp-voice { color: var(--soft); }\n#hc-pond .hcp-tool svg { width: 14px; height: 14px; flex: none; }\n#hc-pond .hcp-volume { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 999px;\n    border: 0; background: var(--card); font-size: 14px; }\n#hc-pond .hcp-volume input { width: 96px; accent-color: var(--ink); }\n#hc-pond .hcp-gap { width: 10px; }\n#hc-pond .hcp-panel {\n    position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%);\n    overflow-y: auto; overscroll-behavior: contain;   \n    width: min(560px, calc(100vw - 24px)); box-sizing: border-box; padding: 14px; border-radius: 16px;\n    border: 0; background: var(--card); display: flex; flex-direction: column; gap: 12px;\n  }\n#hc-pond .hcp-panel[hidden] { display: none; }\n#hc-pond .hcp-panel .hcp-kinds, #hc-pond .hcp-panel .hcp-count { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }\n#hc-pond .hcp-panel .hcp-kinds { padding: 0 44px; }\n#hc-pond .hcp-panel .hcp-close {\n    position: absolute; top: 8px; right: 8px; width: 44px; height: 44px; border: 0; border-radius: 50%;\n    background: var(--bg); color: var(--ink); display: grid; place-items: center; cursor: pointer; padding: 0; }\n#hc-pond .hcp-panel .hcp-close svg { width: 14px; height: 14px; }\n#hc-pond .hcp-panel .hcp-scale { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; }\n#hc-pond .hcp-pick { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 8px 0 16px; border-radius: 999px; font-size: 14px; }\n#hc-pond .hcp-pick select { font: inherit; letter-spacing: inherit; color: var(--ink); background: transparent; border: 0; padding: 8px 4px; cursor: pointer; }\n#hc-pond .hcp-panel .hcp-chip, #hc-pond .hcp-panel .hcp-tool, #hc-pond .hcp-panel .hcp-pick { background: var(--bg); }\n#hc-pond #hcp-blobsToggle svg { transition: transform .2s ease; }\n#hc-pond #hcp-blobsToggle[aria-expanded="true"] svg { transform: rotate(180deg); }\n#hc-pond .hcp-dots { display: inline-flex; align-items: center; gap: 3px; }\n#hc-pond .hcp-dots:empty { display: none; }\n#hc-pond .hcp-dots i { display: block; width: 9px; height: 9px; border-radius: 50%; }\n#hc-pond .hcp-dots em { font-style: normal; font-size: 12px; color: var(--soft); margin-left: 2px; }\n#hc-pond .hcp-panel .hcp-count { align-items: center; }\n#hc-pond .hcp-howmany { font-size: 13px; color: var(--soft); padding: 0 6px; }\n#hc-pond .hcp-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }\n#hc-pond .hcp-tool[disabled] { opacity: .4; cursor: default; }\n#hc-pond button:focus-visible, #hc-pond input:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }\n#hc-pond .hcp-wake {\n    position: fixed; inset: 0; display: grid; place-items: center; padding: 20px;\n    background: color-mix(in srgb, var(--bg) 55%, transparent); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);\n  }\n#hc-pond .hcp-wake[hidden] { display: none; }\n#hc-pond .hcp-wake .hcp-card { max-width: 440px; background: var(--card); border-radius: 16px; padding: 32px 32px 30px; text-align: center; }\n#hc-pond .hcp-wake h1 { margin: 0 0 12px; font-size: 36px; line-height: 1.3; font-weight: 700; letter-spacing: normal; }\n#hc-pond .hcp-wake p { margin: 0 0 24px; font-size: 16px; line-height: 1.8; color: var(--ink); }\n#hc-pond .hcp-wake .hcp-nw { white-space: nowrap; }\n#hc-pond .hcp-wake button {\n    min-height: 48px; padding: 0 22px; border-radius: 999px; border: 0; background: var(--ink); color: var(--bg);\n    font: inherit; font-size: 16px; font-weight: 700; cursor: pointer;\n  }\n@media (max-width: 600px) { #hc-pond .hcp-panel { padding-top: 58px; } #hc-pond .hcp-panel .hcp-kinds { padding: 0; } }\n#hc-pond *, #hc-pond *::before, #hc-pond *::after { box-sizing: border-box; }\n#hc-pond button { letter-spacing: normal; text-transform: none; }\n#hc-pond h1, #hc-pond p, #hc-pond button, #hc-pond label, #hc-pond input, #hc-pond span, #hc-pond strong { font-family: inherit; }\n#hc-pond h1 { color: var(--ink); text-transform: none; }\nhtml.hc-pond-on .site_header, html.hc-pond-on .mobile_site_header, html.hc-pond-on .link_active a { background-color: #F3DCDF !important; }\nhtml.hc-pond-on .hc-blobs, html.hc-pond-on .hc-pause { display: none !important; }\n';
+  var POND_MARKUP = '<svg id="hcp-pond" aria-hidden="true"></svg>\n\n<p class="hcp-caption" id="hcp-caption"></p>\n\n<div class="hcp-tray" role="group" aria-label="pond controls">\n  <div class="hcp-panel" id="hcp-blobPanel" hidden>\n    <button class="hcp-close" id="hcp-blobClose" type="button" aria-label="close blobs &amp; sounds"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>\n    <div class="hcp-kinds" id="hcp-chips"></div>\n    <div class="hcp-count">\n      <button class="hcp-tool" id="hcp-fewer" type="button"><svg viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="6" width="10" height="2" rx="1" fill="currentColor"/></svg>fewer blobs</button>\n      <span class="hcp-howmany" id="hcp-howMany"></span>\n      <button class="hcp-tool" id="hcp-more" type="button"><svg viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="6" width="10" height="2" rx="1" fill="currentColor"/><rect x="6" y="2" width="2" height="10" rx="1" fill="currentColor"/></svg>more blobs</button>\n    </div>\n    <div class="hcp-scale">\n      <label class="hcp-pick" for="hcp-scalePick">scale <select id="hcp-scalePick"></select></label>\n      <button class="hcp-tool" id="hcp-surprise" type="button"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1l1.4 4.6L13 7l-4.6 1.4L7 13l-1.4-4.6L1 7l4.6-1.4z" fill="currentColor"/></svg>surprise me</button>\n      <span class="hcp-sr" id="hcp-scaleSr" aria-live="polite"></span>\n    </div>\n  </div>\n  <button class="hcp-tool" id="hcp-blobsToggle" type="button" aria-expanded="false" aria-controls="hcp-blobPanel"><span class="hcp-dots" id="hcp-blobDots" aria-hidden="true"></span>blobs &amp; sounds<span class="hcp-sr" id="hcp-blobSr"></span><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 9l4-4 4 4" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></button>\n  <label class="hcp-volume">volume <input id="hcp-volume" type="range" min="0" max="1" step="0.01" value="0.7"></label>\n  <button class="hcp-tool" id="hcp-pause" type="button"></button>\n</div>\n\n<div class="hcp-wake" id="hcp-wake">\n  <div class="hcp-card">\n    <h1>the blob-pond</h1>\n    <p>blob blob! The blobs float across lines and play them, each with its own sound and movement. Are you a <span class="hcp-nw">blob-poker</span> or a <span class="hcp-nw">blob-watcher</span>? Choose who lives in the <span class="hcp-nw">blob-pond</span> under “blobs &amp; sounds” at the bottom. Sound on!</p>\n    <button type="button" id="hcp-wakeBtn">enter the blob-pond</button>\n  </div>\n</div>';
+  function POND_JS() {
+(function () {
+  'use strict';
+  var NS = 'http://www.w3.org/2000/svg';
+  var svg = document.getElementById('hcp-pond');
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function rand(a, b) { return a + Math.random() * (b - a); }
+
+  /* ---------- time of day in Reykjavík sets the key and pace ---------- */
+  function reykjavikNow() {
+    var d = new Date();          // Iceland is on UTC all year
+    return { h: d.getUTCHours(), m: d.getUTCMinutes() };
+  }
+  var MOODS = {          // the time of day picks the key, the pace and the default scale
+    morning: { root: 62, scale: 'majpent', pace: 1.0,  night: false },
+    day:     { root: 65, scale: 'majpent', pace: 1.0,  night: false },
+    evening: { root: 57, scale: 'hirajoshi', pace: 0.85, night: false },
+    night:   { root: 52, scale: 'minpent', pace: 0.7,  night: true }
+  };
+  // Scales: steps in semitones from the key note. Fractions are fine, because the pond tunes every note itself,
+  // so it can play tunings no piano can. 'period' is where the scale repeats (12 = an octave).
+  var SCALES = {
+    majpent:   { name: 'major pentatonic', steps: [0, 2, 4, 7, 9] },
+    minpent:   { name: 'minor pentatonic', steps: [0, 3, 5, 7, 10] },
+    lydian:    { name: 'lydian',           steps: [0, 2, 4, 6, 7, 9, 11] },
+    dorian:    { name: 'dorian',           steps: [0, 2, 3, 5, 7, 9, 10] },
+    whole:     { name: 'whole-tone',       steps: [0, 2, 4, 6, 8, 10] },
+    hirajoshi: { name: 'hirajoshi',        steps: [0, 2, 3, 7, 8] },
+    slendro:   { name: 'slendro',          steps: [0, 2.4, 4.8, 7.2, 9.6] },              // five near-equal steps, gamelan-style
+    pelog:     { name: 'pelog',            steps: [0, 1.2, 2.7, 6.7, 7.85] },             // an approximation: every gamelan has its own tuning
+    harmonic:  { name: 'harmonic series',  steps: [8, 9, 10, 11, 12, 13, 14].map(function (h) { return 12 * Math.log2(h / 8); }) },
+    bp:        { name: 'bohlen–pierce',    steps: [0, 2, 3, 4, 6, 7, 9, 10, 12].map(function (s) { return s * 19.0196 / 13; }),
+                 period: 19.0196, secret: true }                                            // no octaves: repeats at three times the frequency
+  };
+  function moodName(h) { return h >= 5 && h < 11 ? 'morning' : h >= 11 && h < 17 ? 'day' : h >= 17 && h < 22 ? 'evening' : 'night'; }
+  var forced = (location.hash || '').slice(1);          // #morning, #day, #evening or #night to try a mood
+  var moodKey = MOODS[forced] ? forced : moodName(reykjavikNow().h);
+  var mood = MOODS[moodKey];
+  document.getElementById('hc-pond').classList.toggle('night', mood.night);
+  // which scale: 'time' follows the time of day; on about one visit in thirty, something strange happens
+  var chosen = SCALES[forced] ? forced : (Math.random() < 1 / 30 ? 'bp' : 'time');
+  var strange = chosen === 'bp' && !SCALES[forced];
+  function scaleId() { return chosen === 'time' ? mood.scale : chosen; }
+  var NOTE = ['c', 'c♯', 'd', 'e♭', 'e', 'f', 'f♯', 'g', 'a♭', 'a', 'b♭', 'b'];
+  function scaleLabel() { return SCALES[scaleId()].name; }
+  // the caption is built once and then only its words change, so a keyboard user's focus on the scale button survives
+  document.getElementById('hcp-caption').innerHTML = '<strong id="hcp-capWhere"></strong><span id="hcp-capScaleWrap">, <button type="button" class="hcp-scaleLink" id="hcp-capScale">' +
+    '<span aria-hidden="true">♪ </span><span class="hcp-sr">scale: </span><span id="hcp-capScaleName"></span></button></span>, <span id="hcp-capTime"></span>';
+  function drawCaption() {
+    var n = reykjavikNow();
+    document.getElementById('hcp-capWhere').textContent = strange ? 'something strange in reykjavík' : moodKey + ' in reykjavík';
+    document.getElementById('hcp-capScaleWrap').hidden = strange;          // the secret stays a secret
+    document.getElementById('hcp-capScaleName').textContent = scaleLabel();
+    document.getElementById('hcp-capTime').textContent = String(n.h).padStart(2, '0') + ':' + String(n.m).padStart(2, '0');
+  }
+  drawCaption(); setInterval(drawCaption, 30000);
+
+  /* ---------- the lines (strings) ---------- */
+  // the pond measures its own drawing area rather than trusting the window size: on phones, Cargo switches
+  // to the real screen width only after this script has started, and Safari doesn't always say so
+  var r0 = svg.getBoundingClientRect(), W = Math.round(r0.width) || innerWidth, H = Math.round(r0.height) || innerHeight, NL = 7, lines = [];
+  function zoom() { return W < 600 ? 0.75 : 1; }   // narrow screens: blobs drawn a bit smaller, a zoomed-out feel
+  var gLines = document.createElementNS(NS, 'g'), gBlobs = document.createElementNS(NS, 'g'), defs = document.createElementNS(NS, 'defs');
+  svg.appendChild(defs); svg.appendChild(gLines); svg.appendChild(gBlobs);
+  function buildLines() {
+    gLines.innerHTML = ''; lines = [];
+    for (var k = 0; k < NL; k++) {
+      var p = document.createElementNS(NS, 'path');
+      p.setAttribute('fill', 'none'); p.setAttribute('stroke', 'var(--line)'); p.setAttribute('stroke-width', '1.5'); p.setAttribute('stroke-linecap', 'round');
+      gLines.appendChild(p);
+      lines.push({ el: p, y: H * (0.15 + 0.66 * k / (NL - 1)), slope: rand(-0.05, 0.05) * H, bendA: rand(5, 14), bendPh: rand(0, 6.3), plucks: [] });
+    }
+  }
+  function lineY(L, x) { return L.y + L.slope * (x / W - 0.5) + L.bendA * Math.sin(x / W * Math.PI * 1.6 + L.bendPh); }
+  function noteAt(deg) {             // a scale degree as a pitch (fractional pitches allowed)
+    var sc = SCALES[scaleId()], n = sc.steps.length, p = sc.period || 12;
+    return mood.root + p * Math.floor(deg / n) + sc.steps[((deg % n) + n) % n];
+  }
+  function lineMidi(k) { return noteAt(NL - 1 - k); }   // top line = highest
+  function samePitch(a, b) {         // the same note in a different octave (or period)
+    var p = SCALES[scaleId()].period || 12, r = (((a - b) % p) + p) % p;
+    return r < 0.01 || p - r < 0.01;
+  }
+  function pluck(L, x, amp) { L.plucks.push({ x: x, t: 0, a: reduce ? amp * 0.3 : amp }); if (L.plucks.length > 6) L.plucks.shift(); }
+  function drawLine(L, dt) {
+    L.plucks.forEach(function (p) { p.t += dt; });
+    L.plucks = L.plucks.filter(function (p) { return p.t < 2.5; });
+    var d = '';
+    for (var i = 0; i <= 48; i++) {
+      var x = W * i / 48, y = lineY(L, x);
+      L.plucks.forEach(function (p) {
+        var dx = x - p.x; y += p.a * Math.exp(-dx * dx / (2 * 140 * 140)) * Math.sin(p.t * 22) * Math.exp(-p.t * 2.4);
+      });
+      d += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+    }
+    L.el.setAttribute('d', d);
+  }
+
+  /* ---------- sound ---------- */
+  var ctx = null, master, verbSend, delaySend, hallSend, noiseBuf = null, volume = 0.7, recent = [];
+  var LAH_PEAK = 0.26;   // the singer's level (matched to the kalimba, then a touch softer)
+  var EP_PEAK = 0.10;    // the electric piano's level: a gentle, occasional visitor
+  var KOTO_PEAK = 0.25;  // the koto's level (matched to the kalimba, then a touch softer)
+  function mtof(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+  function initAudio() {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    ctx = new AC();
+    master = ctx.createGain(); master.gain.value = volume;
+    var comp = ctx.createDynamicsCompressor(); comp.threshold.value = -20; comp.ratio.value = 3;
+    master.connect(comp); comp.connect(ctx.destination);
+    // a soft room: generated reverb
+    var verb = ctx.createConvolver(), len = Math.floor(ctx.sampleRate * 3.8), buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (var c = 0; c < 2; c++) { var data = buf.getChannelData(c); for (var i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6); }
+    verb.buffer = buf; verbSend = ctx.createGain(); verbSend.gain.value = 0.55; verbSend.connect(verb); verb.connect(master);
+    // a slow echo
+    var delay = ctx.createDelay(1.5), fb = ctx.createGain(), tone = ctx.createBiquadFilter();
+    delay.delayTime.value = 0.46; fb.gain.value = 0.3; tone.type = 'lowpass'; tone.frequency.value = 1800;
+    delaySend = ctx.createGain(); delaySend.gain.value = 0.3;
+    delaySend.connect(delay); delay.connect(tone); tone.connect(fb); fb.connect(delay); tone.connect(master);
+    // a long, soft hall just for the singer: 6.5 s, slightly darkened, with a short pre-delay
+    var hall = ctx.createConvolver(), hl = Math.floor(ctx.sampleRate * 6.5), hb = ctx.createBuffer(2, hl, ctx.sampleRate);
+    for (var hc = 0; hc < 2; hc++) { var hd = hb.getChannelData(hc); for (var j = 0; j < hl; j++) hd[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / hl, 3.2); }
+    hall.buffer = hb;
+    var pre = ctx.createDelay(0.2), hallTone = ctx.createBiquadFilter(), hallLevel = ctx.createGain();
+    pre.delayTime.value = 0.05; hallTone.type = 'lowpass'; hallTone.frequency.value = 4200; hallLevel.gain.value = 0.55;
+    hallSend = ctx.createGain(); hallSend.connect(pre); pre.connect(hall); hall.connect(hallTone); hallTone.connect(hallLevel); hallLevel.connect(master);
+  }
+  function breath() {   // a little air for the singer
+    if (!noiseBuf) { noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate); var d = noiseBuf.getChannelData(0); for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; }
+    return noiseBuf;
+  }
+  function osc(type, f, t0, t1, dest, detune) {
+    var o = ctx.createOscillator(); o.type = type; o.frequency.value = f; if (detune) o.detune.value = detune;
+    o.connect(dest); o.start(t0); o.stop(t1);
+  }
+  function env(t, peak, atk, dec) {
+    var g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(peak, t + atk); g.gain.exponentialRampToValueAtTime(0.0001, t + atk + dec);
+    return g;
+  }
+  // A plucked string (Karplus–Strong), computed once per pitch and reused. The string's length has to be a whole
+  // number of samples, which would leave high notes off-pitch, so 'rate' retunes each one exactly on playback.
+  var kotoCache = {};
+  function kotoBuffer(f) {
+    var key = f.toFixed(2); if (kotoCache[key]) return kotoCache[key];
+    var sr = ctx.sampleRate, N = Math.max(2, Math.round(sr / f + 0.5)), len = Math.floor(sr * 3.4);
+    var buf = ctx.createBuffer(1, len, sr), d = buf.getChannelData(0), line = new Float32Array(N), prev = 0, mean = 0, i;
+    for (i = 0; i < N; i++) { prev += 0.45 * ((Math.random() * 2 - 1) - prev); line[i] = prev; mean += prev / N; }   // softened noise: a finger, not a pick
+    for (i = 0; i < N; i++) line[i] -= mean;
+    var g = Math.pow(10, -3 / (4.0 * sr / (N - 0.5))), idx = 0;                     // fades by 60 dB over about 4 seconds
+    for (var j = 0; j < len; j++) {
+      var cur = line[idx], nxt = line[(idx + 1) % N];
+      d[j] = cur; line[idx] = g * 0.5 * (cur + nxt); idx = (idx + 1) % N;
+    }
+    return (kotoCache[key] = { buf: buf, rate: f / (sr / (N - 0.5)) });   // the loop is N - 0.5 samples long
+  }
+  var VOICES = {
+    // bells: the higher the note, the gentler the strike, the fainter the bright overtone, and a soft filter on top
+    bells:   function (t, f, out) { var hi = Math.min(1, 700 / f), soft = ctx.createBiquadFilter();
+               soft.type = 'lowpass'; soft.frequency.value = 2500; soft.connect(out);
+               var g = env(t, 0.13 * Math.sqrt(hi), 0.004 + 0.02 * (1 - hi), 2.8); g.connect(soft); osc('sine', f, t, t + 3, g);
+               var g2 = env(t, 0.05 * hi * hi * hi, 0.006, 1.2); g2.connect(soft); osc('sine', f * 2.76, t, t + 1.4, g2); return [0.6, 0.35]; },
+    // soft koto: a plucked string (see kotoBuffer), a little wooden body, and now and then a pressed note (oshide)
+    koto:    function (t, f, out, len, vel, bendTo) { vel = vel || 1;
+               var kb = kotoBuffer(f), src = ctx.createBufferSource(); src.buffer = kb.buf; src.playbackRate.value = kb.rate;
+               if (bendTo) { src.playbackRate.setValueAtTime(kb.rate, t + 0.22); src.playbackRate.linearRampToValueAtTime(kb.rate * bendTo / f, t + 0.45); }
+               var body = ctx.createBiquadFilter(); body.type = 'peaking'; body.frequency.value = 900; body.Q.value = 1; body.gain.value = 4;
+               var soft = ctx.createBiquadFilter(); soft.type = 'lowpass'; soft.frequency.value = 3400;
+               var g = ctx.createGain(); g.gain.value = KOTO_PEAK * vel;
+               src.connect(body); body.connect(soft); soft.connect(g); g.connect(out); src.start(t); src.stop(t + kb.buf.duration);
+               return [0.5, 0.22, 0.3]; },
+    kalimba: function (t, f, out) { var g = env(t, 0.15, 0.006, 1.5); g.connect(out); osc('triangle', f, t, t + 1.7, g);
+               var g2 = env(t, 0.05, 0.002, 0.25); g2.connect(out); osc('sine', f * 3, t, t + 0.35, g2); return [0.45, 0.3]; },
+    marimba: function (t, f, out) { var g = env(t, 0.17, 0.003, 0.8); g.connect(out); osc('sine', f, t, t + 0.9, g);
+               var g2 = env(t, 0.04, 0.002, 0.12); g2.connect(out); osc('sine', f * 4, t, t + 0.2, g2); return [0.4, 0.25]; },
+    bass:    function (t, f, out) { var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 520; lp.connect(out);
+               var g = env(t, 0.24, 0.03, 2.4); g.connect(lp); osc('triangle', f, t, t + 2.6, g); osc('sine', f, t, t + 2.6, g); return [0.25, 0.05]; },
+    trills:  function (t, f, out) { var g = env(t, 0.1, 0.004, 0.5); g.connect(out); osc('triangle', f, t, t + 0.6, g); return [0.4, 0.4]; },
+    // a soft sung "lah": a breathy tone shaped by the resonances of a voice, gliding from "l" into an open "ah"
+    lah:     function (t, f, out) {
+               var end = t + 1.4, src = ctx.createOscillator(); src.type = 'sawtooth';
+               src.frequency.setValueAtTime(f * 0.96, t); src.frequency.linearRampToValueAtTime(f, t + 0.09);     // a small scoop up into the note
+               var vib = ctx.createOscillator(), vg = ctx.createGain(); vib.frequency.value = 5.3;
+               vg.gain.setValueAtTime(0, t); vg.gain.linearRampToValueAtTime(f * 0.011, t + 0.35); vib.connect(vg); vg.connect(src.frequency);
+               var tone = ctx.createBiquadFilter(); tone.type = 'lowpass'; tone.frequency.value = 3400; src.connect(tone);
+               var air = ctx.createBufferSource(); air.buffer = breath(); var ag = ctx.createGain(); ag.gain.value = 0.18; air.connect(ag); ag.connect(tone);
+               var body = ctx.createGain();
+               // [l, ah, level, sharpness] for the first three resonances of a woman's voice
+               [[360, 850, 1, 7], [1300, 1220, 0.55, 11], [2700, 2810, 0.28, 18]].forEach(function (F) {
+                 var bp = ctx.createBiquadFilter(); bp.type = 'bandpass'; bp.Q.value = F[3];
+                 bp.frequency.setValueAtTime(F[0], t); bp.frequency.linearRampToValueAtTime(F[1], t + 0.075);
+                 var g = ctx.createGain(); g.gain.value = F[2]; tone.connect(bp); bp.connect(g); g.connect(body);
+               });
+               var e = ctx.createGain(); e.gain.setValueAtTime(0.0001, t); e.gain.linearRampToValueAtTime(LAH_PEAK * 0.55, t + 0.035);   // the soft "l"
+               e.gain.linearRampToValueAtTime(LAH_PEAK, t + 0.1); e.gain.setTargetAtTime(0.0001, t + 0.28, 0.13);                         // "ah", short
+               body.connect(e); e.connect(out);
+               src.start(t); vib.start(t); air.start(t); src.stop(end); vib.stop(end); air.stop(end);
+               return [0.25, 0.12, 1]; },
+    // soft electric piano (Rhodes-style FM): starts with a little bell-like brightness, mellows as it rings
+    ep:      function (t, f, out, len, vel) { vel = vel || 1; var end = t + 4;
+               var car = ctx.createOscillator(); car.type = 'sine'; car.frequency.value = f;
+               var mod = ctx.createOscillator(); mod.type = 'sine'; mod.frequency.value = f;
+               var mg = ctx.createGain(); mg.gain.setValueAtTime(f * 1.6 * vel, t); mg.gain.exponentialRampToValueAtTime(f * 0.04, t + 1.4);
+               mod.connect(mg); mg.connect(car.frequency);
+               var soft = ctx.createBiquadFilter(); soft.type = 'lowpass'; soft.frequency.value = 2600; soft.connect(out);
+               var g = env(t, EP_PEAK * vel, 0.006, 3.6); g.connect(soft); car.connect(g);
+               var tg = env(t, EP_PEAK * 0.12 * vel, 0.002, 0.18); tg.connect(soft); osc('sine', f * 7, t, t + 0.25, tg);   // the tine's tick
+               car.start(t); mod.start(t); car.stop(end); mod.stop(end);
+               return [0.7, 0.22, 0.35]; },
+    // soft pad: round tones (no buzzy saws), a slight chorus, a filter that blooms open and closes again, slow breathing, lots of room
+    pad:     function (t, f, out, len) { var end = t + len + 4.2;
+               var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = 0.3;
+               lp.frequency.setValueAtTime(350, t); lp.frequency.linearRampToValueAtTime(1400, t + 1.6); lp.frequency.linearRampToValueAtTime(500, t + len + 4);
+               lp.connect(out);
+               var g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.08, t + 1.6);
+               g.gain.setValueAtTime(0.08, t + len); g.gain.exponentialRampToValueAtTime(0.0001, t + len + 4); g.connect(lp);
+               var lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.25; lg.gain.value = 0.016;
+               lfo.connect(lg); lg.connect(g.gain); lfo.start(t); lfo.stop(end);
+               [[f, 1, 'sine'], [f * 2, 0.25, 'sine'], [f * 1.5, 0.35, 'triangle']].forEach(function (p) {
+                 [-5, 5].forEach(function (cents) { var pg = ctx.createGain(); pg.gain.value = p[1] * 0.5; pg.connect(g); osc(p[2], p[0], t, end, pg, cents); });
+               });
+               return [0.9, 0.12]; }
+  };
+  function play(voice, midi, x, opts) {
+    opts = opts || {};
+    if (!ctx || ctx.state !== 'running') return false;
+    var now = ctx.currentTime;
+    recent = recent.filter(function (r) { return r > now - 1; });
+    if (recent.length >= 5 && !opts.force) return false;      // keep it calm: at most a handful of notes a second
+    recent.push(now);
+    var t = now + 0.01, out = ctx.createGain(), node = out;
+    if (opts.muffled) { var lp = ctx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 380; out.gain.value = 0.7; out.connect(lp); node = lp; }
+    var pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+    if (pan) { pan.pan.value = Math.max(-0.8, Math.min(0.8, x / W * 1.6 - 0.8)); node.connect(pan); node = pan; }
+    var sends = VOICES[voice](t, mtof(midi), out, opts.len || 2, opts.vel, opts.bend ? mtof(opts.bend) : 0);
+    node.connect(master);
+    var v = ctx.createGain(); v.gain.value = sends[0]; node.connect(v); v.connect(verbSend);
+    var e = ctx.createGain(); e.gain.value = sends[1]; node.connect(e); e.connect(delaySend);
+    if (sends[2]) { var hs = ctx.createGain(); hs.gain.value = sends[2]; node.connect(hs); hs.connect(hallSend); }
+    return true;
+  }
+
+  /* ---------- blob shapes (same organic outline as the site) ---------- */
+  function outline(b, time) {
+    var N = 28, pts = [], pod = b.pod, podAng = pod.ang + time * pod.drift;
+    var reach = 0.16 * Math.pow(Math.max(0, Math.sin(time * pod.sp + pod.ph)), 2);
+    for (var j = 0; j < N; j++) {
+      var th = j / N * Math.PI * 2, r = 1;
+      for (var h = 0; h < b.waves.length; h++) { var o = b.waves[h];
+        r += o.a * (0.6 + 0.4 * Math.sin(time * o.am + o.amPh)) * Math.sin(o.k * th + o.ph + time * o.sp); }
+      var dd = Math.atan2(Math.sin(th - podAng), Math.cos(th - podAng));
+      r += reach * Math.exp(-dd * dd / 0.25);
+      pts.push([Math.cos(th) * r * 45, Math.sin(th) * r * 45]);
+    }
+    var f = function (v) { return v.toFixed(1); }, d = 'M' + f(pts[0][0]) + ' ' + f(pts[0][1]);
+    for (var k = 0; k < N; k++) {
+      var p0 = pts[(k - 1 + N) % N], p1 = pts[k], p2 = pts[(k + 1) % N], p3 = pts[(k + 2) % N];
+      d += 'C' + f(p1[0] + (p2[0] - p0[0]) / 6) + ' ' + f(p1[1] + (p2[1] - p0[1]) / 6) + ' ' +
+                 f(p2[0] - (p3[0] - p1[0]) / 6) + ' ' + f(p2[1] - (p3[1] - p1[1]) / 6) + ' ' + f(p2[0]) + ' ' + f(p2[1]);
+    }
+    return d + 'Z';
+  }
+
+  /* ---------- the characters ---------- */
+  var KINDS = {
+    shy:     { voice: 'bells',   color: '#2BA6CF', size: 46,  oct: 12,  on: true },
+    watcher: { voice: 'kalimba', color: '#B4533C', size: 112, oct: 0,   on: true },
+    swell:   { voice: 'pad',     color: '#EE9BB4', size: 86,  oct: -12, on: true },
+    drop:    { voice: 'marimba', color: '#E2B23A', size: 64,  oct: 0,   on: false },
+    hungry:  { voice: 'bass',    color: '#7FC2A0', size: 122, oct: -24, on: true },
+    chatter: { voice: 'trills',  color: '#6B5FA8', size: 52,  oct: 12,  on: false },
+    singer:  { voice: 'lah',     color: '#B98BD0', size: 58,  oct: 0,   on: true },
+    strummer:{ voice: 'koto',    color: '#C9925A', size: 70,  oct: 0,   on: true }
+  };
+  // one of Halli's faces for the watcher (dots for eyes, hollow smile)
+  var FACE = { ref: [38.4, 33.4, 261.6, 266.6], box: [93.9, 119.0, 151.4, 149.3],
+    svg: '<circle cx="98.85" cy="123.95" r="4.99" fill="#fff"/><circle cx="146.46" cy="124.96" r="4.99" fill="#fff"/>' +
+         '<path d="M108.9,137.4s4.37,5.64,12.7,5.93,14.39-4.8,14.39-4.8" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke="#fff" stroke-width="12px"/>' +
+         '<path d="M108.9,136.48s4.37,5.64,12.7,5.93c8.32.28,14.39-4.8,14.39-4.8" stroke="BODY" stroke-width="2px" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' };
+
+  Object.keys(KINDS).forEach(function (k) {
+    var c = KINDS[k].color, g = document.createElementNS(NS, 'radialGradient');
+    g.id = 'g-' + k;
+    g.innerHTML = '<stop offset="0" stop-color="' + c + '" stop-opacity="1"/><stop offset="0.6" stop-color="' + c + '" stop-opacity="0.75"/>' +
+                  '<stop offset="1" stop-color="' + c + '" stop-opacity="0.25"/>';
+    defs.appendChild(g);
+  });
+
+  var blobs = [];
+  function makeBlob(kind) {
+    var K = KINDS[kind], g = document.createElementNS(NS, 'g'), path = document.createElementNS(NS, 'path');
+    path.setAttribute('fill', 'url(#g-' + kind + ')'); g.appendChild(path); gBlobs.appendChild(g);
+    var ang = rand(0, 6.3), sp = rand(9, 18);
+    var twin = blobs.some(function (o) { return o.kind === kind; });   // extra copies of a kind vary a little in size
+    var b = { kind: kind, K: K, g: g, path: path, d: K.size * (twin ? rand(0.8, 1.15) : 1), x: rand(0.1, 0.9) * W, y: rand(0.1, 0.9) * H,
+      vx: Math.cos(ang) * sp, vy: Math.sin(ang) * sp, ox: 0, oy: 0, sx: 1, sy: 1, svx: 0, svy: 0, tx: 1, ty: 1, grow: 1,
+      rot: kind === 'watcher' ? 0 : rand(0, 360), vr: kind === 'watcher' ? 0 : rand(-6, 6), state: 'float', side: [], cool: [],
+      personal: rand(0, 80), circle: (Math.random() < 0.5 ? -1 : 1) * rand(0.5, 1),
+      waves: [[2, 0.10], [3, 0.07], [4, 0.045], [5, 0.025]].map(function (w) {
+        return { k: w[0], a: w[1] * rand(0.5, 1), ph: rand(0, 6.3), sp: rand(0.08, 0.25) * (Math.random() < 0.5 ? -1 : 1), am: rand(0.1, 0.3), amPh: rand(0, 6.3) }; }),
+      pod: { ang: rand(0, 6.3), drift: rand(-0.15, 0.15), sp: rand(0.12, 0.25), ph: rand(0, 6.3) } };
+    if (kind === 'watcher') {
+      var fg = document.createElementNS(NS, 'g'), R = FACE.ref, B = FACE.box, s = 90 / ((R[2] - R[0] + R[3] - R[1]) / 2);
+      fg.innerHTML = FACE.svg.replace(/BODY/g, K.color); g.appendChild(fg);
+      var fcx = (B[0] + B[2]) / 2, fcy = (B[1] + B[3]) / 2;
+      b.face = { g: fg, s: s, fcx: fcx, fcy: fcy, ox: (fcx - (R[0] + R[2]) / 2) * s * 0.75, oy: (fcy - (R[1] + R[3]) / 2) * s * 0.75,
+        lx: 0, ly: 0, blink: 0, next: rand(2, 6), eyes: [].slice.call(fg.querySelectorAll('circle')).map(function (e) {
+          return { el: e, cx: +e.getAttribute('cx'), cy: +e.getAttribute('cy') }; }) };
+      placeFace(b);
+    }
+    blobs.push(b);
+    return b;
+  }
+  function enter(b) {               // a new blob drifts in from an edge, so you can watch it arrive
+    var e = Math.floor(rand(0, 4)), r = b.d / 2 + 10;
+    b.x = e === 0 ? -r : e === 1 ? W + r : rand(0.1, 0.9) * W;
+    b.y = e === 2 ? -r : e === 3 ? H + r : rand(0.15, 0.85) * H;
+    var dx = rand(0.3, 0.7) * W - b.x, dy = rand(0.3, 0.7) * H - b.y, l = Math.sqrt(dx * dx + dy * dy) || 1, sp = rand(12, 18);
+    b.vx = dx / l * sp; b.vy = dy / l * sp; b.side = [];
+  }
+  function leave(b) {               // send a blob away gently: it shrinks and fades over about a second
+    if (!b || b.state === 'leaving') return;
+    if (b.prey) release(b);
+    if (b.state === 'swallowed') release(b.host);
+    if (held === b) held = null;
+    b.state = 'leaving'; b.leaveT = 0;
+  }
+  function removeBlob(b) { gBlobs.removeChild(b.g); blobs.splice(blobs.indexOf(b), 1); syncTray(); }
+  function present() { return blobs.filter(function (b) { return b.state !== 'leaving'; }); }
+  function radius(b) { return b.d / 2 * zoom() * (b.sx + b.sy) / 2; }
+  function placeFace(b) {
+    var f = b.face, sq = f.blink > 0 ? 0.12 : 1;
+    f.g.setAttribute('transform', 'translate(' + (f.ox + f.lx * 4).toFixed(2) + ' ' + (f.oy + f.ly * 4).toFixed(2) + ') scale(' + f.s.toFixed(4) +
+      ') translate(' + (-f.fcx).toFixed(2) + ' ' + (-f.fcy).toFixed(2) + ')');
+    f.eyes.forEach(function (e) {
+      e.el.setAttribute('transform', 'translate(' + (e.cx + f.lx * 3.2).toFixed(2) + ' ' + (e.cy + f.ly * 3.2).toFixed(2) + ') scale(1 ' + sq + ') translate(' + (-e.cx) + ' ' + (-e.cy) + ')');
+    });
+  }
+
+  /* ---------- what each one does when it crosses a line ---------- */
+  function sing(b, k, force) {
+    var midi = lineMidi(k) + b.K.oct, muffled = b.state === 'swallowed';
+    if (b.kind === 'shy') while (midi > 86) midi -= 12;                    // the highest bells drop an octave: gentler on the ear
+    var bend = b.kind === 'strummer' && Math.random() < 0.15 ? noteAt(NL - k) + b.K.oct : 0;   // oshide: now and then pressed up to the next note
+    if (b.kind === 'singer') {
+      while (midi < 62) midi += 12; while (midi > 79) midi -= 12;          // keep her in a woman's singing range, whatever the key
+      var nowS = performance.now() / 1000;
+      if (b.lastLah && nowS - b.lastLah < 1.6) return;                       // an occasional "lah!", never a stream of them
+      b.lastLah = nowS;
+    }
+    var ok = play(b.K.voice, midi, b.x, { muffled: muffled, force: force, len: 1.5 + b.grow * 2, bend: bend });
+    if (!ok) return;
+    pluck(lines[k], b.x, muffled ? 3 : 4 + b.d / 14);
+    if (!muffled) { b.svx += 0.5; b.svy += 0.7; }
+  }
+  function nearestLine(b) {
+    var best = 0, bd = Infinity;
+    lines.forEach(function (L, k) { var d = Math.abs(lineY(L, b.x) - b.y); if (d < bd) { bd = d; best = k; } });
+    return best;
+  }
+
+  /* ---------- clicks ---------- */
+  var ptr = null, lastMove = performance.now(), curious = false, held = null, paused = false;
+  function hit(x, y) {
+    for (var i = blobs.length - 1; i >= 0; i--) { var b = blobs[i];
+      if (b.state !== 'float') continue;
+      var dx = x - b.x, dy = y - b.y, r = radius(b) * 0.9; if (dx * dx + dy * dy < r * r) return b; }
+    return null;
+  }
+  function flee(b, px, py, power) {
+    var dx = b.x - px, dy = b.y - py, len = Math.sqrt(dx * dx + dy * dy) || 1;
+    b.ox += dx / len * power; b.oy += dy / len * power;
+  }
+  function release(host) {
+    var p = host.prey; if (!p) return;
+    var a = rand(0, 6.3);
+    p.state = 'float'; p.side = []; p.ox = Math.cos(a) * 300; p.oy = Math.sin(a) * 300; p.tx = p.ty = p.grow;
+    p.g.style.opacity = ''; host.prey = null; host.tx = host.ty = host.grow; host.svx -= 2; host.svy += 2.4;
+  }
+  function act(b) {
+    var k = nearestLine(b), base = lineMidi(k);
+    if (b.kind === 'swell') {
+      b.grow = Math.min(b.grow * 1.2, 1.8); b.tx = b.ty = b.grow; b.svx += 2; b.svy += 2.6;
+      play('pad', base + b.K.oct, b.x, { force: true, len: 2 + b.grow * 2 });
+    } else if (b.kind === 'drop') {
+      b.state = 'held'; held = b; b.tx = 0.92; b.ty = 0.6;
+    } else if (b.kind === 'hungry') {
+      if (b.prey) { release(b); play('bass', base - 5 + b.K.oct, b.x, { force: true }); return; }
+      var best = null, bd = Infinity;
+      blobs.forEach(function (o) { if (o === b || o.state !== 'float') return;
+        var d = Math.hypot(o.x - b.x, o.y - b.y); if (d < bd) { bd = d; best = o; } });
+      if (!best) { b.svx += 2; return; }
+      b.prey = best; best.state = 'swallowed'; best.host = b; best.gulp = 0; best.orbit = rand(0, 6.3); best.side = [];
+      best.tx = best.ty = Math.min(0.55, b.d * 0.42 / best.d); gBlobs.appendChild(best.g);
+      b.tx = b.ty = b.grow * 1.12; b.svx += 1.5; b.svy += 1.5;
+      play('bass', base + b.K.oct, b.x, { force: true });
+    } else if (b.kind === 'watcher') {
+      b.face.blink = 0.3; b.svx += 1.4; b.svy -= 1.8;
+      play('kalimba', base, b.x, { force: true });
+      setTimeout(function () { play('kalimba', base + 7, b.x, { force: true }); }, 220);
+    } else if (b.kind === 'singer') {
+      var m = base + 7; while (m < 62) m += 12; while (m > 79) m -= 12;      // clicked: one "lah!" a fifth up
+      b.svx -= 1.2; b.svy += 2.4; b.lastLah = performance.now() / 1000;
+      play('lah', m, b.x, { force: true });
+    } else if (b.kind === 'strummer') {
+      b.svx += 1.6; b.svy -= 1.8;
+      for (var s = 0; s < NL; s++) (function (s) {                       // sararin: a hand sweeping across all the strings
+        setTimeout(function () { if (play('koto', lineMidi(s), b.x, { force: true, vel: 0.9 - s * 0.06 })) pluck(lines[s], b.x, 6); }, s * 70);
+      })(s);
+    } else if (b.kind === 'chatter') {
+      b.svx += 2; b.svy -= 2;
+      [0, 2, 1, 3, 2].forEach(function (step, i) {
+        setTimeout(function () { var kk = Math.max(0, Math.min(NL - 1, k - step)); play('trills', lineMidi(kk) + 12, b.x, { force: true }); }, i * 95);
+      });
+    }
+  }
+  svg.addEventListener('pointerdown', function (e) {
+    ptr = { x: e.clientX, y: e.clientY };
+    var b = hit(e.clientX, e.clientY); if (!b) return;
+    if (b.kind === 'shy') { flee(b, e.clientX, e.clientY, 420); return; }
+    e.preventDefault(); act(b);
+  });
+  addEventListener('pointermove', function (e) {
+    ptr = { x: e.clientX, y: e.clientY }; lastMove = performance.now();
+    if (curious) { curious = false;
+      blobs.forEach(function (b) { if (b.state !== 'float') return;
+        var d = Math.hypot(b.x - e.clientX, b.y - e.clientY); if (d < 350) flee(b, e.clientX, e.clientY, 300 * (1 - d / 350)); }); }
+    var over = hit(e.clientX, e.clientY);
+    svg.style.cursor = over && over.kind !== 'shy' ? 'pointer' : '';
+  }, { passive: true });
+  function up(e) {
+    if (e.pointerType !== 'mouse') ptr = null;
+    if (!held) return;
+    held.state = 'falling'; held.fall = 0; held.vr = rand(-80, 80); held = null;   // falls through every line: a cascade
+  }
+  addEventListener('pointerup', up); addEventListener('pointercancel', up);
+  document.addEventListener('pointerout', function (e) { if (!e.relatedTarget) ptr = null; });   // cursor left the window
+
+  /* ---------- controls ---------- */
+  var chips = document.getElementById('hcp-chips'), chipFor = {}, MAX_BLOBS = 16, picked = false;   // picked: the visitor has chosen kinds themselves
+  var moreBtn = document.getElementById('hcp-more'), fewerBtn = document.getElementById('hcp-fewer');
+  function syncTray() {             // blob buttons show which kinds are in; more/fewer grey out at their limits
+    var here = present();
+    Object.keys(chipFor).forEach(function (k) {
+      chipFor[k].setAttribute('aria-pressed', String(here.some(function (b) { return b.kind === k; })));
+    });
+    moreBtn.disabled = here.length >= MAX_BLOBS; fewerBtn.disabled = here.length === 0;
+    // the toggle shows the pond's blobs as coloured dots (up to 8, then +n); screen readers hear the count instead
+    var dots = document.getElementById('hcp-blobDots');
+    dots.innerHTML = here.slice(0, 8).map(function (b) { return '<i style="background:' + b.K.color + '"></i>'; }).join('') +
+      (here.length > 8 ? '<em>+' + (here.length - 8) + '</em>' : '');
+    document.getElementById('hcp-blobSr').textContent = ', ' + here.length + ' in the pond';
+    document.getElementById('hcp-howMany').textContent = here.length + ' in the pond, room for ' + MAX_BLOBS;
+  }
+  Object.keys(KINDS).forEach(function (kind) {
+    var K = KINDS[kind], bt = document.createElement('button');
+    bt.type = 'button'; bt.className = 'hcp-chip'; bt.setAttribute('aria-pressed', String(K.on));
+    bt.innerHTML = '<span class="hcp-dot" style="background:' + K.color + '"></span>' + kind + ' <span class="hcp-voice">' + K.voice + '</span>';
+    bt.addEventListener('click', function () {
+      picked = true;
+      if (bt.getAttribute('aria-pressed') === 'true') present().filter(function (b) { return b.kind === kind; }).forEach(leave);   // all of this kind go
+      else if (present().length < MAX_BLOBS) enter(makeBlob(kind));
+      syncTray();
+    });
+    chips.appendChild(bt); chipFor[kind] = bt;
+    if (K.on) makeBlob(kind);
+  });
+  moreBtn.addEventListener('click', function () {
+    if (present().length >= MAX_BLOBS) return;
+    var kinds = Object.keys(KINDS), inNow = kinds.filter(function (k) { return present().some(function (b) { return b.kind === k; }); });
+    var pool = inNow.length && (picked || Math.random() < 0.75) ? inNow : kinds;   // after you've chosen kinds: only those; otherwise mostly more of the same, sometimes someone new
+    enter(makeBlob(pool[Math.floor(Math.random() * pool.length)])); syncTray();
+  });
+  fewerBtn.addEventListener('click', function () { var here = present(); leave(here[here.length - 1]); syncTray(); });   // the newest one goes
+  syncTray();
+  // scale picker and "surprise me"
+  var pick = document.getElementById('hcp-scalePick');
+  function fillPicker() {
+    var opts = [['time', 'follows the time of day']].concat(Object.keys(SCALES).filter(function (k) { return !SCALES[k].secret || chosen === k; })
+      .map(function (k) { return [k, k === 'bp' && strange ? 'something strange' : SCALES[k].name]; }));
+    pick.innerHTML = opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === chosen ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
+  }
+  function setScale(id, how) {
+    chosen = id; strange = false; fillPicker(); drawCaption();
+    document.getElementById('hcp-scaleSr').textContent = 'now playing the ' + scaleLabel() + ' scale';
+    arpeggio();                       // hear the new scale straight away
+  }
+  pick.addEventListener('change', function () { setScale(pick.value, 'picked'); });
+  document.getElementById('hcp-surprise').addEventListener('click', function () {
+    // weighted towards what people rarely hear; never the scale that's playing now
+    var w = { slendro: 3, pelog: 3, harmonic: 3, hirajoshi: 2.5, whole: 2, bp: 1.5, lydian: 1.5, dorian: 1, majpent: 0.4, minpent: 0.4 };
+    var now = scaleId(), keys = Object.keys(w).filter(function (k) { return k !== now; });
+    var r = Math.random() * keys.reduce(function (s, k) { return s + w[k]; }, 0), i = 0;
+    for (; i < keys.length - 1; i++) { r -= w[keys[i]]; if (r <= 0) break; }
+    setScale(keys[i], 'surprise');
+  });
+  fillPicker();
+  // the blobs panel: opens above the toggle; the toggle or Escape closes it
+  var panel = document.getElementById('hcp-blobPanel'), toggle = document.getElementById('hcp-blobsToggle');
+  function fitPanel() {             // never taller than the space between the caption and the tray
+    if (panel.hidden) return;
+    var top = document.getElementById('hcp-caption').getBoundingClientRect().top - 6;
+    var trayTop = panel.parentElement.getBoundingClientRect().top;
+    panel.style.maxHeight = Math.max(160, trayTop - 10 - top) + 'px';
+  }
+  function setPanel(open) { panel.hidden = !open; toggle.setAttribute('aria-expanded', String(open)); fitPanel(); }
+  addEventListener('resize', fitPanel);
+  toggle.addEventListener('click', function () { setPanel(panel.hidden); });
+  addEventListener('keydown', function (e) { if (e.key === 'Escape' && !panel.hidden) { setPanel(false); toggle.focus(); } });
+  document.getElementById('hcp-capScale').addEventListener('click', function () { setPanel(true); pick.focus(); });   // the caption's scale name opens the picker
+  document.getElementById('hcp-blobClose').addEventListener('click', function () { setPanel(false); toggle.focus(); });   // the X: same as the arrow or Escape
+  document.getElementById('hcp-volume').addEventListener('input', function (e) {
+    volume = +e.target.value; if (master) master.gain.setTargetAtTime(volume, ctx.currentTime, 0.05);
+  });
+  var pauseBtn = document.getElementById('hcp-pause');
+  var ICON_PAUSE = '<svg viewBox="0 0 14 14" aria-hidden="true"><rect x="2" y="1.5" width="3.5" height="11" rx="1" fill="currentColor"/><rect x="8.5" y="1.5" width="3.5" height="11" rx="1" fill="currentColor"/></svg>';
+  var ICON_PLAY = '<svg viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.8v10.4c0 .6.6 1 1.1.7l8.4-5.2c.5-.3.5-1.1 0-1.4L4.1 1.1C3.6.8 3 1.2 3 1.8z" fill="currentColor"/></svg>';
+  function drawPause() { pauseBtn.innerHTML = (paused ? ICON_PLAY + 'wake blobs' : ICON_PAUSE + 'pause blobs'); }
+  pauseBtn.addEventListener('click', function () { paused = !paused; drawPause(); });
+  drawPause();
+  document.getElementById('hcp-wakeBtn').addEventListener('click', function () {
+    initAudio(); if (ctx && ctx.resume) ctx.resume();
+    document.getElementById('hcp-wake').hidden = true;
+    blobs.forEach(function (b) { b.side = []; });
+    pauseBtn.focus({ preventScroll: true });
+  });
+  function fitToScreen() {          // checked every frame: if the drawing area changed size, rescale the pond to it
+    var r = svg.getBoundingClientRect(), nw = Math.round(r.width), nh = Math.round(r.height);
+    if (!nw || !nh || (nw === W && nh === H)) return;
+    var fx = nw / W, fy = nh / H;
+    blobs.forEach(function (b) { b.x *= fx; b.y *= fy; b.side = []; });
+    W = nw; H = nh; buildLines();
+  }
+  addEventListener('resize', fitToScreen);
+  buildLines();
+
+  /* ---------- the loop ---------- */
+  var last = performance.now(), t = 0;
+  var nextArp = performance.now() + rand(25, 40) * 1000;   // the electric piano's first visit
+  function arpeggio() {             // a broken chord from the current scale, rolled by a slightly uneven hand
+    var len = SCALES[scaleId()].steps.length, deg = Math.floor(rand(0, len)), steps = Math.random() < 0.5 ? [0, 2, 4] : [0, 2, 4, len], at = 0;
+    if (Math.random() < 0.25) steps = steps.slice().reverse();      // now and then it rolls downwards
+    steps.forEach(function (s, i) {
+      var d = deg + s, midi = noteAt(d) - 12, vel = 0.85 - i * 0.08 + rand(-0.05, 0.05);
+      setTimeout(function () {
+        if (paused) return;
+        if (play('ep', midi, W * rand(0.3, 0.7), { force: true, vel: vel }))
+          lines.forEach(function (L, k) { if (samePitch(lineMidi(k), midi)) pluck(L, W * rand(0.3, 0.7), 5); });   // its lines shimmer
+      }, at);
+      at += rand(190, 290);
+    });
+  }
+  function frame(now) {
+    var dt = Math.min((now - last) / 1000, 0.05); last = now;
+    fitToScreen();
+    var pace = mood.pace * (reduce ? 0.3 : 1);
+    if (!paused) t += dt * pace;
+    var gone = [];
+    if (paused || !ctx || ctx.state !== 'running') nextArp += dt * 1000;   // the piano waits while the pond sleeps
+    else if (now > nextArp) { arpeggio(); nextArp = now + rand(50, 110) * 1000; }
+    var rest = now - lastMove;
+    curious = !paused && !!ptr && rest > 3000 && rest < 15000;   // they come to look, then lose interest and drift off again
+    if (curious) {
+      for (var a = 0; a < blobs.length; a++) for (var c = a + 1; c < blobs.length; c++) {
+        var A = blobs[a], C = blobs[c]; if (A.state !== 'float' || C.state !== 'float') continue;
+        var sx = C.x - A.x, sy = C.y - A.y, sd = Math.sqrt(sx * sx + sy * sy) || 1, room = (radius(A) + radius(C)) * 0.85;
+        if (sd < room) { var nudge = (1 - sd / room) * 120 * dt; A.ox -= sx / sd * nudge; A.oy -= sy / sd * nudge; C.ox += sx / sd * nudge; C.oy += sy / sd * nudge; }
+      }
+    }
+    lines.forEach(function (L) { drawLine(L, paused ? 0 : dt); });
+
+    blobs.forEach(function (b) {
+      b.svx += ((b.tx - b.sx) * 170 - b.svx * 9) * dt; b.sx += b.svx * dt;
+      b.svy += ((b.ty - b.sy) * 170 - b.svy * 9) * dt; b.sy += b.svy * dt;
+      var px = b.x, py = b.y;
+      if (b.state === 'leaving') {
+        b.leaveT += dt; b.g.style.opacity = Math.max(0, 1 - b.leaveT / 1.2).toFixed(3); b.tx = b.ty = 0.6;
+        if (b.leaveT > 1.2) gone.push(b);
+      }
+
+      if (b.state === 'float' && !paused) {
+        if (b.kind === 'shy' && ptr) { var dx = b.x - ptr.x, dy = b.y - ptr.y, dist = Math.sqrt(dx * dx + dy * dy) || 1, reach = radius(b) + 70;
+          if (dist < reach) { var push = (1 - dist / reach) * 2600 * dt; b.ox += dx / dist * push; b.oy += dy / dist * push; } }
+        if (curious) { var cx = ptr.x - b.x, cy = ptr.y - b.y, cd = Math.sqrt(cx * cx + cy * cy) || 1;
+          var ring = radius(b) + (b.kind === 'shy' ? 110 : 45) + b.personal, pull = cd > ring ? Math.min(1, (cd - ring) / 200) : -0.5;
+          b.ox += cx / cd * pull * 140 * dt; b.oy += cy / cd * pull * 140 * dt;
+          b.ox += -cy / cd * b.circle * 90 * dt; b.oy += cx / cd * b.circle * 90 * dt; }
+        b.ox *= Math.exp(-3 * dt); b.oy *= Math.exp(-3 * dt);
+        var slow = pace * (b.prey ? 0.5 : 1) * (curious ? 0.4 : 1);
+        b.x += (b.vx * slow + b.ox) * dt; b.y += (b.vy * slow + b.oy) * dt; b.rot += b.vr * pace * dt;
+        if (b.kind === 'swell' && b.grow > 1) { b.grow += (1 - b.grow) * dt * 0.04; b.tx = b.ty = b.grow; }   // slowly lets the air out
+        var m = radius(b) + 10, wrapped = false;
+        if (b.x < -m) { b.x = W + m; wrapped = true; } else if (b.x > W + m) { b.x = -m; wrapped = true; }
+        if (b.y < -m) { b.y = H + m; wrapped = true; } else if (b.y > H + m) { b.y = -m; wrapped = true; }
+        if (wrapped) b.side = [];                                   // a jump across the screen is not a crossing
+      } else if (b.state === 'swallowed') {
+        var host = b.host, orb = radius(host) * 0.16;
+        b.gulp = Math.min(1, b.gulp + dt * 2.5); if (!paused) b.orbit += dt * 0.5;
+        var hx = host.x + Math.cos(b.orbit) * orb, hy = host.y + Math.sin(b.orbit * 1.3) * orb, follow = b.gulp < 1 ? Math.min(1, dt * 8) : 1;
+        b.x += (hx - b.x) * follow; b.y += (hy - b.y) * follow;
+        b.g.style.opacity = (1 - 0.62 * b.gulp).toFixed(3);
+      } else if (b.state === 'falling') {
+        b.fall += 1100 * dt; b.y += b.fall * dt; b.rot += b.vr * dt;
+        if (b.y - radius(b) > H + 20) {                             // drifts back in from the top
+          b.state = 'float'; b.y = -radius(b) - 10; b.x = rand(0.15, 0.85) * W; b.tx = b.ty = 1; b.side = [];
+          b.vx = rand(-10, 10); b.vy = rand(8, 14);
+        }
+      }
+
+      // crossing a line plays it
+      if ((!paused || b.state === 'falling') && b.state !== 'leaving') {
+        lines.forEach(function (L, k) {
+          var side = b.y < lineY(L, b.x) ? -1 : 1;
+          if (b.side[k] !== undefined && side !== b.side[k] && b.state !== 'held') {
+            var cool = b.state === 'falling' ? 0.05 : 0.6;
+            if (!b.cool[k] || now / 1000 - b.cool[k] > cool) { b.cool[k] = now / 1000; sing(b, k, b.state === 'falling'); }
+          }
+          b.side[k] = side;
+        });
+      }
+
+      if (b.face && !paused) {
+        var f = b.face, tx = 0, ty = 0;
+        if (ptr) { var ex = ptr.x - b.x, ey = ptr.y - b.y, ed = Math.sqrt(ex * ex + ey * ey) || 1, kk = Math.min(1, ed / 250); tx = ex / ed * kk; ty = ey / ed * kk; }
+        else { tx = Math.sin(t * 0.37) * 0.6; ty = Math.sin(t * 0.23 + 1) * 0.4; }
+        f.lx += (tx - f.lx) * Math.min(1, dt * 6); f.ly += (ty - f.ly) * Math.min(1, dt * 6);
+        f.next -= dt; if (f.next <= 0) { f.blink = 0.16; f.next = rand(2.5, 7); }
+        if (f.blink > 0) f.blink -= dt;
+        placeFace(b);
+      }
+      b.path.setAttribute('d', outline(b, t));
+      var s = b.d / 90 * zoom();
+      b.g.setAttribute('transform', 'translate(' + b.x.toFixed(1) + ' ' + b.y.toFixed(1) + ') rotate(' + b.rot.toFixed(1) + ') scale(' +
+        (s * b.sx).toFixed(4) + ' ' + (s * b.sy).toFixed(4) + ')');
+    });
+    gone.forEach(removeBlob);
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+  window.__hcPondSleep = function () { if (!paused) { paused = true; drawPause(); } if (ctx && ctx.suspend) ctx.suspend(); };
+  window.__hcPondWake = function () { if (ctx && ctx.resume) ctx.resume(); };
+})();
+}
+  var pending = null;
+  new MutationObserver(function () { clearTimeout(pending); pending = setTimeout(check, 120); }).observe(document.documentElement, { childList: true, subtree: true });
+  addEventListener('popstate', check);
+  check();
+})();
+</script>
+
+<style>
+/* Halli: mobile menu */
+
+body.mobile .mobile_site_header {
+  z-index: 10003;
+}
+
+body.mobile .navigation_toggle,
+body.mobile .navigation_toggle.active {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  right: calc(12px + env(safe-area-inset-right, 0px));
+  width: 56px;
+  height: 56px;
+  box-sizing: border-box;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #492e46;
+  color: #f4dce0;
+  opacity: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Replace Cargo's icon images with two matching strokes. */
+body.mobile .navigation_toggle img {
+  display: none !important;
+}
+
+body.mobile .navigation_toggle::before,
+body.mobile .navigation_toggle::after {
+  content: "";
+  position: absolute;
+  left: 15px;
+  width: 26px;
+  height: 4px;
+  border-radius: 2px;
+  background: currentColor;
+  transform-origin: center;
+}
+
+body.mobile .navigation_toggle::before {
+  top: 20.5px;
+}
+
+body.mobile .navigation_toggle::after {
+  top: 31.5px;
+}
+
+body.mobile .navigation_toggle.active::before {
+  top: 26px;
+  transform: rotate(45deg);
+}
+
+body.mobile .navigation_toggle.active::after {
+  top: 26px;
+  transform: rotate(-45deg);
+}
+
+body.mobile .navigation_toggle:focus-visible {
+  outline: 3px solid #087f92;
+  outline-offset: 4px;
+}
+
+/* Full-screen menu */
+body.mobile .site_header .navigation {
+  position: fixed;
+  inset: 0;
+  z-index: 10002;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0;
+  padding:
+    calc(112px + env(safe-area-inset-top, 0px))
+    24px
+    calc(32px + env(safe-area-inset-bottom, 0px));
+  background: #f4dce0;
+  color: #492e46;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  text-align: left;
+}
+
+body.mobile .site_header .navigation.active {
+  display: block;
+}
+
+body.mobile .site_header .navigation ul.list {
+  display: block;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+body.mobile .site_header .navigation ul.list li {
+  display: block;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  white-space: normal;
+  background: transparent;
+}
+
+body.mobile .site_header .navigation ul.list li a {
+  display: block;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 20px 0;
+  border: 0;
+  border-bottom: 1px solid rgba(73, 46, 70, 0.16);
+  background: transparent;
+  color: #492e46;
+  font-size: clamp(28px, 9vw, 39px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+  text-transform: none;
+  text-decoration: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  overflow: visible;
+  touch-action: manipulation;
+}
+
+body.mobile .site_header .navigation ul.list li a:hover,
+body.mobile .site_header .navigation ul.list li a:focus-visible {
+  color: #087f92;
+}
+
+body.mobile .site_header .navigation ul.list li.link_active a,
+body.mobile .site_header .navigation ul.list li a[aria-current="page"] {
+  color: #087f92;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 8px;
+}
+
+/* Keep the background still and the blob control out of the menu. */
+html.hc-menu-open,
+body.mobile.hc-menu-open {
+  overflow: hidden !important;
+}
+
+body.mobile.hc-menu-open .hc-pause {
+  display: none !important;
+}
+</style>
+
+<script>
+(function () {
+  function setup() {
+    if (window.__hcMobileMenu) return;
+
+    var toggle = document.querySelector(".navigation_toggle");
+    var nav = document.querySelector(".site_header .navigation");
+    if (!toggle || !nav || !window.jQuery) return;
+
+    window.__hcMobileMenu = true;
+
+    /*
+     * Remove Cargo's old behaviour that closes the menu
+     * as soon as you touch an empty area.
+     * Keep Cargo's existing click handler on the toggle.
+     */
+    window.jQuery(nav).off("touchstart");
+
+    if (!nav.id) nav.id = "hc-mobile-navigation";
+
+    toggle.setAttribute("role", "button");
+    toggle.setAttribute("tabindex", "0");
+    toggle.setAttribute("aria-controls", nav.id);
+    nav.setAttribute("aria-label", "Main navigation");
+
+    function isOpen() {
+      return document.body.classList.contains("mobile") &&
+        nav.classList.contains("active");
+    }
+
+    function sync() {
+      var open = isOpen();
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+      document.documentElement.classList.toggle("hc-menu-open", open);
+      document.body.classList.toggle("hc-menu-open", open);
+    }
+
+    function closeMenu(returnFocus) {
+      nav.classList.remove("active");
+      toggle.classList.remove("active");
+      sync();
+      if (returnFocus) toggle.focus();
+    }
+
+    toggle.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        toggle.click();
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (!isOpen()) return;
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeMenu(true);
+      }
+
+      if (event.key === "Tab") {
+        var links = Array.from(nav.querySelectorAll("a[href]"))
+          .filter(function (link) {
+            return link.getClientRects().length > 0;
+          });
+        var controls = [toggle].concat(links);
+        var index = controls.indexOf(document.activeElement);
+        var next = event.shiftKey ? index - 1 : index + 1;
+
+        event.preventDefault();
+        if (next < 0) next = controls.length - 1;
+        if (next >= controls.length) next = 0;
+        controls[next].focus();
+      }
+    });
+
+    nav.addEventListener("click", function (event) {
+      if (event.target.closest("a[href]")) {
+        closeMenu(false);
+      }
+    });
+
+    new MutationObserver(sync).observe(nav, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    window.addEventListener("resize", sync);
+    sync();
+  }
+
+  if (document.readyState === "complete") {
+    setup();
+  } else {
+    window.addEventListener("load", setup, { once: true });
+  }
+})();
+</script>

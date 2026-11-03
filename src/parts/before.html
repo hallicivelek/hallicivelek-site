@@ -1,0 +1,59 @@
+<script type="text/javascript">
+/**
+* Add a filter to your project navigation
+*/
+function addFilterActive(selector, remove_on_page, active_class) {
+   if(typeof Cargo.Helper == "object") {
+       var filter = Cargo.Helper.GetActiveFilter();
+   } else {
+       var filter = Cargo.Location.GetUserFilter();
+   }
+
+   var el_selector = (selector) ? $(selector) : $('.link_link');
+       active_class = (active_class) ? active_class : "link_active";
+
+   if( $('[href$="filter/'+filter+'"]',el_selector).parent() == selector) {
+       $('[href$="filter/'+filter+'"]',el_selector).addClass(active_class);
+   } else {
+       $('[href$="filter/'+filter+'"]',el_selector).parent().addClass(active_class);
+   }
+
+   if(remove_on_page) {
+       $(document).bind("projectLoadComplete", function() {
+           $("."+active_class).removeClass(active_class);
+       });
+       $(document).bind("projectCloseComplete", function() {
+           addFilterActive(selector, false);
+       });
+   }
+}
+
+$(function() {
+   var selector = ".link_link";
+   var remove_on_page = false;
+   var active_class = "link_active";
+
+   addFilterActive(selector, remove_on_page, active_class);
+});
+</script>
+
+
+<!-- Statcounter code for hallicivelek.com
+http://hallicivelek.com on Cargo Collective -->
+<script type="text/javascript">
+var sc_project=11932360;
+var sc_invisible=1;
+var sc_security="8612abcb";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics
+Made Easy - StatCounter" href="https:/statcounter.com/"
+target="_blank"><img class="statcounter"
+src="https://c.statcounter.com/11932360/0/8612abcb/1/"
+alt="Web Analytics Made Easy -
+StatCounter"></a></div></noscript>
+<!-- End of Statcounter Code -->
+
+<link rel="stylesheet" href="https://use.typekit.net/yhc8ger.css">

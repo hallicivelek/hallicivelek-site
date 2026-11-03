@@ -1,0 +1,325 @@
+<!-- Complete Custom HTML for hallicivelek.com (short version: the add-ons load from GitHub Pages).
+     Replace everything in Custom HTML with this whole file. -->
+<script type="text/javascript">
+/**
+* Add a filter to your project navigation
+*/
+function addFilterActive(selector, remove_on_page, active_class) {
+   if(typeof Cargo.Helper == "object") {
+       var filter = Cargo.Helper.GetActiveFilter();
+   } else {
+       var filter = Cargo.Location.GetUserFilter();
+   }
+
+   var el_selector = (selector) ? $(selector) : $('.link_link');
+       active_class = (active_class) ? active_class : "link_active";
+
+   if( $('[href$="filter/'+filter+'"]',el_selector).parent() == selector) {
+       $('[href$="filter/'+filter+'"]',el_selector).addClass(active_class);
+   } else {
+       $('[href$="filter/'+filter+'"]',el_selector).parent().addClass(active_class);
+   }
+
+   if(remove_on_page) {
+       $(document).bind("projectLoadComplete", function() {
+           $("."+active_class).removeClass(active_class);
+       });
+       $(document).bind("projectCloseComplete", function() {
+           addFilterActive(selector, false);
+       });
+   }
+}
+
+$(function() {
+   var selector = ".link_link";
+   var remove_on_page = false;
+   var active_class = "link_active";
+
+   addFilterActive(selector, remove_on_page, active_class);
+});
+</script>
+
+
+<!-- Statcounter code for hallicivelek.com
+http://hallicivelek.com on Cargo Collective -->
+<script type="text/javascript">
+var sc_project=11932360;
+var sc_invisible=1;
+var sc_security="8612abcb";
+</script>
+<script type="text/javascript"
+src="https://www.statcounter.com/counter/counter.js"
+async></script>
+<noscript><div class="statcounter"><a title="Web Analytics
+Made Easy - StatCounter" href="https:/statcounter.com/"
+target="_blank"><img class="statcounter"
+src="https://c.statcounter.com/11932360/0/8612abcb/1/"
+alt="Web Analytics Made Easy -
+StatCounter"></a></div></noscript>
+<!-- End of Statcounter Code -->
+
+<link rel="stylesheet" href="https://use.typekit.net/yhc8ger.css">
+
+<!-- ================================================================
+     hallicivelek.com — custom add-ons, loaded from GitHub (github.com/hallicivelek/hallicivelek-site)
+     1. Two-column fix      projects across two columns, in a random order of the day
+     2. Current page in nav  blue + aria-current on every page
+     3. Floating blobs      the background blobs, faces, pause button (not on the blob-pond page)
+     4. The blob-pond       builds the pond on the page whose address contains "blob-pond"
+     Each is its own script, so if one ever breaks (or GitHub is down) the others and the site keep working.
+     ================================================================ -->
+<script src="https://hallicivelek.github.io/hallicivelek-site/dist/js/hc-columns.js"></script>
+<script src="https://hallicivelek.github.io/hallicivelek-site/dist/js/hc-nav-active.js"></script>
+<script src="https://hallicivelek.github.io/hallicivelek-site/dist/js/hc-blobs.js"></script>
+<script src="https://hallicivelek.github.io/hallicivelek-site/dist/js/hc-pond.js"></script>
+
+<style>
+/* Halli: mobile menu */
+
+body.mobile .mobile_site_header {
+  z-index: 10003;
+}
+
+body.mobile .navigation_toggle,
+body.mobile .navigation_toggle.active {
+  position: fixed;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  right: calc(12px + env(safe-area-inset-right, 0px));
+  width: 56px;
+  height: 56px;
+  box-sizing: border-box;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #492e46;
+  color: #f4dce0;
+  opacity: 1;
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Replace Cargo's icon images with two matching strokes. */
+body.mobile .navigation_toggle img {
+  display: none !important;
+}
+
+body.mobile .navigation_toggle::before,
+body.mobile .navigation_toggle::after {
+  content: "";
+  position: absolute;
+  left: 15px;
+  width: 26px;
+  height: 4px;
+  border-radius: 2px;
+  background: currentColor;
+  transform-origin: center;
+}
+
+body.mobile .navigation_toggle::before {
+  top: 20.5px;
+}
+
+body.mobile .navigation_toggle::after {
+  top: 31.5px;
+}
+
+body.mobile .navigation_toggle.active::before {
+  top: 26px;
+  transform: rotate(45deg);
+}
+
+body.mobile .navigation_toggle.active::after {
+  top: 26px;
+  transform: rotate(-45deg);
+}
+
+body.mobile .navigation_toggle:focus-visible {
+  outline: 3px solid #087f92;
+  outline-offset: 4px;
+}
+
+/* Full-screen menu */
+body.mobile .site_header .navigation {
+  position: fixed;
+  inset: 0;
+  z-index: 10002;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  margin: 0;
+  padding:
+    calc(112px + env(safe-area-inset-top, 0px))
+    24px
+    calc(32px + env(safe-area-inset-bottom, 0px));
+  background: #f4dce0;
+  color: #492e46;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  text-align: left;
+}
+
+body.mobile .site_header .navigation.active {
+  display: block;
+}
+
+body.mobile .site_header .navigation ul.list {
+  display: block;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+body.mobile .site_header .navigation ul.list li {
+  display: block;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  white-space: normal;
+  background: transparent;
+}
+
+body.mobile .site_header .navigation ul.list li a {
+  display: block;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 20px 0;
+  border: 0;
+  border-bottom: 1px solid rgba(73, 46, 70, 0.16);
+  background: transparent;
+  color: #492e46;
+  font-size: clamp(28px, 9vw, 39px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+  text-transform: none;
+  text-decoration: none;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  overflow: visible;
+  touch-action: manipulation;
+}
+
+body.mobile .site_header .navigation ul.list li a:hover,
+body.mobile .site_header .navigation ul.list li a:focus-visible {
+  color: #087f92;
+}
+
+body.mobile .site_header .navigation ul.list li.link_active a,
+body.mobile .site_header .navigation ul.list li a[aria-current="page"] {
+  color: #087f92;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 8px;
+}
+
+/* Keep the background still and the blob control out of the menu. */
+html.hc-menu-open,
+body.mobile.hc-menu-open {
+  overflow: hidden !important;
+}
+
+body.mobile.hc-menu-open .hc-pause {
+  display: none !important;
+}
+</style>
+
+<script>
+(function () {
+  function setup() {
+    if (window.__hcMobileMenu) return;
+
+    var toggle = document.querySelector(".navigation_toggle");
+    var nav = document.querySelector(".site_header .navigation");
+    if (!toggle || !nav || !window.jQuery) return;
+
+    window.__hcMobileMenu = true;
+
+    /*
+     * Remove Cargo's old behaviour that closes the menu
+     * as soon as you touch an empty area.
+     * Keep Cargo's existing click handler on the toggle.
+     */
+    window.jQuery(nav).off("touchstart");
+
+    if (!nav.id) nav.id = "hc-mobile-navigation";
+
+    toggle.setAttribute("role", "button");
+    toggle.setAttribute("tabindex", "0");
+    toggle.setAttribute("aria-controls", nav.id);
+    nav.setAttribute("aria-label", "Main navigation");
+
+    function isOpen() {
+      return document.body.classList.contains("mobile") &&
+        nav.classList.contains("active");
+    }
+
+    function sync() {
+      var open = isOpen();
+      toggle.setAttribute("aria-expanded", String(open));
+      toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+      document.documentElement.classList.toggle("hc-menu-open", open);
+      document.body.classList.toggle("hc-menu-open", open);
+    }
+
+    function closeMenu(returnFocus) {
+      nav.classList.remove("active");
+      toggle.classList.remove("active");
+      sync();
+      if (returnFocus) toggle.focus();
+    }
+
+    toggle.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        toggle.click();
+      }
+    });
+
+    document.addEventListener("keydown", function (event) {
+      if (!isOpen()) return;
+
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeMenu(true);
+      }
+
+      if (event.key === "Tab") {
+        var links = Array.from(nav.querySelectorAll("a[href]"))
+          .filter(function (link) {
+            return link.getClientRects().length > 0;
+          });
+        var controls = [toggle].concat(links);
+        var index = controls.indexOf(document.activeElement);
+        var next = event.shiftKey ? index - 1 : index + 1;
+
+        event.preventDefault();
+        if (next < 0) next = controls.length - 1;
+        if (next >= controls.length) next = 0;
+        controls[next].focus();
+      }
+    });
+
+    nav.addEventListener("click", function (event) {
+      if (event.target.closest("a[href]")) {
+        closeMenu(false);
+      }
+    });
+
+    new MutationObserver(sync).observe(nav, {
+      attributes: true,
+      attributeFilter: ["class"]
+    });
+
+    window.addEventListener("resize", sync);
+    sync();
+  }
+
+  if (document.readyState === "complete") {
+    setup();
+  } else {
+    window.addEventListener("load", setup, { once: true });
+  }
+})();
+</script>

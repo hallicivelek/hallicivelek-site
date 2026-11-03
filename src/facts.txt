@@ -1,0 +1,156 @@
+# Facts for the random sort on the project grid.
+# Each visit picks one of these at random and puts the matching projects first.
+# A sort is only picked when at least 2 projects on the page match it.
+#
+#   [name]                  starts a sort (the name is only for you, and for ?hc-sort=name)
+#   label:                  the line above the grid
+#   badge:                  the tag on each matching card; {n} is the number
+#   badge 1:                (optional) the tag when the number is 1
+#   Project-address: 14     a project and its number: most first
+#   Project-address         a project with no number: matching ones first, in your usual order
+#   Project-address: 4 jogging   a number and the word on its badge (instead of the badge: line)
+#   order: lowest first     (optional) for numbers: lowest first instead of most first
+#
+# The project address is the end of its link, e.g. hallicivelek.com/Cheerios -> Cheerios
+# Preview one sort with ?hc-sort=hands at the end of any page address.
+# Lines starting with # are notes and are ignored.
+
+[hands]
+label: today's order: most hands first
+badge: {n} hands
+badge 1: 1 hand
+Cheerios: 28
+Retro-Stefson-Kimbabwe: 14
+Retro-Stefson-Montana: 12
+Smite-The-World: 2
+Automysophobia: 2
+Uppskriftabok-skaldverk: 1
+FM-Belfast-how-to-make-friends: 1
+
+[stripes]
+label: today's order: stripes first
+badge: stripes
+FM-Belfast-how-to-make-friends
+Retro-Stefson-Kimbabwe
+
+[looking left]
+label: today's order: everyone looking left goes first
+badge: looking left
+Icelandsmites
+Cheerios
+Sesar-A-Stormurinn-a-undan-logninu
+Retro-Stefson-Qween
+
+[black and white]
+label: today's order: black and white first
+badge: black and white
+Smite-The-World
+Uppskriftabok-skaldverk
+Retro-Stefson-Qween
+Icelandsmites
+Grapewaves
+Nothing-Ekkert
+Sesar-A-Gerdutadsjalfur-Doityourself
+Apparat-Organ-Quartet
+
+[lots of yellow]
+label: today's order: lots of yellow first
+badge: yellow
+Cheerios
+Apparat-Organ-Quartet-Romantika
+Unicef-Christmas-Card
+Pedro-Pilatus-album-artwork
+Retro-Stefson-Kimbabwe
+
+[halli-blue]
+label: today's order: Halli-blue first
+badge: Halli-blue
+
+[speed]
+label: today's order: from sitting still to full speed
+badge: {n}
+order: lowest first
+# Halli: please check the speeds and the words; same number = same speed
+Sitjikall: 1 sitting
+Krjupandi-blomakona: 1 kneeling
+Blue-walker: 2 walking
+Strollin-Into-The-Club-Like: 3 strolling
+Skokkikona: 4 jogging
+Fartrunner: 5 running
+Swimbert-1: 6 swimming
+Toasterman-On-The-Move: 6 on the move!
+
+[gaze]
+label: today's order: looking left, looking at you, looking right
+badge: {n}
+order: lowest first
+# 1 = looking left, 2 = looking at you, 3 = looking right. Needs the "at you" and "right" lists.
+Icelandsmites: 1 looking left
+Cheerios: 1 looking left
+Sesar-A-Stormurinn-a-undan-logninu: 1 looking left
+Retro-Stefson-Qween: 1 looking left
+
+[faces]
+label: today's order: most faces first
+badge: {n} faces
+badge 1: 1 face
+
+[colours]
+label: today's order: from black and white to Cheerios
+badge: {n} colours
+badge 1: 1 colour
+order: lowest first
+
+[hair]
+label: today's order: hair is the main event
+badge: hair
+Firehair-1
+hairtower
+Fluffyhead
+Bluefluffy
+Beardgrumphead
+
+[food]
+label: today's order: food involved
+badge: food
+Cheerios
+Pumpkinator
+Grapewaves
+Uppskriftabok-skaldverk
+Toasterman-On-The-Move
+Kronan
+
+[cats]
+label: today's order: cats first
+badge: cat
+Cat-family
+Adopt-this-cat
+
+[halli in it]
+label: today's order: Halli is in these
+badge: Halli
+Selfie-1
+The-Future-Selfie
+Halli-lettering
+
+[drops]
+label: today's order: drops, squirts and crumbs first
+badge: drops, squirts, crumbs
+Smite-The-World
+Uppskriftabok-skaldverk
+Millilending
+Retro-Stefson-Retro-Stefson
+FM-Belfast-how-to-make-friends
+Icelandsmites
+Grapewaves
+Automysophobia
+Pedro-Pilatus-album-artwork
+Unicef-Christmas-Card
+Halli-lettering
+Pungstoppuslayer
+Sitjikall
+Skokkikona
+Blue-sinker
+Beardgrumphead
+Swimbert-1
+Phuture-Joga

@@ -1,0 +1,8 @@
+/* More room between project cards for the blobs (desktop only).
+   Paste at the END of Cargo's Custom CSS, so it wins over the site's 40px rules.
+   Keep the pair in step: column width = 50% minus half the gap. */
+@media (min-width: 768px) {
+  .thumbnails.clear { gap: 120px; }
+  .column { width: calc(50% - 60px) !important; }
+  .thumbnail { margin-bottom: 120px; }
+}
