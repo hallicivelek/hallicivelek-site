@@ -115,7 +115,7 @@ async def main(base):
           .sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(x => x[2])""")
         cards = sum(len(c) for c in r['cols'])
         check('grid: three columns become two, no card lost', len(r['cols']) == 2 and cards == len(GRID_SLUGS), f"{len(r['cols'])} columns, {cards} cards")
-        check('grid: ?hc-sort=hands names the sort', r['label'] == "today's order: most hands first", r['label'])
+        check('grid: ?hc-sort=hands names the sort', r['label'] == "sorted by: number of hands", r['label'])
         firsts = [x.split(' [')[0] for x in FIRST_BY_HANDS]
         check('grid: most hands first, top to bottom', order[:6] == firsts, ', '.join(order[:6]))
         badges = sorted(x for c in r['cols'] for x in c if '[' in x)
@@ -125,7 +125,7 @@ async def main(base):
         check('grid: shuffle picks another sort and keeps every card', r2['label'] != r['label'] and sum(len(c) for c in r2['cols']) == len(GRID_SLUGS), r2['label'])
         await page.goto(base + '/filter/artdirection/?r=1'); await page.wait_for_timeout(800)
         r = await page.evaluate(GRID_DUMP)
-        check('grid: a visit without ?hc-sort gets a random sort with 2+ badges', r['label'] not in (None, "today's order: the usual")
+        check('grid: a visit without ?hc-sort gets a random sort with 2+ badges', r['label'] not in (None, "sorted by: Halli's taste")
               and sum('[' in x for c in r['cols'] for x in c) >= 2, r['label'])
         check('no script errors (grid)', not errs, '; '.join(errs)[:200])
         await page.close()
@@ -138,7 +138,7 @@ async def main(base):
         await page.goto(base + '/short/filter/artdirection/?hc-sort=hands'); await page.wait_for_timeout(1200)
         r = await page.evaluate(GRID_DUMP)
         n = await page.evaluate("document.querySelectorAll('.hc-blob').length")
-        check('script files: pond, background blobs and sorted grid all work', pond and n == 9 and r['label'] == "today's order: most hands first"
+        check('script files: pond, background blobs and sorted grid all work', pond and n == 9 and r['label'] == "sorted by: number of hands"
               and len(r['cols']) == 2, f"pond {pond}, {n} blobs, {r['label']}")
         check('no script errors (script files)', not errs, '; '.join(errs)[:200])
         await page.close()

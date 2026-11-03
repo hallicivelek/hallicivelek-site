@@ -3,16 +3,16 @@
      so the third column ended up under the other two. This re-deals the cards
      into two columns in Cargo's own project order.
      Random sort: each visit picks one of Halli's facts (src/facts.txt, filled in by the build)
-     and puts the matching projects first, with a badge on each card and a line above the
-     grid naming the sort. Clicking the line picks another. ?hc-sort=hands previews one. -->
+     and puts the matching projects first, with a tag above each matching card and a line above the
+     grid naming the sort ("sorted by: hands"). Clicking the line picks another. ?hc-sort=hands previews one. -->
 <style>
   .hc-sort { margin: 0 0 28px; }
   .hc-sort button { font: inherit; font-size: 18px; color: rgb(73, 46, 70); background: none; border: 0; padding: 4px 0; cursor: pointer; text-align: inherit; }
   .hc-sort-again { color: rgb(59, 191, 201); margin-left: .6em; white-space: nowrap; }
   .hc-sort button:hover .hc-sort-again, .hc-sort button:focus-visible .hc-sort-again { text-decoration: underline; }
   .hc-sort-card { position: relative; }
-  .hc-sort-badge { position: absolute; top: 12px; left: 12px; z-index: 2; padding: 1px 11px; border-radius: 999px;
-    background: rgb(243, 220, 223); color: rgb(73, 46, 70); font-size: 14px; line-height: 1.7; pointer-events: none; }
+  .hc-sort-badge { position: absolute; bottom: calc(100% + 6px); left: 0; z-index: 2; padding: 1px 11px; border-radius: 999px; white-space: nowrap;
+    background: #fff; color: rgb(73, 46, 70); font-size: 14px; line-height: 1.7; pointer-events: none; }
 </style>
 <script>
 (function () {
@@ -21,7 +21,8 @@
 
   var MIN_WIDTH = 768;   // below this width Cargo's own columns are kept (only re-ordered)
   var SORTS = /*FACTS*/[];
-  var USUAL = { name: 'usual', label: "today's order: the usual", badge: '', items: {} };
+  var FRAME = 'sorted by: ';
+  var USUAL = { name: 'usual', label: "Halli's taste", badge: '', items: {} };
   var current = null;    // the sort in use
   var gridIds = '';      // which projects the grid shows, to notice a filter change
   var dealt = '';        // the layout we last made, to tell our own changes from Cargo's
@@ -79,7 +80,7 @@
     }
     if (box.nextSibling !== th) th.parentNode.insertBefore(box, th);
     var text = box.querySelector('.hc-sort-label');
-    if (text.textContent !== current.label) text.textContent = current.label;
+    if (text.textContent !== FRAME + current.label) text.textContent = FRAME + current.label;
   }
 
   function layoutOf(cols) {

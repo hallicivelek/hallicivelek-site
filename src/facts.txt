@@ -3,8 +3,8 @@
 # A sort is only picked when at least 2 projects on the page match it.
 #
 #   [name]                  starts a sort (the name is only for you, and for ?hc-sort=name)
-#   label:                  the line above the grid
-#   badge:                  the tag on each matching card; {n} is the number
+#   label:                  what the line above the grid says after "sorted by: "
+#   badge:                  the tag above each matching card; {n} is the number
 #   badge 1:                (optional) the tag when the number is 1
 #   Project-address: 14     a project and its number: most first
 #   Project-address         a project with no number: matching ones first, in your usual order
@@ -16,7 +16,7 @@
 # Lines starting with # are notes and are ignored.
 
 [hands]
-label: today's order: most hands first
+label: number of hands
 badge: {n} hands
 badge 1: 1 hand
 Cheerios: 28
@@ -28,13 +28,13 @@ Uppskriftabok-skaldverk: 1
 FM-Belfast-how-to-make-friends: 1
 
 [stripes]
-label: today's order: stripes first
+label: stripes
 badge: stripes
 FM-Belfast-how-to-make-friends
 Retro-Stefson-Kimbabwe
 
 [looking left]
-label: today's order: everyone looking left goes first
+label: looking left
 badge: looking left
 Icelandsmites
 Cheerios
@@ -42,7 +42,7 @@ Sesar-A-Stormurinn-a-undan-logninu
 Retro-Stefson-Qween
 
 [black and white]
-label: today's order: black and white first
+label: black and white
 badge: black and white
 Smite-The-World
 Uppskriftabok-skaldverk
@@ -54,7 +54,7 @@ Sesar-A-Gerdutadsjalfur-Doityourself
 Apparat-Organ-Quartet
 
 [lots of yellow]
-label: today's order: lots of yellow first
+label: lots of yellow
 badge: yellow
 Cheerios
 Apparat-Organ-Quartet-Romantika
@@ -63,11 +63,11 @@ Pedro-Pilatus-album-artwork
 Retro-Stefson-Kimbabwe
 
 [halli-blue]
-label: today's order: Halli-blue first
+label: Halli-blue
 badge: Halli-blue
 
 [speed]
-label: today's order: from sitting still to full speed
+label: speed, from sitting still to full tilt
 badge: {n}
 order: lowest first
 # Halli: please check the speeds and the words; same number = same speed
@@ -81,7 +81,7 @@ Swimbert-1: 6 swimming
 Toasterman-On-The-Move: 6 on the move!
 
 [gaze]
-label: today's order: looking left, looking at you, looking right
+label: where they look: left, at you, right
 badge: {n}
 order: lowest first
 # 1 = looking left, 2 = looking at you, 3 = looking right. Needs the "at you" and "right" lists.
@@ -91,18 +91,18 @@ Sesar-A-Stormurinn-a-undan-logninu: 1 looking left
 Retro-Stefson-Qween: 1 looking left
 
 [faces]
-label: today's order: most faces first
+label: number of faces
 badge: {n} faces
 badge 1: 1 face
 
 [colours]
-label: today's order: from black and white to Cheerios
+label: number of colours
 badge: {n} colours
 badge 1: 1 colour
 order: lowest first
 
 [hair]
-label: today's order: hair is the main event
+label: hair
 badge: hair
 Firehair-1
 hairtower
@@ -111,7 +111,7 @@ Bluefluffy
 Beardgrumphead
 
 [food]
-label: today's order: food involved
+label: food
 badge: food
 Cheerios
 Pumpkinator
@@ -121,20 +121,20 @@ Toasterman-On-The-Move
 Kronan
 
 [cats]
-label: today's order: cats first
+label: cats
 badge: cat
 Cat-family
 Adopt-this-cat
 
 [halli in it]
-label: today's order: Halli is in these
+label: Halli in it
 badge: Halli
 Selfie-1
 The-Future-Selfie
 Halli-lettering
 
 [drops]
-label: today's order: drops, squirts and crumbs first
+label: drops, squirts and crumbs
 badge: drops, squirts, crumbs
 Smite-The-World
 Uppskriftabok-skaldverk
