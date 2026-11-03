@@ -46,8 +46,9 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   on a line it can't read.
 - `src/hc-nav-active.html` — marks the current page in the nav (`link_active` + `aria-current`).
 - `src/hc-eyes.html` — **eyes that follow you** on Halli's portrait (info + contact): swaps Cargo's photo for
-  `assets/portrait/face-no-irises.jpg` (Halli's layer) and lays `iris-left.png` / `iris-right.png` over it in an
-  overlay that is measured onto the photo every frame (wrapping the img broke Cargo's layout). Cursor or last tap;
+  `assets/portrait/face-no-irises.jpg` and stacks `iris-left.png` / `iris-right.png` and `eyelids.png` (the portrait
+  with transparent eyeholes, 25×11 and 23×11) on top — all Halli's layers, all 300 × 359 — in an overlay that is
+  measured onto the photo every frame (wrapping the img broke Cargo's layout). Reach ±5 × ±3.5 px. Cursor or last tap;
   after 4 s idle the eyes watch the nearest blob; reduced motion = looking straight ahead. Numbers are in the
   photo's 300 × 359 pixels.
 - `src/parts/before.html`, `src/parts/after.html` — **Halli's own** Custom HTML (Cargo filter script, StatCounter,

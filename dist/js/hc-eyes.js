@@ -1,17 +1,18 @@
 /* hc-eyes for hallicivelek.com: built from src/hc-eyes.html by build.py, do not edit here */
-(function () { var s = document.createElement("style"); s.textContent = "\n  .hc-eyes { position: absolute; pointer-events: none; }\n  .hc-eye { position: absolute; overflow: hidden; clip-path: ellipse(50% 50% at 50% 50%); pointer-events: none; }\n  .hc-eye img { position: absolute; display: block; height: auto; max-width: none; }\n"; document.head.appendChild(s); })();
+(function () { var s = document.createElement("style"); s.textContent = "\n  .hc-eyes { position: absolute; pointer-events: none; }\n  .hc-eyes img { position: absolute; display: block; max-width: none; margin: 0; padding: 0; border: 0; }\n  .hc-eyes .hc-lids { left: 0; top: 0; width: 100%; height: 100%; }\n"; document.head.appendChild(s); })();
 (function () {
   if (window.__hcEyes) return;
   window.__hcEyes = true;
 
   var PORTRAIT = /Halli-Civelek-artist-portrait/;
   var W = 300, H = 359;   // the portrait's size; all numbers below are in its pixels
-  // eye openings (where the iris may show) and the iris centres when looking straight ahead
+  // the iris centres when looking straight ahead (where they are in the original photo);
+  // the eyeholes in eyelids.png are 25 x 11 (left) and 23 x 11 (right)
   var EYES = [
-    { open: [104, 160.5, 24, 14.5], c: [115.6, 167.6], iris: 'iris-left.png', size: [14, 14] },
-    { open: [165.5, 160.8, 24.5, 13], c: [178, 167], iris: 'iris-right.png', size: [15, 14] }
+    { c: [115.6, 167.6], iris: 'iris-left.png', size: [14, 14] },
+    { c: [178, 167], iris: 'iris-right.png', size: [15, 14] }
   ];
-  var REACH = [4.2, 3];     // how far an iris can move from the centre
+  var REACH = [5, 3.5];     // how far an iris can move from the centre
   var IDLE = 4000;          // ms without a pointer before the eyes go blob-watching
 
   // the layers live next to this script on GitHub Pages: dist/js/hc-eyes.js -> assets/portrait/
@@ -28,8 +29,11 @@
 
   function setup(img) {
     img.setAttribute('data-hc-eyes', '');
-    var face = new Image();
-    face.onload = function () {
+    var face = new Image(), lids = new Image(), loaded = 0;
+    face.onload = lids.onload = function () { if (++loaded === 2) build(); };
+    face.src = BASE + 'face-no-irises.jpg';
+    lids.src = BASE + 'eyelids.png';
+    function build() {
       // an overlay next to the photo (not a wrapper: Cargo's layout around the photo stays untouched)
       var box = document.createElement('span');
       box.className = 'hc-eyes';
@@ -39,28 +43,26 @@
       img.removeAttribute('srcset');
       img.src = face.src;
       var eyes = EYES.map(function (e) {
-        var el = document.createElement('span');
-        el.className = 'hc-eye';
-        el.style.left = pct(e.open[0], W); el.style.top = pct(e.open[1], H);
-        el.style.width = pct(e.open[2], W); el.style.height = pct(e.open[3], H);
         var iris = document.createElement('img');
-        iris.src = BASE + e.iris; iris.alt = '';
-        iris.style.width = pct(e.size[0], e.open[2]);
-        box.appendChild(el); el.appendChild(iris);
-        return { e: e, el: el, iris: iris, x: 0, y: 0 };
+        iris.className = 'hc-eye'; iris.src = BASE + e.iris; iris.alt = '';
+        iris.style.width = pct(e.size[0], W); iris.style.height = pct(e.size[1], H);
+        box.appendChild(iris);
+        return { e: e, iris: iris, x: 0, y: 0 };
       });
+      var top = document.createElement('img');
+      top.className = 'hc-lids'; top.src = lids.src; top.alt = '';
+      box.appendChild(top);
       var l = { img: img, box: box, eyes: eyes };
       live.push(l);
       fit(l); place(eyes[0]); place(eyes[1]);
       if (!calm.matches) requestAnimationFrame(tick);
-    };
-    face.src = BASE + 'face-no-irises.jpg';
+    }
   }
 
   function place(o) {
     var e = o.e;
-    o.iris.style.left = pct(e.c[0] - e.open[0] - e.size[0] / 2 + o.x, e.open[2]);
-    o.iris.style.top = pct(e.c[1] - e.open[1] - e.size[1] / 2 + o.y, e.open[3]);
+    o.iris.style.left = pct(e.c[0] - e.size[0] / 2 + o.x, W);
+    o.iris.style.top = pct(e.c[1] - e.size[1] / 2 + o.y, H);
   }
 
   // keep the overlay exactly on the photo (measured every frame, like the blobs, because Cargo moves things late)
