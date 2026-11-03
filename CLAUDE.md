@@ -7,6 +7,11 @@ Everything reaches the live site through Cargo's **Custom HTML** setting. Two wa
   `https://hallicivelek.github.io/hallicivelek-site/`). Changes to the add-ons go live by **building, committing and
   pushing**; GitHub Pages caches for up to ~10 minutes. Halli only re-pastes when `src/parts/` or the script list changes.
 - **Long (fallback):** `dist/custom-html.html` with everything inline (~119 KB), pasted whole.
+- **Live since 2026-11-03: the short version.** Plain `<script src>` tags in Custom HTML did *not* work on Cargo
+  (the blobs disappeared; cause not pinned down — local and swapped-in tests passed). The short file therefore uses a
+  small **inline loader** that adds the four scripts with `async = false`. Verified on the live site after Halli pasted it.
+- **Text copied out of Cargo's editor loses its backslashes** (confirmed again 2026-11-03: `\n` → `n`). Never use it as
+  source or paste it back; the loader and Halli's parts contain no backslashes, so the short file survives it.
 
 ## Working with Halli
 - When Halli does need to paste, **always hand over a complete file** (`dist/custom-html-short.html`, or the long one),
