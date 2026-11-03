@@ -236,3 +236,4 @@
   document.addEventListener('DOMContentLoaded', scan);
   scan();
 })();
+window.__hcBuild = "2026-11-03 22:09";

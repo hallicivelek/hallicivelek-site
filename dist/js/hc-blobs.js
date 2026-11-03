@@ -559,7 +559,9 @@
   // and Safari doesn't always announce it. Measure the blob layer itself and rescale when it changes.
   // iOS 26 Safari draws the page under its address bar, but fixed layers stop where the bar begins, so the
   // blobs were cut off in a straight line there. On iOS the layer reaches down to the real bottom of the screen.
-  var IOS = window.CSS && CSS.supports && CSS.supports('-webkit-touch-callout', 'none');
+  var IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
+            !!(window.CSS && CSS.supports && CSS.supports('-webkit-touch-callout', 'none'));
+  window.__hcBlobsIOS = IOS;   // shown by ?hc-debug
   function fitToScreen() {
     if (IOS) {
       var vv = window.visualViewport, sc = vv ? vv.scale : 1;
@@ -679,3 +681,4 @@
   }
   requestAnimationFrame(frame);
 })();
+window.__hcBuild = "2026-11-03 22:09";

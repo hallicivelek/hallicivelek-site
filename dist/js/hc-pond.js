@@ -690,6 +690,7 @@
   addEventListener('popstate', check);
   check();
 })();
+window.__hcBuild = "2026-11-03 22:09";
 /* add-ons added after the Custom HTML was pasted, loaded from the same folder */
 (function () { var me = document.currentScript; if (!me || !me.src) return;
   ["hc-eyes", "hc-debug"].forEach(function (name) {

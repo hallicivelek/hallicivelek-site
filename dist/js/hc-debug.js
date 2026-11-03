@@ -37,6 +37,7 @@
            ', pageTop ' + Math.round(vv.pageTop) + ', scale ' + vv.scale.toFixed(3) : 'no visualViewport',
       'scrollY ' + Math.round(scrollY) + '   scroller ' + se.tagName + ' ' + Math.round(se.scrollTop) + '   body.scrollTop ' + Math.round(document.body.scrollTop),
       'fixed heights: ' + probes.map(function (p) { return p[0] + ' ' + Math.round(p[1].getBoundingClientRect().height); }).join(', '),
+      'build ' + (window.__hcBuild || '?') + '   blobs think iOS: ' + window.__hcBlobsIOS + '   layer style.height ' + (layer ? layer.style.height || 'none' : '-'),
       'blob layer: ' + r(layer),
       'pause button: ' + r(document.querySelector('.hc-pause')),
       'viewport tag: ' + ((document.querySelector('meta[name=viewport]') || {}).content || 'none'),
@@ -49,3 +50,4 @@
   }
   if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
 })();
+window.__hcBuild = "2026-11-03 22:09";

@@ -4,7 +4,7 @@
 The loader is plain inline JavaScript (inline scripts are what Cargo is known to run) and has no backslashes,
 so it survives being copied in and out of Cargo's editor, which has stripped backslashes before.
 Run build_facts.py and build_pond_module.py first (build.py does all of it)."""
-import json, re, sys
+import json, re, sys, time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -74,8 +74,9 @@ def build(base=BASE):
     out_dir = ROOT / 'dist' / 'js'
     out_dir.mkdir(exist_ok=True)
     later = [p.stem for p in ADDONS if p.stem not in IN_CARGO]
+    stamp = time.strftime('%Y-%m-%d %H:%M')   # shown by ?hc-debug, to see whether a phone has the newest files
     for p in ADDONS:
-        js = to_js(p)
+        js = to_js(p) + f'window.__hcBuild = {json.dumps(stamp)};\n'
         if p.stem == IN_CARGO[-1] and later:
             js += later_loader(later)
         (out_dir / (p.stem + '.js')).write_text(js)

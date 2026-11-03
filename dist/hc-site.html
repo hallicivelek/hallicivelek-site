@@ -832,7 +832,9 @@
   // and Safari doesn't always announce it. Measure the blob layer itself and rescale when it changes.
   // iOS 26 Safari draws the page under its address bar, but fixed layers stop where the bar begins, so the
   // blobs were cut off in a straight line there. On iOS the layer reaches down to the real bottom of the screen.
-  var IOS = window.CSS && CSS.supports && CSS.supports('-webkit-touch-callout', 'none');
+  var IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) ||
+            !!(window.CSS && CSS.supports && CSS.supports('-webkit-touch-callout', 'none'));
+  window.__hcBlobsIOS = IOS;   // shown by ?hc-debug
   function fitToScreen() {
     if (IOS) {
       var vv = window.visualViewport, sc = vv ? vv.scale : 1;
@@ -1957,6 +1959,7 @@
            ', pageTop ' + Math.round(vv.pageTop) + ', scale ' + vv.scale.toFixed(3) : 'no visualViewport',
       'scrollY ' + Math.round(scrollY) + '   scroller ' + se.tagName + ' ' + Math.round(se.scrollTop) + '   body.scrollTop ' + Math.round(document.body.scrollTop),
       'fixed heights: ' + probes.map(function (p) { return p[0] + ' ' + Math.round(p[1].getBoundingClientRect().height); }).join(', '),
+      'build ' + (window.__hcBuild || '?') + '   blobs think iOS: ' + window.__hcBlobsIOS + '   layer style.height ' + (layer ? layer.style.height || 'none' : '-'),
       'blob layer: ' + r(layer),
       'pause button: ' + r(document.querySelector('.hc-pause')),
       'viewport tag: ' + ((document.querySelector('meta[name=viewport]') || {}).content || 'none'),
