@@ -557,7 +557,16 @@
   document.addEventListener('pointercancel', release);
   // Checked every frame: on phones Cargo switches to the real screen width only after this script has started,
   // and Safari doesn't always announce it. Measure the blob layer itself and rescale when it changes.
+  // iOS 26 Safari draws the page under its address bar, but fixed layers stop where the bar begins, so the
+  // blobs were cut off in a straight line there. On iOS the layer reaches down to the real bottom of the screen.
+  var IOS = window.CSS && CSS.supports && CSS.supports('-webkit-touch-callout', 'none');
   function fitToScreen() {
+    if (IOS) {
+      var vv = window.visualViewport, sc = vv ? vv.scale : 1;
+      var full = (innerWidth > innerHeight ? Math.min(screen.width, screen.height) : Math.max(screen.width, screen.height)) / sc;
+      var want = Math.max(innerHeight, Math.round(full)) + 'px';
+      if (layer.style.height !== want) layer.style.height = want;
+    }
     var r = layer.getBoundingClientRect(), nw = Math.round(r.width), nh = Math.round(r.height);
     if (!nw || !nh || (nw === W && nh === H)) return;
     var fx = nw / W, fy = nh / H, wasWide = W >= 700;

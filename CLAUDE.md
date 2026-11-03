@@ -112,10 +112,12 @@ picker and "surprise me" (weighted towards unfamiliar scales: slendro, pelog, ha
 Accessibility: pause button (WCAG 2.2.2), reduced-motion respected, screen-reader labels, keyboard-reachable controls.
 
 ## Open items and ideas
-- **Open (2026-11-03): on Halli's iPhone the fixed blob layer and the pause button end ~2/3 down the screen**
-  (blobs clipped there, button floats mid-screen once scrolling); the held pencil drifted by about the scroll distance
-  for the same reason (fixed: now positioned inside the photo overlay). Not reproduced in Chromium or WebKit with an
-  iPhone viewport. Waiting for a `?hc-debug` screenshot from his phone before changing how the blobs measure the screen.
+- **iOS 26 Safari (measured on Halli's iPhone with `?hc-debug`, 2026-11-03):** the page is drawn under the address
+  bar, but fixed layers stop where the bar begins (`innerHeight` 714 with the bar out, 767 shrunk, screen 874). The
+  blob layer was cut off in a straight line there; `fitToScreen` in hc-blobs now stretches the layer to the screen
+  height on iOS (`CSS.supports('-webkit-touch-callout', 'none')`). Also: one-word hover titles at 20px made the info page
+  414px wide on a 402px phone and Safari zoomed out (scale 0.983); titles now wrap and are 16px on phones.
+  The pause button sits where iOS 26 puts fixed bottom elements: just above the address bar's spot.
 - Pond test "evening plays hirajoshi" retries when it hits the pond's secret 1-in-30 "something strange" visit.
 - Not tested anywhere but Halli's own devices: real Safari on iPhone, and whether Cargo limits Custom HTML size
   (the file is ~119 KB since the random sort; ~98 KB is the largest size Halli has confirmed working).

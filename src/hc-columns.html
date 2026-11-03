@@ -13,6 +13,9 @@
   .hc-sort-again { color: rgb(59, 191, 201); margin-left: .6em; white-space: nowrap; }
   .hc-sort button:hover .hc-sort-again, .hc-sort button:focus-visible .hc-sort-again { text-decoration: underline; }
   .thumbnails .thumb_title, .thumbnails .thumb_title span { font-size: 20px; line-height: 1.4; color: rgb(73, 46, 70); }   /* plum: 9.1:1 on the site pink */
+  /* long one-word titles ("Pungstöppuslayer") made the phone page wider than the screen, so Safari zoomed out */
+  .thumbnails .thumb_title { overflow-wrap: anywhere; }
+  @media (max-width: 600px) { .thumbnails .thumb_title, .thumbnails .thumb_title span { font-size: 16px; } }
   .hc-sort-card .thumb_info { position: relative; }
   .hc-sort-fact { position: absolute; top: 100%; left: 0; right: 0; margin-top: 2px; text-align: center;
     font-size: 15px; line-height: 1.5; color: rgba(73, 46, 70, .78); pointer-events: none;   /* 5.1:1 on the site pink */
