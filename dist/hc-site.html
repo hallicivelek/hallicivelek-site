@@ -1646,7 +1646,7 @@
      simply look at you. If the layers can't be loaded, the original portrait stays as it is.
      Halli's pencil (pencil.png) lies to the right of the photo. Click or tap it to pick it up, then draw black
      lines on the face; Esc or a click/tap outside the photo puts it back. The drawing is not saved: it is gone
-     when you leave the page. -->
+     when you leave the page (Cargo's leave-on-Esc is held back while there is a drawing). -->
 <style>
   .hc-eyes { position: absolute; pointer-events: none; }
   .hc-eyes img { position: absolute; display: block; max-width: none; margin: 0; padding: 0; border: 0; }
@@ -1660,7 +1660,7 @@
   .hc-pencil:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 4px; }
   .hc-drawing .hc-pencil { visibility: hidden; }
   @media (max-width: 600px) { .hc-pencil { left: calc(100% + 6px); width: 24px; } }
-  .hc-pencil-held { position: fixed; z-index: 10002; width: 30px; height: auto; pointer-events: none; display: none;
+  .hc-eyes .hc-pencil-held { position: absolute; z-index: 3; width: 30px; height: auto; pointer-events: none; display: none;
     transform: rotate(14deg); }
 </style>
 <script>
@@ -1742,7 +1742,9 @@
     l.box.appendChild(btn);
     var held = document.createElement('img');
     held.className = 'hc-pencil-held'; held.alt = ''; held.src = BASE + 'pencil.png';
-    document.body.appendChild(held);
+    // placed inside the overlay, measured from the photo like the strokes are: a position: fixed pencil drifted
+    // away from the line on iPhone (by about the scroll distance), so tip and line now share one reference
+    l.box.appendChild(held);
     l.ink = ink; l.held = held; l.strokes = []; l.size = '';
     var holding = false, stroke = null;
 
@@ -1751,11 +1753,11 @@
       var off = e.pointerType === 'touch' ? FINGER : [0, 0];
       return [e.clientX + off[0], e.clientY + off[1]];
     }
-    function follow(x, y) {
-      var w = held.offsetWidth || 30, h = held.offsetHeight || w * 200 / 59;
+    function follow(x, y) {   // x, y on screen (clientX / clientY)
+      var w = held.offsetWidth || 30, h = held.offsetHeight || w * 200 / 59, b = l.box.getBoundingClientRect();
       held.style.transformOrigin = (TIP[0] * w) + 'px ' + (TIP[1] * h) + 'px';
-      held.style.left = (x - TIP[0] * w) + 'px';
-      held.style.top = (y - TIP[1] * h) + 'px';
+      held.style.left = (x - b.left - TIP[0] * w) + 'px';
+      held.style.top = (y - b.top - TIP[1] * h) + 'px';
     }
     function pickUp(x, y) {
       holding = true;
@@ -1801,9 +1803,12 @@
     // the held pencil follows the mouse anywhere; a click or tap outside the photo puts it back
     addEventListener('pointermove', function (e) { if (holding) { var t = tipOf(e); follow(t[0], t[1]); } }, { passive: true });
     addEventListener('pointerdown', function (e) { if (holding && e.target !== ink) putDown(); }, true);
-    // Esc puts the pencil down; Cargo also closes the page on Esc, so it doesn't get this one
+    // Esc puts the pencil down. Cargo leaves the page on Esc (back to the front page), which would throw the
+    // drawing away, so while the pencil is held or there is a drawing on the face, Cargo doesn't get it.
     addEventListener('keydown', function (e) {
-      if (holding && e.key === 'Escape') { e.stopImmediatePropagation(); e.preventDefault(); putDown(); btn.focus(); }
+      if (e.key !== 'Escape' || !l.img.isConnected || !(holding || l.strokes.length)) return;
+      e.stopImmediatePropagation(); e.preventDefault();
+      if (holding) { putDown(); btn.focus(); }
     }, true);
   }
 
@@ -1855,9 +1860,7 @@
   var running = false;
   function tick() {
     live = live.filter(function (l) {
-      if (l.img.isConnected) return true;
-      if (l.held) l.held.remove();   // Cargo changed page: the drawing goes with it
-      return false;
+      return l.img.isConnected;   // Cargo changed page: the drawing went with it
     });
     if (!live.length) { running = false; return; }
     running = true;

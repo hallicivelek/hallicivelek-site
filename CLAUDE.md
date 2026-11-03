@@ -55,7 +55,8 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   **Pencil** (Halli's `pencil.png`, tip at 15,191 of 59×200): lies right of the photo; click/tap picks it up, the
   pencil's tip draws black lines on a canvas over the face (strokes kept in photo pixels, redrawn on resize, not
   saved). On touch the tip is held 14 px left / 46 px above the finger so you can see it. Esc or a click/tap outside
-  the photo puts it back; Esc is stopped from reaching Cargo, which would otherwise close the page.
+  the photo puts it back. Cargo leaves the page on Esc (to `/`, a document keydown listener); our window-capture
+  listener keeps Esc from Cargo while the pencil is held **or a drawing exists** (Halli lost a drawing to a second Esc).
 - `src/parts/before.html`, `src/parts/after.html` — **Halli's own** Custom HTML (Cargo filter script, StatCounter,
   Typekit link that loads the site font Pacaembu; mobile menu fixes). Keep as he gives them.
 - `tools/build_pond_module.py` — converts `src/pond.html` into the Cargo-safe `dist/hc-pond.html` (see Fencing).

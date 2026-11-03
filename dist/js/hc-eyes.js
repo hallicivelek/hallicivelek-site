@@ -1,5 +1,5 @@
 /* hc-eyes for hallicivelek.com: built from src/hc-eyes.html by build.py, do not edit here */
-(function () { var s = document.createElement("style"); s.textContent = "\n  .hc-eyes { position: absolute; pointer-events: none; }\n  .hc-eyes img { position: absolute; display: block; max-width: none; margin: 0; padding: 0; border: 0; }\n  .hc-eyes .hc-lids, .hc-eyes .hc-ink { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }\n  .hc-eyes .hc-ink { pointer-events: none; }\n  .hc-eyes.hc-drawing .hc-ink { pointer-events: auto; touch-action: none; cursor: none; }\n  .hc-pencil { position: absolute; left: calc(100% + 18px); top: 30%; width: 30px; padding: 0; margin: 0; border: 0;\n    background: none; cursor: pointer; pointer-events: auto; transform: rotate(8deg); transition: transform .25s ease; }\n  .hc-pencil img { position: static !important; width: 100%; height: auto; }\n  .hc-pencil:hover, .hc-pencil:focus-visible { transform: rotate(16deg) translateY(-4px); }\n  .hc-pencil:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 4px; }\n  .hc-drawing .hc-pencil { visibility: hidden; }\n  @media (max-width: 600px) { .hc-pencil { left: calc(100% + 6px); width: 24px; } }\n  .hc-pencil-held { position: fixed; z-index: 10002; width: 30px; height: auto; pointer-events: none; display: none;\n    transform: rotate(14deg); }\n"; document.head.appendChild(s); })();
+(function () { var s = document.createElement("style"); s.textContent = "\n  .hc-eyes { position: absolute; pointer-events: none; }\n  .hc-eyes img { position: absolute; display: block; max-width: none; margin: 0; padding: 0; border: 0; }\n  .hc-eyes .hc-lids, .hc-eyes .hc-ink { position: absolute; left: 0; top: 0; width: 100%; height: 100%; }\n  .hc-eyes .hc-ink { pointer-events: none; }\n  .hc-eyes.hc-drawing .hc-ink { pointer-events: auto; touch-action: none; cursor: none; }\n  .hc-pencil { position: absolute; left: calc(100% + 18px); top: 30%; width: 30px; padding: 0; margin: 0; border: 0;\n    background: none; cursor: pointer; pointer-events: auto; transform: rotate(8deg); transition: transform .25s ease; }\n  .hc-pencil img { position: static !important; width: 100%; height: auto; }\n  .hc-pencil:hover, .hc-pencil:focus-visible { transform: rotate(16deg) translateY(-4px); }\n  .hc-pencil:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 4px; }\n  .hc-drawing .hc-pencil { visibility: hidden; }\n  @media (max-width: 600px) { .hc-pencil { left: calc(100% + 6px); width: 24px; } }\n  .hc-eyes .hc-pencil-held { position: absolute; z-index: 3; width: 30px; height: auto; pointer-events: none; display: none;\n    transform: rotate(14deg); }\n"; document.head.appendChild(s); })();
 (function () {
   if (window.__hcEyes) return;
   window.__hcEyes = true;
@@ -78,7 +78,9 @@
     l.box.appendChild(btn);
     var held = document.createElement('img');
     held.className = 'hc-pencil-held'; held.alt = ''; held.src = BASE + 'pencil.png';
-    document.body.appendChild(held);
+    // placed inside the overlay, measured from the photo like the strokes are: a position: fixed pencil drifted
+    // away from the line on iPhone (by about the scroll distance), so tip and line now share one reference
+    l.box.appendChild(held);
     l.ink = ink; l.held = held; l.strokes = []; l.size = '';
     var holding = false, stroke = null;
 
@@ -87,11 +89,11 @@
       var off = e.pointerType === 'touch' ? FINGER : [0, 0];
       return [e.clientX + off[0], e.clientY + off[1]];
     }
-    function follow(x, y) {
-      var w = held.offsetWidth || 30, h = held.offsetHeight || w * 200 / 59;
+    function follow(x, y) {   // x, y on screen (clientX / clientY)
+      var w = held.offsetWidth || 30, h = held.offsetHeight || w * 200 / 59, b = l.box.getBoundingClientRect();
       held.style.transformOrigin = (TIP[0] * w) + 'px ' + (TIP[1] * h) + 'px';
-      held.style.left = (x - TIP[0] * w) + 'px';
-      held.style.top = (y - TIP[1] * h) + 'px';
+      held.style.left = (x - b.left - TIP[0] * w) + 'px';
+      held.style.top = (y - b.top - TIP[1] * h) + 'px';
     }
     function pickUp(x, y) {
       holding = true;
@@ -137,9 +139,12 @@
     // the held pencil follows the mouse anywhere; a click or tap outside the photo puts it back
     addEventListener('pointermove', function (e) { if (holding) { var t = tipOf(e); follow(t[0], t[1]); } }, { passive: true });
     addEventListener('pointerdown', function (e) { if (holding && e.target !== ink) putDown(); }, true);
-    // Esc puts the pencil down; Cargo also closes the page on Esc, so it doesn't get this one
+    // Esc puts the pencil down. Cargo leaves the page on Esc (back to the front page), which would throw the
+    // drawing away, so while the pencil is held or there is a drawing on the face, Cargo doesn't get it.
     addEventListener('keydown', function (e) {
-      if (holding && e.key === 'Escape') { e.stopImmediatePropagation(); e.preventDefault(); putDown(); btn.focus(); }
+      if (e.key !== 'Escape' || !l.img.isConnected || !(holding || l.strokes.length)) return;
+      e.stopImmediatePropagation(); e.preventDefault();
+      if (holding) { putDown(); btn.focus(); }
     }, true);
   }
 
@@ -191,9 +196,7 @@
   var running = false;
   function tick() {
     live = live.filter(function (l) {
-      if (l.img.isConnected) return true;
-      if (l.held) l.held.remove();   // Cargo changed page: the drawing goes with it
-      return false;
+      return l.img.isConnected;   // Cargo changed page: the drawing went with it
     });
     if (!live.length) { running = false; return; }
     running = true;

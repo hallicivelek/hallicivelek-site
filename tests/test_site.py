@@ -71,6 +71,9 @@ async def main(base):
         page = await b.new_page(viewport={'width': 1300, 'height': 760}); errs = []
         page.on('pageerror', lambda e: errs.append(str(e)))
         await page.goto(base + '/blob-pond/#evening'); await page.wait_for_timeout(1200)
+        for n in range(5):   # about one visit in thirty is the pond's secret "something strange" visit: try again
+            if 'strange' not in await page.evaluate("document.getElementById('hcp-capWhere').textContent"): break
+            await page.goto(base + f'/blob-pond/?again={n}#evening'); await page.wait_for_timeout(1200)
         r = await page.evaluate("""() => ({
           pond: !!document.getElementById('hc-pond'), bgBlobs: !!document.querySelector('.hc-blobs'),
           headerBg: getComputedStyle(document.querySelector('.site_header')).backgroundColor,
@@ -163,9 +166,11 @@ async def main(base):
         await page.mouse.move(r[0] + 100 * r[2] / 300, r[1] + 240 * r[2] / 300); await page.mouse.down()
         await page.mouse.move(r[0] + 200 * r[2] / 300, r[1] + 250 * r[2] / 300, steps=10); await page.mouse.up()
         inked = await page.evaluate("(() => { const c = document.querySelector('.hc-ink'), d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i]) n++; return n; })()")
+        await page.evaluate("document.addEventListener('keydown', e => { if (e.key === 'Escape') window.__cargoEsc = (window.__cargoEsc || 0) + 1; })")   # stands in for Cargo's leave-on-Esc
         await page.keyboard.press('Escape'); await page.wait_for_timeout(150)
-        down = await page.evaluate("[!document.querySelector('.hc-eyes').classList.contains('hc-drawing'), location.pathname]")
-        check('pencil: pick it up, draw a line, Esc puts it back (and the page stays)', holding and inked > 50 and down[0] and down[1] == '/short/info-contact/',
+        await page.keyboard.press('Escape'); await page.wait_for_timeout(150)   # a second Esc, pencil already down
+        down = await page.evaluate("[!document.querySelector('.hc-eyes').classList.contains('hc-drawing'), !window.__cargoEsc ? location.pathname : 'Cargo got Esc']")
+        check('pencil: pick it up, draw a line, Esc puts it back; Cargo never gets Esc while there is a drawing', holding and inked > 50 and down[0] and down[1] == '/short/info-contact/',
               f'holding {holding}, {inked} inked pixels, after Esc {down}')
         check('eyes: cross-eyed with the cursor on the nose', nose[0] > straight[0] + 1 and nose[1] < straight[1] - 1, f'{nose} vs straight {[round(v, 1) for v in straight]}')
         check('no script errors (script files)', not errs, '; '.join(errs)[:200])
