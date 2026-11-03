@@ -1,12 +1,18 @@
 # hallicivelek.com — blobs and the blob-pond
 
 Interactive add-ons for Halli Civelek's portfolio site, hallicivelek.com, which runs on **Cargo Collective** (Cargo 2).
-Everything reaches the live site as one block of HTML that Halli pastes into Cargo's **Custom HTML** setting.
-There is no deploy pipeline: the deliverable is always `dist/custom-html.html`.
+Everything reaches the live site through Cargo's **Custom HTML** setting. Two ways (both built every time):
+- **Short (current plan):** `dist/custom-html-short.html` = Halli's own parts + four `<script src>` lines that load
+  `dist/js/*.js` from GitHub Pages (repo `github.com/hallicivelek/hallicivelek-site`, public, served from `main` at
+  `https://hallicivelek.github.io/hallicivelek-site/`). Changes to the add-ons go live by **building, committing and
+  pushing**; GitHub Pages caches for up to ~10 minutes. Halli only re-pastes when `src/parts/` or the script list changes.
+- **Long (fallback):** `dist/custom-html.html` with everything inline (~119 KB), pasted whole.
 
 ## Working with Halli
-- **Always hand over the complete `dist/custom-html.html`**, never fragments. He pastes it over the whole of Cargo's
-  Custom HTML. It contains his own parts too (see `src/parts/`), so it must be complete.
+- When Halli does need to paste, **always hand over a complete file** (`dist/custom-html-short.html`, or the long one),
+  never fragments. He pastes it over the whole of Cargo's Custom HTML. It contains his own parts too (see `src/parts/`).
+- Commits and pushes to the repo publish to the live site: commit/push only when Halli asks or has agreed to the
+  change. Commits use his GitHub noreply address (set in the repo's git config), not his work email.
 - If Halli has changed anything in Cargo's Custom HTML himself (e.g. the mobile menu), get the new version from him
   and update `src/parts/` **before** building, or the build will overwrite his change.
 - **Never rebuild from code he pastes back into chat.** Pasting has stripped backslashes before (`/\/+$/` arrived as
@@ -18,7 +24,7 @@ There is no deploy pipeline: the deliverable is always `dist/custom-html.html`.
 ## Build and test
 ```
 python3 build.py              # src/ → dist/hc-columns.html, dist/hc-pond.html, dist/custom-html.html; syntax-checks every script
-python3 tests/test_site.py    # 27 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, phone)
+python3 tests/test_site.py    # 29 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, phone)
 ```
 Tests need `python3 -m pip install --user playwright` (this Mac has no bare `pip`) and `python3 -m playwright install chromium`.
 The build was verified to reproduce the installed files byte-for-byte when this project was set up.
@@ -35,7 +41,8 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   Typekit link that loads the site font Pacaembu; mobile menu fixes). Keep as he gives them.
 - `tools/build_pond_module.py` — converts `src/pond.html` into the Cargo-safe `dist/hc-pond.html` (see Fencing).
 - `tools/pond_loader_template.js.html` — the loader wrapped around the pond on Cargo.
-- `tools/build_custom_html.py` — assembles `dist/custom-html.html`.
+- `tools/build_custom_html.py` — assembles `dist/custom-html.html` (long version).
+- `tools/build_scripts.py` — makes `dist/js/*.js` and `dist/custom-html-short.html` (short version).
 - `assets/blob-faces/` — Halli's six face drawings (originals; already embedded in the code as `FACES` / `FACE`).
 - `custom-css/spacing.css` — the card-spacing snippet that lives in Cargo's Custom CSS.
 
