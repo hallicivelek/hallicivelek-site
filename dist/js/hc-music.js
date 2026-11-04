@@ -1,0 +1,133 @@
+/* hc-music for hallicivelek.com: built from src/hc-music.html by build.py, do not edit here */
+(function () { var s = document.createElement("style"); s.textContent = "\n  html.hc-mu-on .thumbnails, html.hc-mu-on #hc-sort, html.hc-mu-on #hc-intro { display: none !important; }\n  #hc-mu { max-width: 700px; margin: 0 auto; padding-bottom: 80px; text-align: left; color: rgb(73, 46, 70); font-family: pacaembu, sans-serif; }\n  #hc-mu * { text-align: left; }\n  #hc-mu h1 { font-family: inherit; font-size: 44px; line-height: 1.1; margin: 0 0 14px; font-weight: bold; color: inherit; text-transform: none; }\n  #hc-mu .hc-mu-lede { font-size: 22px; line-height: 1.3; margin: 0 0 48px; }\n  #hc-mu h2 { font-family: inherit; font-size: 27px; line-height: 1.2; font-weight: bold; margin: 0 0 18px; color: inherit; text-transform: none; }\n  #hc-mu .hc-mu-plus { margin: 44px 0 28px; opacity: .6; }\n  #hc-mu p { font-size: 16px; line-height: 1.55; margin: 0 0 14px; color: inherit; }\n  #hc-mu a { color: rgb(14, 118, 128); }\n  #hc-mu a:hover { background: none !important; color: rgb(14, 118, 128) !important; }\n  #hc-mu .hc-mu-rel { display: flex; gap: 28px; align-items: flex-start; flex-wrap: wrap; }\n  #hc-mu .hc-mu-rel > img { width: 200px; height: auto; flex: none; display: block; }\n  #hc-mu .hc-mu-rel > div { flex: 1; min-width: 260px; }\n  #hc-mu .hc-mu-name { font-size: 19px; font-weight: bold; margin: 0 0 6px; }\n  #hc-mu blockquote { margin: 0 0 18px; padding: 0 0 0 14px; border-left: 3px solid rgba(73, 46, 70, .2); font-size: 15px; line-height: 1.6; }\n  #hc-mu .hc-mu-small { font-size: 14px; opacity: .8; }\n  #hc-mu .hc-mu-stores { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 12px; padding: 0; list-style: none; }\n  #hc-mu .hc-mu-stores a { display: inline-block; font-size: 15px; font-weight: bold; text-decoration: none; padding: 7px 14px; border-radius: 999px;\n    background: rgba(255, 255, 255, .55); color: rgb(73, 46, 70); }\n  #hc-mu .hc-mu-stores a:hover, #hc-mu .hc-mu-stores a:focus-visible { background: #fff !important; color: rgb(73, 46, 70) !important; }\n  #hc-mu a:focus-visible, #hc-mu button:focus-visible, #hc-mu summary:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n  #hc-mu .hc-mu-mix { display: flex; gap: 20px; align-items: flex-start; padding: 18px 0; border-top: 1px solid rgba(73, 46, 70, .18); }\n  #hc-mu .hc-mu-mix:last-child { border-bottom: 1px solid rgba(73, 46, 70, .18); }\n  #hc-mu .hc-mu-mix > img { width: 96px; height: 96px; object-fit: cover; flex: none; border-radius: 6px; }\n  #hc-mu .hc-mu-mix > div { flex: 1; min-width: 0; }\n  #hc-mu .hc-mu-mix h3 { font-family: inherit; font-size: 19px; font-weight: bold; margin: 0; color: inherit; text-transform: none; line-height: 1.3; }\n  #hc-mu .hc-mu-who { font-size: 14px; opacity: .8; margin: 2px 0 6px; }\n  #hc-mu .hc-mu-what { font-size: 15px; margin: 0 0 10px; }\n  #hc-mu .hc-mu-play { font: inherit; font-size: 15px; font-weight: bold; color: #fff; background: rgb(14, 118, 128); border: 0; border-radius: 999px;\n    padding: 7px 16px; cursor: pointer; letter-spacing: normal; text-transform: none; }\n  #hc-mu .hc-mu-player { margin: 12px 0 0; }\n  #hc-mu .hc-mu-player iframe { display: block; width: 100%; height: 60px; border: 0; }\n  #hc-mu details { margin: 12px 0 0; }\n  #hc-mu summary { cursor: pointer; font-size: 15px; font-weight: bold; color: rgb(14, 118, 128); list-style: none; display: inline-block; }\n  #hc-mu summary::-webkit-details-marker { display: none; }\n  #hc-mu summary::after { content: ' +'; }\n  #hc-mu details[open] summary::after { content: ' –'; }\n  #hc-mu ol { margin: 10px 0 0; padding-left: 26px; font-size: 14px; line-height: 1.7; }\n  @media (max-width: 600px) { #hc-mu h1 { font-size: 34px; } #hc-mu .hc-mu-lede { font-size: 19px; } #hc-mu .hc-mu-mix > img { width: 72px; height: 72px; } }\n"; document.head.appendChild(s); })();
+(function () {
+  if (window.__hcMusic) return;
+  window.__hcMusic = true;
+  var PAGE = /music-?mixes/i;
+  var TITLE = 'Music & mixes – Halli Civelek';
+  var DESCRIPTION = 'Italo disco mixes with tracklists, remixes and Wanton Boys Club, by Halli Civelek.';
+  var IMG = 'https://payload.cargocollective.com/1/9/304840/';
+  var STORES = [['Apple Music', 'https://itunes.apple.com/gb/album/1449061630'],
+    ['Beatport', 'https://www.beatport.com/release/you-are-ok-and-the-mandarin/2481864'],
+    ['Juno', 'https://www.junodownload.com/products/wanton-boys-you-are-ok-the-mandarin/4008625-02/'],
+    ['Traxsource', 'https://www.traxsource.com/title/1085245/you-are-ok-and-the-mandarin'],
+    ['Tidal', 'https://tidal.com/browse/album/102158931'],
+    ['Amazon', 'https://www.amazon.com/You-Mandarin-Wanton-Boys-Club/dp/B07MQBHXWN']];
+  var MIXES = [
+    { title: 'Italo!', who: 'Halli Civelek & Terrordisco, as Dj Shy Like An Angel & Dj Forever Lover', year: '2007', what: 'Italo disco',
+      img: '14259912/HalliCivelek-Italo-mix-w-Terrordisco2007_600.jpg', feed: '/hallicivelek/dj-shy-like-an-angel-dj-forever-lover-present-italo-2007/',
+      tracks: ['Savage – A Love Again', 'Italian Boys – Forever Lovers', 'RAF – Self Control vs. Sandra – Maria Magdalena',
+        'N.O.I.A. – Stranger In A Strange Land (Club Mix)', 'Cheaps – Moliendo Café', 'International Music System – Dancing Therapy',
+        'Massara – Margherita', 'Casco – Cybernetic Love', 'Maskio – Subway', 'My Mine – Hypnotic Tango', 'La Bionda – I Wanna Be Your Lover',
+        'Q – The Voice Of Q', 'Public Passion – Flash In The Night', 'Charlie – Spacer Woman', 'The Immortals – Ultimate Warlord',
+        'Moses – We Just (edit)', 'Mike Mareen – Dancing In The Dark (Galactica remix)', 'Cyber People – Polaris', 'Body Electric – Magic Electronic',
+        'Trax – Crusader', 'Garcons – French Boy', 'Julius Brown – Party', "Lime – Babe We're Gonna Love Tonite", 'Yellow Magic Orchestra – Rydeen'] },
+    { title: 'Italo Rider', who: 'Halli Civelek', year: '2007', what: '74 minutes of Italo disco greatness',
+      img: '6909892/halli_italorider_mix.jpg', feed: '/hallicivelek/italo-rider-2007/',
+      tracks: ['Maskio – Dear Sir', 'BWH – Stop', 'Blind Date – Your Heart Keeps Burning', 'Time & Love – Tea for Two', 'Moments – The Station',
+        "Doctor's Cat – Feel The Drive (vocal mix)", 'Klapto – Queen Of The Night', 'Via Verdi – Diamond', 'Den Harrow – Broken Radio',
+        'Starflight – Dance To The Beat', 'Blue – Everybody Needs Somebody', "Jago – I'm Going To Go (vocal mix)", 'Ivan – Fotonovela (Chapter II)',
+        'Klapto – Mister Game', "Tabú D'Apache – Don't Believe In Love", 'Pineapples – Come On Closer', 'Cellophane – Gimmy Love',
+        'Mya & The Mirror – Hesitation', 'Fun Fun – Give Me Your Love', 'Sylvia – Automatic Lover'] },
+    { title: 'Hotplay (from Europe) – Minimix #1', who: 'Halli Civelek (Kontrapunkt) & Terrordisco', year: '2008',
+      what: '17 minutes of Italo disco, old skool house, freestyle and boogie',
+      img: '14260043/HotplayfromEurope-mixgraphic_600.jpg', feed: '/hallicivelek/hotplay-from-europe-minimix-1/',
+      tracks: ['Ago – It Will Never Be', 'Kariya – Let Me Love You For Tonight', 'Boeing – Dance To The Beat', 'Corina – Temptation',
+        "Tabú D'Apache – Don't Believe In Love", 'Richie Rich feat. Ralphi Rosario – You Used To Salsa (remix of Salsa House)',
+        'Charlie – Spacer Woman', 'Deskee – Let There Be House'] },
+    { title: 'Electronic Oddities 1969–1986', who: 'Halli Civelek', year: '2003', what: 'Minimal wave, Italo disco, disco, synth-pop, experimental',
+      img: '14259915/hallicivelek-amixofodditiesandrarities_600.jpg', feed: '/hallicivelek/halli-civelek-november-mix-2008/',
+      tracks: ["Lio – You Go To My Head ('80)", "Thomas Leer – Saving Grace ('82)", "Le Syndicat Electronique – Entrevue Misanthropique ('03)",
+        "World In Motion – Senseless ('83)", "Topo – Ba Ba Go, Go ('83)", "Harry Breuer & Jean-Jacques Perrey – Paris 2079 ('69)",
+        "Kazino – Binary ('85)", "Axel Romain – Where Are You Sleepers ('86)", "Nospy – Woiajo ('82)", "Number One Ensemble – Back To Heaven ('80)",
+        "Hank Shostak – Don't Tell Me ('86)", "Vivien Vee – Alright ('82)", "East Wall – Eyes Of Glass ('85)", "Methusalem – Zombie ('80)",
+        "Methusalem – The Black Hole ('80)", "Telex – L'amour Toujours ('85)", "Telex – L'amour Toujours (Special Dance Mix) ('85)",
+        "J.M. Band – Computer Monkey ('83)", "G'Race – On Fire ('80)", "Polar Praxis – (I Want) To Be Different ('84)",
+        "Harry Breuer & Jean-Jacques Perrey – Moog Foo Young ('69)", "Russisk Disko – Russisk Disko ('82)"] }
+  ];
+
+  function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
+  function link(text, href, cls) { var a = el('a', cls, text); a.href = href; if (/^https?:/.test(href)) { a.target = '_blank'; a.rel = 'noopener'; } return a; }
+  function plus() { var p = el('p', 'hc-mu-plus', '+ + +'); p.setAttribute('aria-hidden', 'true'); return p; }
+
+  function mix(m, i) {
+    var row = el('div', 'hc-mu-mix');
+    var img = el('img'); img.src = IMG + m.img; img.alt = ''; img.loading = 'lazy'; row.appendChild(img);
+    var body = el('div'); row.appendChild(body);
+    body.appendChild(el('h3', '', m.title));
+    body.appendChild(el('p', 'hc-mu-who', m.who + ' · ' + m.year));
+    body.appendChild(el('p', 'hc-mu-what', m.what));
+    var play = el('button', 'hc-mu-play', '▶ Play'); play.type = 'button';
+    play.setAttribute('aria-expanded', 'false'); play.setAttribute('aria-controls', 'hc-mu-player-' + i);
+    var box = el('div', 'hc-mu-player'); box.id = 'hc-mu-player-' + i;
+    play.addEventListener('click', function () {
+      var open = !!box.firstChild;
+      box.innerHTML = '';
+      if (!open) {
+        var f = el('iframe'); f.title = m.title + ' on Mixcloud'; f.allow = 'autoplay';
+        f.src = 'https://player-widget.mixcloud.com/widget/iframe/?hide_cover=1&mini=1&light=1&feed=' + encodeURIComponent(m.feed);
+        box.appendChild(f);
+      }
+      play.textContent = open ? '▶ Play' : '■ Close player';
+      play.setAttribute('aria-expanded', String(!open));
+    });
+    body.appendChild(play); body.appendChild(box);
+    var d = el('details'); d.appendChild(el('summary', '', 'Tracklist (' + m.tracks.length + ')'));
+    var ol = el('ol'); m.tracks.forEach(function (t) { ol.appendChild(el('li', '', t)); }); d.appendChild(ol);
+    body.appendChild(d);
+    return row;
+  }
+
+  function build(box) {
+    [].slice.call(box.children).forEach(function (c) { c.setAttribute('data-hc-mu-fallback', ''); c.style.display = 'none'; });
+    var root = el('div'); root.id = 'hc-mu';
+    root.appendChild(el('h1', '', 'Music'));
+    root.appendChild(el('p', 'hc-mu-lede', "I make music as Wanton Boys Club and under my own name, remix other people's songs, and now and then put together a mix."));
+
+    root.appendChild(el('h2', '', 'Wanton Boys Club'));
+    var rel = el('div', 'hc-mu-rel');
+    var cover = el('img'); cover.src = IMG + '13766357/WantonBoysClub-YouAreOK-TheMandarin-albumartwork-400px-shadow_400.jpg';
+    cover.alt = 'You Are OK & The Mandarin, single cover'; rel.appendChild(cover);
+    var t = el('div'); rel.appendChild(t);
+    t.appendChild(el('p', 'hc-mu-name', 'You Are OK & The Mandarin'));
+    t.appendChild(el('blockquote', '', "A bouncy, space-disco epic with nods to Italo disco and early 90's house. The single also recalls the disco funk of acts like Eddie Grant and Lipps Inc with its delicately jittery instrumentation."));
+    t.appendChild(el('p', 'hc-mu-small', 'Listen & buy:'));
+    var ul = el('ul', 'hc-mu-stores');
+    STORES.forEach(function (s) { var li = el('li'); li.appendChild(link(s[0], s[1])); ul.appendChild(li); });
+    t.appendChild(ul);
+    var w = el('p', 'hc-mu-small'); w.appendChild(link('wantonboys.club →', 'http://www.wantonboys.club')); t.appendChild(w);
+    root.appendChild(rel);
+
+    root.appendChild(plus());
+    root.appendChild(el('h2', '', 'Remixes'));
+    root.appendChild(el('p', '', 'As Halli Civelek, for FM Belfast, múm, Sin Fang, Retro Stefson, Moses Hightower and Sísí Ey (and two Led Zeppelin edits, which you can find using your Poirot brain).'));
+    var sc = el('p'); sc.appendChild(link('Listen on SoundCloud →', 'https://soundcloud.com/hallicivelek')); root.appendChild(sc);
+
+    root.appendChild(plus());
+    root.appendChild(el('h2', '', 'Mixes'));
+    var list = el('div', 'hc-mu-mixes'); MIXES.forEach(function (m, i) { list.appendChild(mix(m, i)); }); root.appendChild(list);
+    box.appendChild(root);
+  }
+
+  function describe() {
+    if (document.title !== TITLE) document.title = TITLE;
+    var m = document.querySelector('meta[name="description"]');
+    if (!m) { m = document.createElement('meta'); m.name = 'description'; document.head.appendChild(m); }
+    if (m.content !== DESCRIPTION) m.content = DESCRIPTION;
+  }
+
+  function check() {
+    var here = PAGE.test(location.pathname);
+    document.documentElement.classList.toggle('hc-mu-on', here);
+    if (!here) return;
+    describe();
+    var box = document.querySelector('.project_content');
+    if (box && !box.querySelector('#hc-mu')) build(box);
+  }
+  var pending = null;
+  new MutationObserver(function () { clearTimeout(pending); pending = setTimeout(check, 120); })
+    .observe(document.documentElement, { childList: true, subtree: true });
+  addEventListener('popstate', check);
+  check();
+})();
+window.__hcBuild = "2026-11-04 03:02";

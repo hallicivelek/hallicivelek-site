@@ -112,4 +112,4 @@
   addEventListener('popstate', function () { setTimeout(place, 150); });
   if (document.body) set(mode); else document.addEventListener('DOMContentLoaded', function () { set(mode); });
 })();
-window.__hcBuild = "2026-11-04 02:44";
+window.__hcBuild = "2026-11-04 03:02";

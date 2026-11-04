@@ -65,6 +65,11 @@ The build was verified to reproduce the installed files byte-for-byte when this 
 - **Pond preview mode:** `?hc-preview` *inside an iframe* (pond_loader_template) adds `html.hc-pond-preview`: no Cargo
   header, no wake screen, no tray or caption, so audio never starts. Opened directly, `?hc-preview` does nothing.
 - `src/hc-retro.html` — **1999 mode** (see below).
+- `src/hc-music.html` — **music** (page address contains `music-mixes`; nav label "music"): about-me style page with
+  Wanton Boys Club (cover, unattributed press quote, store buttons; Google Play dropped, it closed in 2020), remixes,
+  and the four mixes with in-place Mixcloud players and tracklists (the four /filter/mix/ pages stay for old links).
+  Hides Cargo's content (fallback) and grid; sets the title "Music & mixes – Halli Civelek" and a meta description
+  (Cargo's Title field is also the nav label, so it stays "music").
 - `custom-css/header.css` — the bigger logo (~300px), for Cargo's Custom CSS on launch day.
 - `src/hc-debug.html` — screen measurements overlay, **only with `?hc-debug`** in the address (for diagnosing phones).
 - `src/parts/before.html`, `src/parts/after.html` — **Halli's own** Custom HTML (Cargo filter script, StatCounter,
