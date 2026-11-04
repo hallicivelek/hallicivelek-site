@@ -3,7 +3,7 @@
 (function () {
   if (window.__hcMusic) return;
   window.__hcMusic = true;
-  var PAGE = /music-?mixes/i;
+  var PAGE = /^\/music(-?mixes)?\/?$/i;   // the music page, at music-mixes (or music, if Cargo renames it)
   var TITLE = 'Music & mixes – Halli Civelek';
   var DESCRIPTION = 'Italo disco mixes with tracklists, remixes and Wanton Boys Club, by Halli Civelek.';
   var IMG = 'https://payload.cargocollective.com/1/9/304840/';
@@ -130,4 +130,4 @@
   addEventListener('popstate', check);
   check();
 })();
-window.__hcBuild = "2026-11-04 03:02";
+window.__hcBuild = "2026-11-04 03:05";
