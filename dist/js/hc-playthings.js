@@ -44,7 +44,10 @@
   }
 
   function build(box) {
-    [].slice.call(box.children).forEach(function (c) { c.setAttribute('data-hc-pt-fallback', ''); c.style.display = 'none'; });
+    // Cargo's own content (loose text included) moves into one hidden box: kept as the fallback
+    var keep = document.createElement('div'); keep.setAttribute('data-hc-pt-fallback', ''); keep.style.display = 'none';
+    while (box.firstChild) keep.appendChild(box.firstChild);
+    box.appendChild(keep);
     var root = el('div'); root.id = 'hc-pt';
     root.appendChild(el('p', 'hc-pt-intro', INTRO));
     var grid = el('div', 'hc-pt-grid');
@@ -66,4 +69,4 @@
   addEventListener('popstate', check);
   check();
 })();
-window.__hcBuild = "2026-11-04 03:08";
+window.__hcBuild = "2026-11-04 03:13";

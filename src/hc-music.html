@@ -10,6 +10,7 @@
   #hc-mu h1 { font-family: inherit; font-size: 44px; line-height: 1.1; margin: 0 0 14px; font-weight: bold; color: inherit; text-transform: none; }
   #hc-mu .hc-mu-lede { font-size: 22px; line-height: 1.3; margin: 0 0 48px; }
   #hc-mu h2 { font-family: inherit; font-size: 27px; line-height: 1.2; font-weight: bold; margin: 0 0 18px; color: inherit; text-transform: none; }
+  #hc-mu h2.hc-mu-big { font-size: 44px; line-height: 1.1; }
   #hc-mu .hc-mu-plus { margin: 44px 0 28px; opacity: .6; }
   #hc-mu p { font-size: 16px; line-height: 1.55; margin: 0 0 14px; color: inherit; }
   #hc-mu a { color: rgb(14, 118, 128); }
@@ -42,7 +43,7 @@
   #hc-mu summary::after { content: ' +'; }
   #hc-mu details[open] summary::after { content: ' –'; }
   #hc-mu ol { margin: 10px 0 0; padding-left: 26px; font-size: 14px; line-height: 1.7; }
-  @media (max-width: 600px) { #hc-mu h1 { font-size: 34px; } #hc-mu .hc-mu-lede { font-size: 19px; } #hc-mu .hc-mu-mix > img { width: 72px; height: 72px; } }
+  @media (max-width: 600px) { #hc-mu h1, #hc-mu h2.hc-mu-big { font-size: 34px; } #hc-mu .hc-mu-lede { font-size: 19px; } #hc-mu .hc-mu-mix > img { width: 72px; height: 72px; } }
 </style>
 <script>
 (function () {
@@ -80,7 +81,7 @@
       tracks: ['Ago – It Will Never Be', 'Kariya – Let Me Love You For Tonight', 'Boeing – Dance To The Beat', 'Corina – Temptation',
         "Tabú D'Apache – Don't Believe In Love", 'Richie Rich feat. Ralphi Rosario – You Used To Salsa (remix of Salsa House)',
         'Charlie – Spacer Woman', 'Deskee – Let There Be House'] },
-    { title: 'Electronic Oddities 1969–1986', who: 'Halli Civelek', year: '2003', what: 'Minimal wave, Italo disco, disco, synth-pop, experimental',
+    { title: 'Electronic Oddities 1969–1986', who: 'Halli Civelek', year: '2008', what: 'Minimal wave, Italo disco, disco, synth-pop, experimental',
       img: '14259915/hallicivelek-amixofodditiesandrarities_600.jpg', feed: '/hallicivelek/halli-civelek-november-mix-2008/',
       tracks: ["Lio – You Go To My Head ('80)", "Thomas Leer – Saving Grace ('82)", "Le Syndicat Electronique – Entrevue Misanthropique ('03)",
         "World In Motion – Senseless ('83)", "Topo – Ba Ba Go, Go ('83)", "Harry Breuer & Jean-Jacques Perrey – Paris 2079 ('69)",
@@ -124,7 +125,10 @@
   }
 
   function build(box) {
-    [].slice.call(box.children).forEach(function (c) { c.setAttribute('data-hc-mu-fallback', ''); c.style.display = 'none'; });
+    // Cargo's own content (loose text included) moves into one hidden box: kept as the fallback
+    var keep = document.createElement('div'); keep.setAttribute('data-hc-mu-fallback', ''); keep.style.display = 'none';
+    while (box.firstChild) keep.appendChild(box.firstChild);
+    box.appendChild(keep);
     var root = el('div'); root.id = 'hc-mu';
     root.appendChild(el('h1', '', 'Music'));
     root.appendChild(el('p', 'hc-mu-lede', "I make music as Wanton Boys Club and under my own name, remix other people's songs, and now and then put together a mix."));
@@ -149,7 +153,7 @@
     var sc = el('p'); sc.appendChild(link('Listen on SoundCloud →', 'https://soundcloud.com/hallicivelek')); root.appendChild(sc);
 
     root.appendChild(plus());
-    root.appendChild(el('h2', '', 'Mixes'));
+    root.appendChild(el('h2', 'hc-mu-big', 'Mixes'));   // as big as "Music": the mixes are what many visitors come for
     var list = el('div', 'hc-mu-mixes'); MIXES.forEach(function (m, i) { list.appendChild(mix(m, i)); }); root.appendChild(list);
     box.appendChild(root);
   }

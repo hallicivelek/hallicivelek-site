@@ -237,17 +237,18 @@ async def main(base):
         # ---- music: everything on one page, mixes play in place ----
         page = await b.new_page(viewport={'width': 1300, 'height': 900}); errs = []
         page.on('pageerror', lambda e: errs.append(str(e)))
-        await page.goto(base + '/short/music-mixes/'); await page.wait_for_timeout(1500)
+        await page.goto(base + '/music-mixes/'); await page.wait_for_timeout(1500)
         r = await page.evaluate("""() => ({ h: [...document.querySelectorAll('#hc-mu h2')].map(h => h.textContent),
           mixes: [...document.querySelectorAll('#hc-mu .hc-mu-mix')].map(m => m.querySelector('h3').textContent + ' ' + m.querySelectorAll('li').length),
           stores: [...document.querySelectorAll('#hc-mu .hc-mu-stores a')].map(a => a.textContent),
           fallback: [...document.querySelectorAll('[data-hc-mu-fallback]')].every(e => getComputedStyle(e).display === 'none'),
           grid: [...document.querySelectorAll('.thumbnails')].every(e => getComputedStyle(e).display === 'none'),
           title: document.title, desc: (document.querySelector('meta[name="description"]') || {}).content,
-          left: getComputedStyle(document.querySelector('#hc-mu p')).textAlign })""")
+          left: getComputedStyle(document.querySelector('#hc-mu p')).textAlign,
+          loose: [...document.querySelector('.project_content').childNodes].filter(n => n.nodeType === 3 && n.textContent.trim()).length })""")
         check('music: Wanton Boys Club, remixes and four mixes on one page, left-aligned, grid and fallback hidden',
               r['h'] == ['Wanton Boys Club', 'Remixes', 'Mixes'] and r['mixes'] == ['Italo! 24', 'Italo Rider 20', 'Hotplay (from Europe) – Minimix #1 8', 'Electronic Oddities 1969–1986 22']
-              and len(r['stores']) == 6 and 'Google Play' not in r['stores'] and r['fallback'] and r['grid'] and r['left'] == 'left', str(r))
+              and len(r['stores']) == 6 and 'Google Play' not in r['stores'] and r['fallback'] and r['grid'] and r['left'] == 'left' and r['loose'] == 0, str(r))
         check('music: page title and description for search engines', r['title'] == 'Music & mixes – Halli Civelek' and 'Italo disco mixes' in (r['desc'] or ''), r['title'])
         await page.click('#hc-mu .hc-mu-play >> nth=1'); await page.wait_for_timeout(300)
         f = await page.evaluate("[(document.querySelector('#hc-mu-player-1 iframe') || {}).src || '', document.querySelectorAll('#hc-mu iframe').length, document.querySelectorAll('#hc-mu .hc-mu-play')[1].getAttribute('aria-expanded')]")
@@ -333,7 +334,7 @@ if __name__ == '__main__':
                     ('short/info-contact', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', '<div class="project_content"><img src="/Halli-Civelek-artist-portrait_300.jpg" width="300" height="359"></div>')),
                     ('short/filter/artdirection', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID)),
                     ('short/filter/illustration', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID_IMG)),
-                    ('short/music-mixes', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', '<p>I make music as Wanton Boys Club</p>')
+                    ('music-mixes', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', 'loose text from Cargo <br><p>I make music as Wanton Boys Club</p> + + +')
                         .replace('</div></div>\n<script>', '</div>' + GRID + '</div>\n<script>', 1)),
                     ('short/playthings', PAGE.replace('ADDONS', tags)
                         .replace('</style>', '  .project_content a:hover { background-color: rgb(255, 255, 0); color: rgb(0, 0, 0); }\n</style>', 1)
