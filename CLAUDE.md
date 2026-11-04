@@ -88,8 +88,8 @@ won't be prefixed and the Cargo version will look for an element that doesn't ex
 ## The sort line and the random overlords
 Every visit starts in **Halli's order** (Cargo's project order, which Halli sets by hand): "sorted by: Halli
 ↻ try the random overlords" (after the first click: "↻ ask the overlords again", dark teal rgb(14,118,128), bold,
-underlined). On the front page and its filters an intro line sits above it ("Art director and illustrator. This is a
-collection of things I've made."). Clicking picks one of: a sort from `facts.txt` that matches at least 2 projects
+underlined). On the front page and its filters an intro line sits above it ("Some of what I've made, for others and for
+myself." Halli chose no titles here: the about page says who he is). Clicking picks one of: a sort from `facts.txt` that matches at least 2 projects
 on the grid (numbers: most first, or `order: lowest first`), Halli's order, or a **90s sort worked out on the spot**:
 - `modem` "33.6k modem": smallest thumbnail file first (Resource Timing size, else a guess from the pixels); each
   picture loads top to bottom in steps, 3–12 s, only once 25% of the card is on screen; hover fact "≈ N sec on 33.6k"

@@ -9,7 +9,7 @@
   var FRAME = 'sorted by: ';
   var USUAL = { name: 'halli', label: 'Halli', badge: '', items: {} };
   var FIRST = '↻ try the random overlords', AGAIN = '↻ ask the overlords again';
-  var INTRO = "Art director and illustrator. This is a collection of things I've made.";
+  var INTRO = "Some of what I've made, for others and for myself.";
   var INTRO_PAGE = /^\/(filter\/[^/]+\/?)?$/;   // the front page (and its filters)
   var GEO_CHANCE = 1 / 6;                     // how often the overlords choose GeoCities
   var clicked = false;
@@ -266,4 +266,4 @@
   addEventListener('resize', function () { clearTimeout(pending); pending = setTimeout(fix, 200); });
   fix();
 })();
-window.__hcBuild = "2026-11-04 02:25";
+window.__hcBuild = "2026-11-04 02:39";

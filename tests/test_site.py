@@ -141,7 +141,7 @@ async def main(base):
           .map(t => [t.getBoundingClientRect().top, t.getBoundingClientRect().left, t.querySelector('a').getAttribute('href').split('/').pop()])
           .sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(x => x[2])""")
         check("grid: every visit starts in Halli's order, with the overlords offered and the intro above", r['label'] == 'sorted by: Halli'
-              and again == ['↻ try the random overlords', "Art director and illustrator. This is a collection of things I've made."]
+              and again == ['↻ try the random overlords', "Some of what I've made, for others and for myself."]
               and order[:3] == GRID_SLUGS[:3], f"{r['label']} | {again} | {order[:3]}")
         await page.click('#hc-sort button'); await page.wait_for_timeout(900)
         again = await page.evaluate("[document.querySelector('.hc-sort-label').textContent, document.querySelector('.hc-sort-again').textContent]")
