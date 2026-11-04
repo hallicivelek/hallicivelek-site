@@ -57,6 +57,13 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   saved). On touch the tip is held 14 px left / 46 px above the finger so you can see it. Esc or a click/tap outside
   the photo puts it back. Cargo leaves the page on Esc (to `/`, a document keydown listener); our window-capture
   listener keeps Esc from Cargo while the pencil is held **or a drawing exists** (Halli lost a drawing to a second Esc).
+- `src/hc-playthings.html` — **playthings**: on the page whose address contains `playthings`, hides whatever Halli
+  put on the Cargo page (kept as fallback) and draws four cards with live previews: Kontrapunkt (the blog in a
+  scaled-down iframe, gliding), Shakeskin (12 of Halli's friends' faces from shakeskin.com, one at a time with a shake;
+  shakeskin.com won't be framed), The Calculater (still iframe), the blob-pond (`/the-blob-pond?hc-preview`). Hover is
+  20% white (overrides Cargo's yellow `.project_content a:hover`); Halli ruled out tilting. Reduced motion: no glide/shake.
+- **Pond preview mode:** `?hc-preview` *inside an iframe* (pond_loader_template) adds `html.hc-pond-preview`: no Cargo
+  header, no wake screen, no tray or caption, so audio never starts. Opened directly, `?hc-preview` does nothing.
 - `src/hc-debug.html` — screen measurements overlay, **only with `?hc-debug`** in the address (for diagnosing phones).
 - `src/parts/before.html`, `src/parts/after.html` — **Halli's own** Custom HTML (Cargo filter script, StatCounter,
   Typekit link that loads the site font Pacaembu; mobile menu fixes). Keep as he gives them.
@@ -110,6 +117,12 @@ Scales: time of day by default (morning/day major pentatonic, evening **hirajosh
 picker and "surprise me" (weighted towards unfamiliar scales: slendro, pelog, harmonic series, …). Bohlen–Pierce
 (no octaves) only via "surprise me" or as a ~1-in-30 secret visit ("something strange in reykjavík").
 Accessibility: pause button (WCAG 2.2.2), reduced-motion respected, screen-reader labels, keyboard-reachable controls.
+
+## Redesign in progress (2026-11-04)
+Plan and every decision so far: `~/Documents/hallicivelek.com/site-redesign-notes.md` (outside the repo). New nav:
+things I've made · playthings · about me. The about me page is live (pasted by Halli). Playthings is built
+(not pushed until Halli agrees). Still to build: front-page intro, "sorted by: Halli / try the random overlords",
+the 33.6k / Yahoo! / tiny JPG / GeoCities sorts, 1999 mode (Netscape, GeoCities), the bottom-of-the-page award.
 
 ## Where we left off (2026-11-04)
 - **Waiting on Halli:** a new `?hc-debug` screenshot from his iPhone (hallicivelek.com/info-contact?hc-debug, scrolled

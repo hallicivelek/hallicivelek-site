@@ -176,4 +176,4 @@
   addEventListener('resize', function () { clearTimeout(pending); pending = setTimeout(fix, 200); });
   fix();
 })();
-window.__hcBuild = "2026-11-03 22:09";
+window.__hcBuild = "2026-11-04 02:02";

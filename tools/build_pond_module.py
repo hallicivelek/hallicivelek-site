@@ -108,6 +108,9 @@ def build():
 #hc-pond h1 { color: var(--ink); text-transform: none; }
 html.hc-pond-on .site_header, html.hc-pond-on .mobile_site_header, html.hc-pond-on .link_active a { background-color: #F3DCDF !important; }
 html.hc-pond-on .hc-blobs, html.hc-pond-on .hc-pause { display: none !important; }
+html.hc-pond-on.hc-pond-preview .site_header, html.hc-pond-on.hc-pond-preview .mobile_site_header { display: none !important; }
+html.hc-pond-on.hc-pond-preview #hc-pond { z-index: 2147483000; }
+html.hc-pond-on.hc-pond-preview #hc-pond #hcp-wake, html.hc-pond-on.hc-pond-preview #hc-pond .hcp-tray, html.hc-pond-on.hc-pond-preview #hc-pond #hcp-caption { display: none !important; }
 """
     for line in fenced.split('\n'):                           # anything not fenced would leak into Cargo's page
         if '{' in line and not line.lstrip().startswith(('#hc-pond', '@media', 'html.hc-pond-on')):

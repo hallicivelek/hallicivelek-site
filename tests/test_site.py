@@ -176,6 +176,35 @@ async def main(base):
         check('no script errors (script files)', not errs, '; '.join(errs)[:200])
         await page.close()
 
+        # ---- playthings: four cards over Cargo's fallback, the pond card in preview mode ----
+        page = await b.new_page(viewport={'width': 1300, 'height': 900}); errs = []
+        page.on('pageerror', lambda e: errs.append(str(e)))
+        await page.goto(base + '/short/playthings/'); await page.wait_for_timeout(2500)
+        r = await page.evaluate("""() => ({ cards: [...document.querySelectorAll('#hc-pt a.hc-pt-card h2')].map(h => h.firstChild.textContent),
+          intro: (document.querySelector('#hc-pt .hc-pt-intro') || {}).textContent,
+          fallbackHidden: [...document.querySelectorAll('[data-hc-pt-fallback]')].every(e => getComputedStyle(e).display === 'none'),
+          pondSrc: (document.querySelector('#hc-pt iframe[src*="blob-pond"]') || {}).getAttribute ? document.querySelector('#hc-pt iframe[src*="blob-pond"]').getAttribute('src') : null,
+          outsideNewTab: [...document.querySelectorAll('#hc-pt a.hc-pt-card')].filter(a => /^https?:/.test(a.getAttribute('href'))).every(a => a.target === '_blank') })""")
+        hid = await page.evaluate("[...document.querySelectorAll('.thumbnails, #hc-sort')].every(e => getComputedStyle(e).display === 'none')")
+        check("playthings: Cargo's project grid is hidden", hid)
+        check('playthings: four cards in order, intro, Cargo fallback hidden', r['cards'] == ['Music Kontrapunkt Kontrol', 'Shakeskin', 'The Calculater', 'The blob-pond']
+              and r['intro'] == "Things I've built and kept running (some since 2004)." and r['fallbackHidden'] and r['outsideNewTab'], str(r))
+        await page.hover('#hc-pt a.hc-pt-card >> nth=2'); await page.wait_for_timeout(400)
+        bg = await page.evaluate("getComputedStyle(document.querySelectorAll('#hc-pt a.hc-pt-card')[2]).backgroundColor")
+        check("playthings: hover is 20% white, not Cargo's yellow", bg == 'rgba(255, 255, 255, 0.2)', bg)
+        f = next((fr for fr in page.frames if 'hc-preview' in fr.url), None)
+        r = await f.evaluate("""() => ({ pond: !!document.getElementById('hc-pond'), preview: document.documentElement.classList.contains('hc-pond-preview'),
+          header: getComputedStyle(document.querySelector('.site_header')).display,
+          wake: getComputedStyle(document.getElementById('hcp-wake')).display, tray: getComputedStyle(document.querySelector('#hc-pond .hcp-tray')).display,
+          blobs: document.querySelectorAll('#hcp-pond > g, #hcp-pond g').length })""") if f else None
+        check('pond preview: no header, wake screen or controls (so no sound)', bool(r) and r['pond'] and r['preview'] and r['header'] == 'none'
+              and r['wake'] == 'none' and r['tray'] == 'none', str(r))
+        await page.goto(base + '/short/blob-pond/?hc-preview'); await page.wait_for_timeout(1200)
+        r = await page.evaluate("[document.documentElement.classList.contains('hc-pond-preview'), getComputedStyle(document.getElementById('hcp-wake')).display]")
+        check('pond preview only inside another page: opened directly, the wake screen stays', r == [False, 'flex'] or (r[0] is False and r[1] != 'none'), str(r))
+        check('no script errors (playthings)', not errs, '; '.join(errs)[:300])
+        await page.close()
+
         # ---- phone, with Cargo's late viewport switch and the resize signal blocked (closest to Safari) ----
         ctx = await b.new_context(viewport={'width': 390, 'height': 760}, device_scale_factor=3, is_mobile=True, has_touch=True)
         await ctx.add_init_script(BLOCK_RESIZE)
@@ -219,9 +248,13 @@ if __name__ == '__main__':
     (site / 'assets' / 'portrait').mkdir(parents=True)
     for f in (ROOT / 'assets' / 'portrait').iterdir(): (site / 'assets' / 'portrait' / f.name).write_bytes(f.read_bytes())
     (site / 'Halli-Civelek-artist-portrait_300.jpg').write_bytes((ROOT / 'assets' / 'portrait' / 'face-no-irises.jpg').read_bytes())   # stand-in for Cargo's photo
-    for d, html in [('short/blob-pond', PAGE.replace('ADDONS', tags)),
+    for d, html in [('short/blob-pond', PAGE.replace('ADDONS', tags)), ('the-blob-pond', PAGE.replace('ADDONS', tags)),
                     ('short/info-contact', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', '<div class="project_content"><img src="/Halli-Civelek-artist-portrait_300.jpg" width="300" height="359"></div>')),
-                    ('short/filter/artdirection', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID))]:
+                    ('short/filter/artdirection', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID)),
+                    ('short/playthings', PAGE.replace('ADDONS', tags)
+                        .replace('</style>', '  .project_content a:hover { background-color: rgb(255, 255, 0); color: rgb(0, 0, 0); }\n</style>', 1)
+                        .replace('<p>PAGE CONTENT</p>', '<p>Music Kontrapunkt Kontrol, Shakeskin, The Calculater, the blob-pond</p>')
+                        .replace('</div></div>\n<script>', '</div>' + GRID + '</div>\n<script>', 1))]:
         (site / d).mkdir(parents=True); (site / d / 'index.html').write_text(html)
     class Quiet(http.server.SimpleHTTPRequestHandler):
         def log_message(self, *a): pass

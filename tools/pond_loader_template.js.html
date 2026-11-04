@@ -6,6 +6,8 @@
   window.__hcPondLoader = true;
   var POND_PAGE = /blob-?pond/i;
   var mounted = false, hidden = false;
+  // ?hc-preview inside another page (the playthings card): no header, no wake screen, no controls, so no sound
+  var PREVIEW = /[?&]hc-preview(&|$)/.test(location.search) && window.self !== window.top;
 
   function headerHeight() {
     var h = document.querySelector('.site_header');
@@ -24,7 +26,8 @@
     root.innerHTML = POND_MARKUP;
     document.body.appendChild(root);
     document.documentElement.classList.add('hc-pond-on');
-    var setTop = function () { root.style.setProperty('--hdr', headerHeight() + 'px'); };
+    if (PREVIEW) document.documentElement.classList.add('hc-pond-preview');
+    var setTop = function () { root.style.setProperty('--hdr', (PREVIEW ? 0 : headerHeight()) + 'px'); };
     setTop(); addEventListener('resize', setTop); document.addEventListener('DOMContentLoaded', setTop);
     POND_JS();
   }
