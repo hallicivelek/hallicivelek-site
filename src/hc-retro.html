@@ -74,6 +74,14 @@
   .hc-award-badge { width: 84px; height: 84px; margin: 0 auto 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; gap: 10px;
     background: radial-gradient(circle at 35% 30%, #ffe27a, #e0a400 70%); box-shadow: 0 0 0 6px #f3dcdf, 0 0 0 9px #e0a400; perspective: 200px; }
   .hc-award-star { font-size: 40px; color: #fff; display: inline-block; line-height: 1; }
+  /* on the regular site the medal is one of Halli's blobs, smiling (blob-faces-03), in gold */
+  html:not(.hc-ns):not(.hc-gc) .hc-award-badge { width: 120px; height: 120px; background: none; box-shadow: none; }
+  html:not(.hc-ns):not(.hc-gc) .hc-award-star { display: none; }
+  .hc-award-blob { display: none; width: 120px; height: 120px; overflow: visible; }
+  html:not(.hc-ns):not(.hc-gc) .hc-award-blob { display: block; animation: hc-award-bob 4s ease-in-out infinite; }
+  .hc-award-shine { animation: hc-award-shine 3.6s ease-in-out infinite; }
+  @keyframes hc-award-shine { 0% { transform: translateX(0); } 55%, 100% { transform: translateX(520px); } }
+  @keyframes hc-award-bob { 0%, 100% { transform: rotate(-3deg) translateY(0); } 50% { transform: rotate(3deg) translateY(-4px); } }
   .hc-award-text { display: none; }
   .hc-award-title { font-size: 30px; font-weight: bold; margin: 0 0 6px; }
   .hc-award-sub { font-size: 17px; opacity: .8; margin: 0 0 22px; }
@@ -90,7 +98,7 @@
   html.hc-gc .hc-award-pick button { color: #00ff00 !important; }
   @media (prefers-reduced-motion: reduce) {
     .hc-gc-top .hc-gc-scroll span { animation: none; padding-left: 0; }
-    html.hc-gc .hc-new, html.hc-ns .hc-award-star { animation: none; }
+    html.hc-gc .hc-new, html.hc-ns .hc-award-star, .hc-award-blob, .hc-award-shine { animation: none !important; }
   }
 </style>
 <script>
@@ -142,6 +150,16 @@
   var award = el('div', 'hc-award');
   var badge = el('div', 'hc-award-badge'); badge.setAttribute('aria-hidden', 'true');
   badge.appendChild(el('span', 'hc-award-star', '★'));
+  badge.insertAdjacentHTML('beforeend', '<svg class="hc-award-blob" viewBox="20 20 260 260" aria-hidden="true">' +
+    '<defs><radialGradient id="hc-award-gold" cx="35%" cy="28%" r="80%"><stop offset="0" stop-color="#fff3b0"/><stop offset=".35" stop-color="#f6cf4a"/><stop offset=".75" stop-color="#d99a00"/><stop offset="1" stop-color="#b07800"/></radialGradient>' +
+    '<linearGradient id="hc-award-sheen" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".5" stop-color="#fff" stop-opacity=".75"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
+    '<clipPath id="hc-award-clip"><path d="M187.7,43.48c9.43,4.99,17.52,12.2,25.21,21.4,11.63,13.93,24.1,27.87,34.46,42.76,12.86,18.49,18.36,41.16,10.85,62.87-7.09,20.5-26.04,34.65-41.56,48.61-24.28,21.85-51.41,58.22-88.47,47.43-19.67-5.73-37.52-17.42-50.81-33-10.88-12.76-23.97-25.1-30.69-40.71C14.09,117.09,82.25,26.04,163.46,36.06c9.13,1.13,17.07,3.63,24.24,7.42Z"/></clipPath></defs>' +
+    '<path fill="url(#hc-award-gold)" stroke="#c98d00" stroke-width="5" d="M187.7,43.48c9.43,4.99,17.52,12.2,25.21,21.4,11.63,13.93,24.1,27.87,34.46,42.76,12.86,18.49,18.36,41.16,10.85,62.87-7.09,20.5-26.04,34.65-41.56,48.61-24.28,21.85-51.41,58.22-88.47,47.43-19.67-5.73-37.52-17.42-50.81-33-10.88-12.76-23.97-25.1-30.69-40.71C14.09,117.09,82.25,26.04,163.46,36.06c9.13,1.13,17.07,3.63,24.24,7.42Z"/>' +
+    '<g clip-path="url(#hc-award-clip)"><g transform="skewX(-22)"><rect class="hc-award-shine" x="-120" y="0" width="70" height="320" fill="url(#hc-award-sheen)"/></g></g>' +
+    '<g transform="translate(150 150) scale(1.5) translate(-125.5 -110.5)" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">' +
+    '<path fill="#fff" stroke-width="2.8" d="M112.49,114.16s3.12,9.4,13.06,9.4,16.75-10.33,16.75-10.33l-29.8.93Z"/>' +
+    '<path fill="none" stroke-width="2.38" d="M93.48,106.78s1.66-7.03,6.44-7.58,9.2,3.49,9.2,3.49"/>' +
+    '<path fill="none" stroke-width="2.38" d="M142.29,101.08s5.72-4.58,10.08-2.61,5.33,7.1,5.33,7.1"/></g></svg>');
   var bt = el('span', 'hc-award-text'); bt.innerHTML = 'AWARD<br>WINNING<br>SITE'; badge.appendChild(bt);
   award.appendChild(badge);
   award.appendChild(el('p', 'hc-award-title', 'Bottom of the page award'));

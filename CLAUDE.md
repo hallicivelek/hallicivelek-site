@@ -107,6 +107,7 @@ are kept, only re-ordered. Project addresses come from Cargo's models (`project_
 were checked against the 70 live projects on 2026-11-03 — a renamed project in Cargo can change its address.
 
 ## 1999 mode (src/hc-retro.html)
+On the regular site the award medal is a golden, shimmering, smiling blob (Halli's blob-faces-03 face; a sheen sweeps across it, it bobs gently; still with reduced motion).
 Netscape (grey, Times, link blue, sunken frames, bevelled buttons, status bar) or GeoCities (starry tiles, Comic
 Sans, scrolling welcome, UNDER CONSTRUCTION, visitor counter 000417 + 1 a day, rainbow line, gold frames, blinking
 NEW! on the first three projects in Halli's order, cursor sparkles). Never on by default. Ways in: the "Bottom of the
