@@ -71,6 +71,10 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   Hides Cargo's content (fallback) and grid; sets the title "Music & mixes – Halli Civelek" and a meta description
   (Cargo's Title field is also the nav label, so it stays "music").
 - `custom-css/header.css` — the bigger logo (~300px), for Cargo's Custom CSS on launch day.
+- `src/hc-fold.html` — on the Romantika project page, swaps Halli's four-step fold drawing
+  (`halli_apparat_fold_stort.jpg`) for `assets/apparat/fold.mp4` (rendered from the drawing's top panel: 72 frames,
+  25 fps, 940×500; open→closed by 1.44 s, closed→open to the end) with a "see the magic" / "and back again" button and
+  no video controls. Plays straight through without seeking (the test server can't seek). Video error → drawing stays.
 - `src/hc-debug.html` — screen measurements overlay, **only with `?hc-debug`** in the address (for diagnosing phones).
 - `src/parts/before.html`, `src/parts/after.html` — **Halli's own** Custom HTML (Cargo filter script, StatCounter,
   Typekit link that loads the site font Pacaembu; mobile menu fixes). Keep as he gives them.

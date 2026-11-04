@@ -264,6 +264,24 @@ async def main(base):
         check('no script errors (music)', not errs, '; '.join(errs)[:300])
         await page.close()
 
+        # ---- the Romantika fold: video + "see the magic" ----
+        page = await b.new_page(viewport={'width': 1300, 'height': 900}); errs = []
+        page.on('pageerror', lambda e: errs.append(str(e)))
+        await page.goto(base + '/short/romantika/'); await page.wait_for_timeout(1500)
+        r = await page.evaluate("""() => { const v = document.querySelector('.hc-fold video'); return { video: !!v, controls: v && v.controls, muted: v && v.muted,
+          still: getComputedStyle(document.querySelector('img[data-hc-fold]')).display, button: (document.querySelector('.hc-fold button') || {}).textContent }; }""")
+        check('fold: the still drawing becomes a silent video without controls and a "see the magic" button', r == {'video': True, 'controls': False, 'muted': True, 'still': 'none', 'button': 'see the magic'}, str(r))
+        await page.click('.hc-fold button'); await page.wait_for_timeout(2200)
+        r = await page.evaluate("[document.querySelector('.hc-fold video').paused, Math.round(document.querySelector('.hc-fold video').currentTime * 100) / 100, document.querySelector('.hc-fold button').textContent]")
+        check('fold: one click folds it shut and stops there', r[0] and abs(r[1] - 1.44) < 0.1 and r[2] == 'and back again', str(r))
+        await page.click('.hc-fold button'); await page.wait_for_timeout(2200)
+        r = await page.evaluate("[document.querySelector('.hc-fold video').ended, document.querySelector('.hc-fold button').textContent]")
+        await page.click('.hc-fold button'); await page.wait_for_timeout(500)
+        again = await page.evaluate("[document.querySelector('.hc-fold video').paused, document.querySelector('.hc-fold video').currentTime]")
+        check('fold: the next click opens it again, and a third starts over', r == [True, 'see the magic'] and not again[0] and again[1] < 1, f'{r} then {again}')
+        check('no script errors (fold)', not errs, '; '.join(errs)[:300])
+        await page.close()
+
         # ---- playthings: four cards over Cargo's fallback, the pond card in preview mode ----
         page = await b.new_page(viewport={'width': 1300, 'height': 900}); errs = []
         page.on('pageerror', lambda e: errs.append(str(e)))
@@ -340,6 +358,7 @@ if __name__ == '__main__':
                     ('short/info-contact', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', '<div class="project_content"><img src="/Halli-Civelek-artist-portrait_300.jpg" width="300" height="359"></div>')),
                     ('short/filter/artdirection', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID)),
                     ('short/filter/illustration', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID_IMG)),
+                    ('short/romantika', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', '<p>Inside spread</p><img src="/halli_apparat_fold_stort.jpg" width="450" height="944">')),
                     ('music-mixes', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', 'loose text from Cargo <br><p>I make music as Wanton Boys Club</p> + + +')
                         .replace('</div></div>\n<script>', '</div>' + GRID + '</div>\n<script>', 1)),
                     ('short/playthings', PAGE.replace('ADDONS', tags)
@@ -352,6 +371,9 @@ if __name__ == '__main__':
         chunk = lambda t, d: struct.pack('>I', len(d)) + t + d + struct.pack('>I', zlib.crc32(t + d) & 0xffffffff)
         return b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', w, h, 8, 2, 0, 0, 0)) + chunk(b'IDAT', zlib.compress(rows)) + chunk(b'IEND', b'')
     (site / 'px.png').write_bytes(png(120, 90))
+    (site / 'halli_apparat_fold_stort.jpg').write_bytes(png(45, 94))
+    (site / 'assets' / 'apparat').mkdir(parents=True)
+    for f in (ROOT / 'assets' / 'apparat').iterdir(): (site / 'assets' / 'apparat' / f.name).write_bytes(f.read_bytes())
     class Quiet(http.server.SimpleHTTPRequestHandler):
         def log_message(self, *a): pass
     handler = functools.partial(Quiet, directory=str(site))

@@ -1,0 +1,55 @@
+/* hc-fold for hallicivelek.com: built from src/hc-fold.html by build.py, do not edit here */
+(function () { var s = document.createElement("style"); s.textContent = "\n  .hc-fold { margin: 0 auto; max-width: 470px; text-align: center; }\n  .hc-fold video { display: block; width: 100%; height: auto; aspect-ratio: 470 / 250; background: #fff; }\n  .hc-fold button { margin: 16px auto 0; font-family: pacaembu, sans-serif; font-size: 17px; font-weight: bold; color: #fff;\n    background: rgb(14, 118, 128); border: 0; border-radius: 999px; padding: 10px 22px; cursor: pointer; letter-spacing: normal; text-transform: none; }\n  .hc-fold button:hover { background: rgb(11, 96, 104); }\n  .hc-fold button:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n  .hc-fold button[disabled] { opacity: .6; cursor: default; }\n"; document.head.appendChild(s); })();
+(function () {
+  if (window.__hcFold) return;
+  window.__hcFold = true;
+  var STILL = /halli_apparat_fold_stort/;
+  var HALF = 1.44;   // seconds: where the video is fully closed
+  var here = document.currentScript && document.currentScript.src;
+  var BASE = here ? new URL('../../assets/apparat/', here).href : 'https://hallicivelek.github.io/hallicivelek-site/assets/apparat/';
+
+  function setup(img) {
+    img.setAttribute('data-hc-fold', '');
+    var box = document.createElement('div'); box.className = 'hc-fold';
+    var v = document.createElement('video');
+    v.muted = true; v.playsInline = true; v.setAttribute('playsinline', ''); v.setAttribute('muted', '');
+    v.preload = 'auto'; v.poster = BASE + 'fold-open.jpg'; v.src = BASE + 'fold.mp4';
+    v.setAttribute('aria-label', 'The Romantika cover folding: open, the inner panels fold in, closed');
+    var b = document.createElement('button'); b.type = 'button'; b.textContent = 'see the magic';
+    box.appendChild(v); box.appendChild(b);
+    // plays straight through, no jumping about (works even where the server can't seek): the first click plays up to
+    // the closed frame and pauses, the next plays on to the end, which is the open frame again; a click after the end
+    // starts from the top
+    var closed = false, busy = false;
+    function done() {
+      busy = false; b.disabled = false;
+      b.textContent = closed ? 'and back again' : 'see the magic';
+    }
+    function watch() {
+      if (!busy) return;
+      if (closed && v.currentTime >= HALF - 0.02) { v.pause(); done(); return; }
+      if (!closed && v.ended) { done(); return; }
+      requestAnimationFrame(watch);
+    }
+    b.addEventListener('click', function () {
+      if (busy) return;
+      closed = !closed; busy = true; b.disabled = true;
+      var p = v.play(); if (p && p.catch) p.catch(function () { closed = !closed; done(); });
+      requestAnimationFrame(watch);
+    });
+    v.addEventListener('error', function () { box.remove(); img.style.display = ''; });   // keep Halli's drawing
+    img.style.display = 'none';
+    img.parentNode.insertBefore(box, img.nextSibling);
+  }
+
+  function scan() {
+    [].slice.call(document.querySelectorAll('img')).forEach(function (img) {
+      if (!img.hasAttribute('data-hc-fold') && STILL.test(img.getAttribute('src') || '') && !img.closest('.thumbnail')) setup(img);
+    });
+  }
+  var pending = null;
+  new MutationObserver(function () { clearTimeout(pending); pending = setTimeout(scan, 150); })
+    .observe(document.documentElement, { childList: true, subtree: true });
+  scan();
+})();
+window.__hcBuild = "2026-11-04 03:58";
