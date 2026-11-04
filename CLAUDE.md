@@ -2,8 +2,8 @@
 
 Interactive add-ons for Halli Civelek's portfolio site, hallicivelek.com, which runs on **Cargo Collective** (Cargo 2).
 Everything reaches the live site through Cargo's **Custom HTML** setting. Two ways (both built every time):
-- **Short (current plan):** `dist/custom-html-short.html` = Halli's own parts + four `<script src>` lines that load
-  `dist/js/*.js` from GitHub Pages (repo `github.com/hallicivelek/hallicivelek-site`, public, served from `main` at
+- **Short (live):** `dist/custom-html-short.html` = Halli's own parts + an inline loader for `dist/js/*.js` on
+  GitHub Pages (repo `github.com/hallicivelek/hallicivelek-site`, public, served from `main` at
   `https://hallicivelek.github.io/hallicivelek-site/`). Changes to the add-ons go live by **building, committing and
   pushing**; GitHub Pages caches for up to ~10 minutes. Halli only re-pastes when `src/parts/` or the script list changes.
 - **Long (fallback):** `dist/custom-html.html` with everything inline (~119 KB), pasted whole.
@@ -111,17 +111,31 @@ picker and "surprise me" (weighted towards unfamiliar scales: slendro, pelog, ha
 (no octaves) only via "surprise me" or as a ~1-in-30 secret visit ("something strange in reykjavík").
 Accessibility: pause button (WCAG 2.2.2), reduced-motion respected, screen-reader labels, keyboard-reachable controls.
 
+## Where we left off (2026-11-04)
+- **Waiting on Halli:** a new `?hc-debug` screenshot from his iPhone (hallicivelek.com/info-contact?hc-debug, scrolled
+  to the bottom) after build `2026-11-03 22:09` reached his phone. His last screenshot still showed the blob layer
+  at 714px tall, i.e. the iOS stretch had not applied: either his phone still had the old script cached (GitHub Pages
+  allows 10 min) or the iOS check missed. The check now also uses the user agent, and the readout prints
+  `build … blobs think iOS: … layer style.height …`. If the build line is 22:09 and the layer is still 714, the
+  stretch itself doesn't work on real iOS 26 (look at `fitToScreen` in hc-blobs) — not reproducible in Playwright WebKit,
+  which only exercised the branch when forced on.
+- Then decide with Halli whether the pause button stays where iOS 26 puts it or moves to a top corner.
+- Remove `hc-debug` from `ADDONS` once the iPhone work is done (it is invisible without `?hc-debug`, so no rush).
+- Not by Claude, outside the repo, in `~/Documents/hallicivelek.com/`: `custom-html-short.txt` and
+  `info and about gamalt.txt` (Halli's own copies, 2026-11-04) and `gamla html af cargo.txt` (copied out of Cargo,
+  backslashes stripped — never build from it).
+
 ## Open items and ideas
 - **iOS 26 Safari (measured on Halli's iPhone with `?hc-debug`, 2026-11-03):** the page is drawn under the address
   bar, but fixed layers stop where the bar begins (`innerHeight` 714 with the bar out, 767 shrunk, screen 874). The
   blob layer was cut off in a straight line there; `fitToScreen` in hc-blobs now stretches the layer to the screen
-  height on iOS (`CSS.supports('-webkit-touch-callout', 'none')`). Also: one-word hover titles at 20px made the info page
+  height on iOS (user agent, or `CSS.supports('-webkit-touch-callout', 'none')`) — **not yet confirmed on his phone**. Also: one-word hover titles at 20px made the info page
   414px wide on a 402px phone and Safari zoomed out (scale 0.983); titles now wrap and are 16px on phones.
   The pause button sits where iOS 26 puts fixed bottom elements: just above the address bar's spot.
 - Pond test "evening plays hirajoshi" retries when it hits the pond's secret 1-in-30 "something strange" visit.
 - Not tested anywhere but Halli's own devices: real Safari on iPhone, and whether Cargo limits Custom HTML size
   (the file is ~119 KB since the random sort; ~98 KB is the largest size Halli has confirmed working).
-- Titles are 20px and plum #492E46 (9.1:1 on the pink), set in hc-columns' CSS. White was ruled out (1.3:1), and
+- Titles are 20px (16px on phones) and plum #492E46 (9.1:1 on the pink), set in hc-columns' CSS. White was ruled out (1.3:1), and
   Cargo's own title blue was 1.7:1.
 - Random sort: still waiting for Halli's lists for gaze (looking at you / right), faces, colours, Halli-blue and
   visual tags. Speed values are Claude's guesses from the titles, to be checked. Once gaze is complete, the
