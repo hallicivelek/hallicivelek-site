@@ -1,5 +1,5 @@
 /* hc-fold for hallicivelek.com: built from src/hc-fold.html by build.py, do not edit here */
-(function () { var s = document.createElement("style"); s.textContent = "\n  .hc-fold { margin: 0 auto; max-width: 470px; text-align: center; }\n  .hc-fold video { display: block; width: 100%; height: auto; aspect-ratio: 470 / 250; background: #fff; }\n  .hc-fold button { margin: 16px auto 0; font-family: pacaembu, sans-serif; font-size: 17px; font-weight: bold; color: #fff;\n    background: rgb(14, 118, 128); border: 0; border-radius: 999px; padding: 10px 22px; cursor: pointer; letter-spacing: normal; text-transform: none; }\n  .hc-fold button:hover { background: rgb(11, 96, 104); }\n  .hc-fold button:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n  .hc-fold button[disabled] { opacity: .6; cursor: default; }\n"; document.head.appendChild(s); })();
+(function () { var s = document.createElement("style"); s.textContent = "\n  .hc-fold { margin: 0 auto; max-width: 940px; text-align: center; }   /* as wide as the machines illustration above it */\n  .hc-fold video { display: block; width: 100%; height: auto; aspect-ratio: 470 / 250; background: #fff; }\n  .hc-fold button { margin: 16px auto 0; font-family: pacaembu, sans-serif; font-size: 17px; font-weight: bold; color: #fff;\n    background: rgb(14, 118, 128); border: 0; border-radius: 999px; padding: 10px 22px; cursor: pointer; letter-spacing: normal; text-transform: none; }\n  .hc-fold button:hover { background: rgb(11, 96, 104); }\n  .hc-fold button:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n  .hc-fold button[disabled] { opacity: .6; cursor: default; }\n"; document.head.appendChild(s); })();
 (function () {
   if (window.__hcFold) return;
   window.__hcFold = true;
@@ -52,4 +52,4 @@
     .observe(document.documentElement, { childList: true, subtree: true });
   scan();
 })();
-window.__hcBuild = "2026-11-04 03:58";
+window.__hcBuild = "2026-11-04 04:04";
