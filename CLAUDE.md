@@ -93,8 +93,7 @@ won't be prefixed and the Cargo version will look for an element that doesn't ex
 ## The sort line and the random overlords
 Every visit starts in **Halli's order** (Cargo's project order, which Halli sets by hand): "sorted by: Halli
 ↻ try the random overlords" (after the first click: "↻ ask the overlords again", dark teal rgb(14,118,128), bold,
-underlined). On the front page and its filters an intro line sits above it ("Some of what I've made, for others and for
-myself." Halli chose no titles here: the about page says who he is). Clicking picks one of: a sort from `facts.txt` that matches at least 2 projects
+underlined). No intro line above it (tried, Halli: better without). Clicking picks one of: a sort from `facts.txt` that matches at least 2 projects
 on the grid (numbers: most first, or `order: lowest first`), Halli's order, or a **90s sort worked out on the spot**:
 - `modem` "33.6k modem": smallest thumbnail file first (Resource Timing size, else a guess from the pixels); each
   picture loads top to bottom in steps, 3–12 s, only once 25% of the card is on screen; hover fact "≈ N sec on 33.6k"
@@ -110,6 +109,12 @@ on hover, under Cargo's hover title (`.thumb_title`), never as a permanent tag. 
 `?hc-sort=<name>` previews one (fact names, or modem, yahoo, tiny, geocities, halli). On phones Cargo's own columns
 are kept, only re-ordered. Project addresses come from Cargo's models (`project_url`); all addresses in facts.txt
 were checked against the 70 live projects on 2026-11-03 — a renamed project in Cargo can change its address.
+
+## The pinboard (hc-columns CSS)
+Halli's choice 2026-11-04 over rounded white boxes: three columns from 1000px (two from 768px, Cargo's own below),
+44px between columns, 64px between prints; each picture a white-bordered print (10px), square corners, soft
+shadow, tilted by up to ±2.2° (worked out from its address, so the same every visit), straight again on hover.
+Overrides `custom-css/spacing.css` (120px gaps), which can be removed from Cargo's Custom CSS.
 
 ## 1999 mode (src/hc-retro.html)
 On the regular site the award medal is a golden, shimmering, smiling blob (Halli's blob-faces-03 face; a sheen sweeps across it, it bobs gently; still with reduced motion).

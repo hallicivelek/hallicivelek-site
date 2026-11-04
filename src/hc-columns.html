@@ -8,7 +8,8 @@
      dial-up as you scroll to them), Yahoo! directory, 1998 (A to Z), tiny JPG, 1997 (pixelated), and now
      and then GeoCities, 1999 (switches on 1999 mode, see hc-retro). ?hc-sort=hands (or modem, yahoo, tiny,
      geocities, halli) previews one.
-     On the front page an intro line sits above the sort line.
+     Layout ("pinboard", Halli's choice 2026-11-04): three columns on wide screens (two from 768px), every picture a
+     white-bordered print at its own shape, with a soft shadow and a slight tilt that straightens on hover.
      The work stands on its own: a card's fact ("28 hands") only appears on hover, under Cargo's own
      hover title, and takes no space in the layout. -->
 <style>
@@ -16,8 +17,21 @@
   .hc-sort button { font: inherit; font-size: 18px; color: rgb(73, 46, 70); background: none; border: 0; padding: 4px 0; cursor: pointer; text-align: inherit; }
   .hc-sort-again { color: rgb(14, 118, 128); font-weight: bold; text-decoration: underline; text-underline-offset: 4px;
     text-decoration-thickness: 1.5px; margin-left: .6em; white-space: nowrap; }   /* dark teal: about 4:1 on the pink */
-  .hc-intro { font-size: 26px; line-height: 1.35; color: rgb(73, 46, 70); margin: 0 0 18px; max-width: 760px; text-align: left; }
-  @media (max-width: 600px) { .hc-intro { font-size: 20px; } }
+  /* the pinboard: prints instead of rounded white boxes */
+  .thumbnails .thumb_image { background: #fff !important; border-radius: 0 !important; padding: 10px; box-sizing: border-box; height: auto !important;
+    box-shadow: 0 1px 2px rgba(73, 46, 70, .12), 0 12px 26px -12px rgba(73, 46, 70, .38);
+    transform: rotate(var(--hc-tilt, 0deg)); transition: transform .3s cubic-bezier(.3, .7, .2, 1); }
+  .thumbnails .thumb_image img { width: 100% !important; height: auto !important; max-width: none !important; display: block; margin: 0 !important; }
+  .thumbnails .thumbnail:hover .thumb_image, .thumbnails .thumbnail:focus-within .thumb_image { transform: rotate(0deg) scale(1.02); }
+  html.hc-ns .thumbnails .thumb_image { transform: none !important; box-shadow: none !important; }
+  @media (prefers-reduced-motion: reduce) { .thumbnails .thumb_image { transition: none; } }
+  @media (min-width: 768px) {
+    .thumbnails.clear { gap: 44px !important; }
+    .thumbnails.clear .column { width: calc(50% - 22px) !important; }
+    html.hc-three .thumbnails.clear .column { width: calc((100% - 88px) / 3) !important; }
+    .thumbnails .thumbnail { margin-bottom: 0 !important; }
+    .thumbnails .padding_helper { margin-bottom: 64px; }
+  }
   /* 33.6k modem: each picture loads top to bottom in steps once it is on screen */
   @keyframes hc-dial { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
   .hc-dial .thumb_image { background-image: repeating-linear-gradient(0deg, rgba(73, 46, 70, .05) 0 2px, transparent 2px 4px); }
@@ -44,11 +58,12 @@
   window.__hcCols = true;
 
   var MIN_WIDTH = 768;   // below this width Cargo's own columns are kept (only re-ordered)
+  var THREE = 1000;      // from this width: three columns
   var SORTS = /*FACTS*/[];
   var FRAME = 'sorted by: ';
   var USUAL = { name: 'halli', label: 'Halli', badge: '', items: {} };
   var FIRST = '↻ try the random overlords', AGAIN = '↻ ask the overlords again';
-  var INTRO = "Some of what I've made, for others and for myself.";
+  var INTRO = '';        // no intro line above the sort (Halli, 2026-11-04: better without)
   var INTRO_PAGE = /^\/(filter\/[^/]+\/?)?$/;   // the front page (and its filters)
   var GEO_CHANCE = 1 / 6;                     // how often the overlords choose GeoCities
   var clicked = false;
@@ -145,7 +160,7 @@
     }
     if (box.nextSibling !== th) th.parentNode.insertBefore(box, th);
     var intro = document.getElementById('hc-intro');
-    if (INTRO_PAGE.test(location.pathname)) {
+    if (INTRO && INTRO_PAGE.test(location.pathname)) {
       if (!intro) { intro = document.createElement('p'); intro.id = 'hc-intro'; intro.className = 'hc-intro'; intro.textContent = INTRO; }
       if (intro.nextSibling !== box) box.parentNode.insertBefore(intro, box);
     } else if (intro) intro.remove();
@@ -164,7 +179,10 @@
     if (!th) return;
     var cols = [].slice.call(th.children).filter(function (c) { return c.classList.contains('column'); });
     if (!cols.length) return;
-    var use = innerWidth >= MIN_WIDTH ? cols.slice(0, 2) : cols;
+    var three = innerWidth >= THREE && cols.length >= 3;
+    var use = three ? cols.slice(0, 3) : innerWidth >= MIN_WIDTH ? cols.slice(0, 2) : cols;
+    document.documentElement.classList.toggle('hc-three', three);
+    cols.forEach(function (c) { if (use.indexOf(c) >= 0) c.style.removeProperty('display'); });
     var extra = cols.slice(use.length);
     var settled = !extra.some(function (c) { return c.children.length; });
     if (current && settled && dealt === layoutOf(use) && document.getElementById('hc-sort')) return;   // nothing to fix
@@ -185,7 +203,12 @@
         else loose.push(card);
       });
     });
-    groups.forEach(function (g) { g.els.forEach(function (el) { g.h += el.offsetHeight; }); });
+    groups.forEach(function (g) {
+      g.els.forEach(function (el) { g.h += el.offsetHeight; });
+      var box = g.els[0].querySelector('.thumb_image'), n = 0;   // each print's own small tilt, the same on every visit
+      for (var k = 0; k < g.slug.length; k++) n = (n * 31 + g.slug.charCodeAt(k)) % 997;
+      if (box) box.style.setProperty('--hc-tilt', ((n / 997) * 4.4 - 2.2).toFixed(2) + 'deg');
+    });
 
     // Cargo's order first; anything it doesn't know about keeps its place at the end
     var seq = [];

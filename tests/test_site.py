@@ -120,7 +120,7 @@ async def main(base):
           .map(t => [t.getBoundingClientRect().top, t.getBoundingClientRect().left, t.querySelector('a').getAttribute('href').split('/').pop()])
           .sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(x => x[2])""")
         cards = sum(len(c) for c in r['cols'])
-        check('grid: three columns become two, no card lost', len(r['cols']) == 2 and cards == len(GRID_SLUGS), f"{len(r['cols'])} columns, {cards} cards")
+        check('grid: three columns on a wide screen, no card lost', len(r['cols']) == 3 and cards == len(GRID_SLUGS), f"{len(r['cols'])} columns, {cards} cards")
         check('grid: ?hc-sort=hands names the sort', r['label'] == "sorted by: number of hands", r['label'])
         firsts = [x.split(' [')[0] for x in FIRST_BY_HANDS]
         check('grid: most hands first, top to bottom', order[:6] == firsts, ', '.join(order[:6]))
@@ -140,8 +140,8 @@ async def main(base):
         order = await page.evaluate("""() => [...document.querySelectorAll('.thumbnail[name]')].filter(t => t.offsetParent)
           .map(t => [t.getBoundingClientRect().top, t.getBoundingClientRect().left, t.querySelector('a').getAttribute('href').split('/').pop()])
           .sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(x => x[2])""")
-        check("grid: every visit starts in Halli's order, with the overlords offered and the intro above", r['label'] == 'sorted by: Halli'
-              and again == ['↻ try the random overlords', "Some of what I've made, for others and for myself."]
+        check("grid: every visit starts in Halli's order, with the overlords offered and no intro line", r['label'] == 'sorted by: Halli'
+              and again == ['↻ try the random overlords', None]
               and order[:3] == GRID_SLUGS[:3], f"{r['label']} | {again} | {order[:3]}")
         await page.click('#hc-sort button'); await page.wait_for_timeout(900)
         again = await page.evaluate("[document.querySelector('.hc-sort-label').textContent, document.querySelector('.hc-sort-again').textContent]")
@@ -155,6 +155,12 @@ async def main(base):
         facts = sorted({x.split(' [')[1][:-1] for c in r['cols'] for x in c if '[' in x})
         check('grid: Yahoo! directory, 1998 is A to Z, with "Yahoo! › Halli › A" on hover', r['label'] == 'sorted by: Yahoo! directory, 1998'
               and order[:4] == az[:4] and len(facts) >= 3 and all(f.startswith('Yahoo! › Halli › ') for f in facts), f"{order[:4]} | {facts[:3]}")
+        tilt = await page.evaluate("[...document.querySelectorAll('.thumb_image')].map(b => b.style.getPropertyValue('--hc-tilt'))")
+        bg = await page.evaluate("[getComputedStyle(document.querySelector('.thumb_image')).borderRadius, getComputedStyle(document.querySelector('.thumb_image')).boxShadow !== 'none']")
+        check('pinboard: every print has its own small tilt, square corners and a shadow', len(set(tilt)) > 5 and all(abs(float(x[:-3])) <= 2.2 for x in tilt) and bg == ['0px', True], f"{tilt[:4]} {bg}")
+        await page.set_viewport_size({'width': 900, 'height': 760}); await page.wait_for_timeout(700)
+        r = await page.evaluate(GRID_DUMP)
+        check('grid: two columns on a narrower screen, no card lost', len(r['cols']) == 2 and sum(len(c) for c in r['cols']) == len(GRID_SLUGS), f"{len(r['cols'])} columns")
         check('no script errors (grid)', not errs, '; '.join(errs)[:200])
         await page.close()
 
@@ -167,7 +173,7 @@ async def main(base):
         r = await page.evaluate(GRID_DUMP)
         n = await page.evaluate("document.querySelectorAll('.hc-blob').length")
         check('script files: pond, background blobs and sorted grid all work', pond and n == 9 and r['label'] == "sorted by: number of hands"
-              and len(r['cols']) == 2, f"pond {pond}, {n} blobs, {r['label']}")
+              and len(r['cols']) == 3, f"pond {pond}, {n} blobs, {r['label']}")
         await page.goto(base + '/short/info-contact/'); await page.wait_for_timeout(1200)
         eyes = await page.evaluate("[document.querySelectorAll('.hc-eye').length, (document.querySelector('img[data-hc-eyes]') || {}).src || '']")
         async def iris_x():   # left edge of each iris, in % of the photo width
