@@ -1,0 +1,7 @@
+/* Bigger HALLI CIVELEK lettering in the header (desktop), about 300px wide instead of 185px.
+   Paste at the END of Cargo's Custom CSS on launch day. Phones keep Cargo's own mobile header. */
+@media (min-width: 768px) {
+  .site_header { padding-top: 14px; padding-bottom: 14px; align-items: center; }
+  .site_header .header_image, .site_header .header_image a { height: auto !important; max-height: none !important; overflow: visible !important; }
+  .site_header .header_image img { width: 300px !important; height: auto !important; max-width: none !important; max-height: none !important; }
+}

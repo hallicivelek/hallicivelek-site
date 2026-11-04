@@ -64,6 +64,8 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   20% white (overrides Cargo's yellow `.project_content a:hover`); Halli ruled out tilting. Reduced motion: no glide/shake.
 - **Pond preview mode:** `?hc-preview` *inside an iframe* (pond_loader_template) adds `html.hc-pond-preview`: no Cargo
   header, no wake screen, no tray or caption, so audio never starts. Opened directly, `?hc-preview` does nothing.
+- `src/hc-retro.html` — **1999 mode** (see below).
+- `custom-css/header.css` — the bigger logo (~300px), for Cargo's Custom CSS on launch day.
 - `src/hc-debug.html` — screen measurements overlay, **only with `?hc-debug`** in the address (for diagnosing phones).
 - `src/parts/before.html`, `src/parts/after.html` — **Halli's own** Custom HTML (Cargo filter script, StatCounter,
   Typekit link that loads the site font Pacaembu; mobile menu fixes). Keep as he gives them.
@@ -83,15 +85,34 @@ On the site the pond shares the page with Cargo, so the converter:
 **When you add an id or class to `src/pond.html`, add it to `IDS` / `CLASSES` in `tools/build_pond_module.py`**, or it
 won't be prefixed and the Cargo version will look for an element that doesn't exist.
 
-## The random sort
-Each page load picks one sort from `facts.txt` that matches at least 2 projects on the current grid, deals the
-matching projects first (numbers: most first, or `order: lowest first`) and names the sort in a line above the grid
-("sorted by: number of hands"). **Design rule from Halli:** the work stands on its own, titles only on hover. A card's
-fact ("28 hands") is therefore only shown on hover, under Cargo's hover title (`.thumb_title`), never as a permanent tag. Clicking that line picks another (the usual order is one of the options); cards glide to their
-new places (skipped with reduced motion). A filter change keeps the sort if it still matches 2+, else picks again.
-`?hc-sort=<name>` previews one sort. On phones Cargo's own columns are kept, only re-ordered.
-Project addresses come from Cargo's models (`project_url`); all addresses in facts.txt were checked against the 70
-live projects on 2026-11-03 — a renamed project in Cargo can change its address.
+## The sort line and the random overlords
+Every visit starts in **Halli's order** (Cargo's project order, which Halli sets by hand): "sorted by: Halli
+↻ try the random overlords" (after the first click: "↻ ask the overlords again", dark teal rgb(14,118,128), bold,
+underlined). On the front page and its filters an intro line sits above it ("Art director and illustrator. This is a
+collection of things I've made."). Clicking picks one of: a sort from `facts.txt` that matches at least 2 projects
+on the grid (numbers: most first, or `order: lowest first`), Halli's order, or a **90s sort worked out on the spot**:
+- `modem` "33.6k modem": smallest thumbnail file first (Resource Timing size, else a guess from the pixels); each
+  picture loads top to bottom in steps, 3–12 s, only once 25% of the card is on screen; hover fact "≈ N sec on 33.6k"
+  (N = the real on-screen time). No dial-up with reduced motion.
+- `yahoo` "Yahoo! directory, 1998": A to Z by title (Icelandic collation); hover "Yahoo! › Halli › K".
+- `tiny` "tiny JPG, 1997": smallest first; each picture drawn onto a canvas at 1/14 size and blown up pixelated;
+  hover "kronan_SMALL.jpg · 2 KB".
+- `geocities` "GeoCities, 1999": about 1 in 6 clicks (when hc-retro is loaded and GeoCities isn't on): keeps the
+  order and switches the site to GeoCities mode.
+**Design rule from Halli:** the work stands on its own, titles only on hover. A card's fact is therefore only shown
+on hover, under Cargo's hover title (`.thumb_title`), never as a permanent tag. Cards glide to their new places
+(skipped with reduced motion). A filter change keeps the sort if it still matches 2+, else goes back to Halli's order.
+`?hc-sort=<name>` previews one (fact names, or modem, yahoo, tiny, geocities, halli). On phones Cargo's own columns
+are kept, only re-ordered. Project addresses come from Cargo's models (`project_url`); all addresses in facts.txt
+were checked against the 70 live projects on 2026-11-03 — a renamed project in Cargo can change its address.
+
+## 1999 mode (src/hc-retro.html)
+Netscape (grey, Times, link blue, sunken frames, bevelled buttons, status bar) or GeoCities (starry tiles, Comic
+Sans, scrolling welcome, UNDER CONSTRUCTION, visitor counter 000417 + 1 a day, rainbow line, gold frames, blinking
+NEW! on the first three projects in Halli's order, cursor sparkles). Never on by default. Ways in: the "Bottom of the
+page award" under the grid ("Pick your prize: Netscape – GeoCities"; in Netscape mode the medal is a bevelled badge
+with a spinning star) and the overlords' GeoCities pick. "⏻ back to 2026" sits left of the blobs' pause button while
+a mode is on. The mode lasts for the visit (sessionStorage `hc-1999`). `window.__hcRetro.set('ns'|'gc'|'off')`.
 
 ## Things learned the hard way
 - **Cargo adds the phone viewport tag late**, with a script, after our scripts have started. Anything that reads
@@ -121,8 +142,9 @@ Accessibility: pause button (WCAG 2.2.2), reduced-motion respected, screen-reade
 ## Redesign in progress (2026-11-04)
 Plan and every decision so far: `~/Documents/hallicivelek.com/site-redesign-notes.md` (outside the repo). New nav:
 things I've made · playthings · about me. The about me page is live (pasted by Halli). Playthings is built
-(not pushed until Halli agrees). Still to build: front-page intro, "sorted by: Halli / try the random overlords",
-the 33.6k / Yahoo! / tiny JPG / GeoCities sorts, 1999 mode (Netscape, GeoCities), the bottom-of-the-page award.
+and live. Front page built 2026-11-04 (intro, sorted by: Halli, overlords, 90s sorts, 1999 mode, award): pushing it
+makes it live straight away, so push only when Halli says. Launch day in Cargo: nav labels, hand-picked order,
+header.css, remove "Other projects" from about me.
 
 ## Where we left off (2026-11-04)
 - **Waiting on Halli:** a new `?hc-debug` screenshot from his iPhone (hallicivelek.com/info-contact?hc-debug, scrolled

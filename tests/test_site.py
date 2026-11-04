@@ -6,7 +6,7 @@ The stand-in mimics what matters about hallicivelek.com on Cargo:
 - deliberately clashing global styles (.caption, h1, p, button) to prove the pond is fenced
 - NO viewport tag at first; a script near the end adds it, like Cargo does on phones
 It cannot test real Cargo, real Safari, or Cargo's limit on Custom HTML size."""
-import asyncio, functools, http.server, threading, tempfile, sys
+import asyncio, functools, http.server, threading, tempfile, sys, re, zlib, struct
 from pathlib import Path
 from playwright.async_api import async_playwright
 
@@ -48,6 +48,8 @@ GRID = ('<div class="thumbnails clear" data-columnize=".thumbnail">' + ''.join(
         + '<script>window.Cargo = { View: { Thumbnail: { collection: { models: '
         + str([{'id': i + 1, 'attributes': {'project_url': s}} for i, s in enumerate(GRID_SLUGS)]).replace("'", '"')
         + ' } } } };</script>')
+# the same grid with real pictures (one test image in different sizes), for the 90s effects
+GRID_IMG = re.sub(r'(<div class="thumb_image" style="height:(\d+)px;background:#fff">)', lambda m: m.group(1) + f'<img src="/px.png?{m.group(2)}" width="200" height="{m.group(2)}" style="width:100%;height:{m.group(2)}px;display:block">', GRID)
 GRID_DUMP = """() => ({ label: document.querySelector('#hc-sort .hc-sort-label') ? document.querySelector('#hc-sort .hc-sort-label').textContent : null,
   cols: [...document.querySelectorAll('.thumbnails .column')].filter(c => getComputedStyle(c).display !== 'none').map(c =>
     [...c.querySelectorAll('.thumbnail[name]')].map(t => { const b = t.closest('.padding_helper').querySelector('.hc-sort-fact');
@@ -134,8 +136,25 @@ async def main(base):
         check('grid: shuffle picks another sort and keeps every card', r2['label'] != r['label'] and sum(len(c) for c in r2['cols']) == len(GRID_SLUGS), r2['label'])
         await page.goto(base + '/filter/artdirection/?r=1'); await page.wait_for_timeout(800)
         r = await page.evaluate(GRID_DUMP)
-        check('grid: a visit without ?hc-sort gets a random sort with 2+ badges', r['label'] not in (None, "sorted by: Halli's taste")
-              and sum('[' in x for c in r['cols'] for x in c) >= 2, r['label'])
+        again = await page.evaluate("[document.querySelector('.hc-sort-again').textContent, (document.getElementById('hc-intro') || {}).textContent]")
+        order = await page.evaluate("""() => [...document.querySelectorAll('.thumbnail[name]')].filter(t => t.offsetParent)
+          .map(t => [t.getBoundingClientRect().top, t.getBoundingClientRect().left, t.querySelector('a').getAttribute('href').split('/').pop()])
+          .sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(x => x[2])""")
+        check("grid: every visit starts in Halli's order, with the overlords offered and the intro above", r['label'] == 'sorted by: Halli'
+              and again == ['↻ try the random overlords', "Art director and illustrator. This is a collection of things I've made."]
+              and order[:3] == GRID_SLUGS[:3], f"{r['label']} | {again} | {order[:3]}")
+        await page.click('#hc-sort button'); await page.wait_for_timeout(900)
+        again = await page.evaluate("[document.querySelector('.hc-sort-label').textContent, document.querySelector('.hc-sort-again').textContent]")
+        check('grid: after the first click it says "ask the overlords again"', again[0] != 'sorted by: Halli' and again[1] == '↻ ask the overlords again', str(again))
+        await page.goto(base + '/filter/artdirection/?hc-sort=yahoo'); await page.wait_for_timeout(900)
+        r = await page.evaluate(GRID_DUMP)
+        order = await page.evaluate("""() => [...document.querySelectorAll('.thumbnail[name]')].filter(t => t.offsetParent)
+          .map(t => [t.getBoundingClientRect().top, t.getBoundingClientRect().left, t.querySelector('.thumb_title').textContent.trim()])
+          .sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(x => x[2])""")
+        az = await page.evaluate("(l) => l.slice().sort((a, b) => a.localeCompare(b, 'is'))", order)
+        facts = sorted({x.split(' [')[1][:-1] for c in r['cols'] for x in c if '[' in x})
+        check('grid: Yahoo! directory, 1998 is A to Z, with "Yahoo! › Halli › A" on hover', r['label'] == 'sorted by: Yahoo! directory, 1998'
+              and order[:4] == az[:4] and len(facts) >= 3 and all(f.startswith('Yahoo! › Halli › ') for f in facts), f"{order[:4]} | {facts[:3]}")
         check('no script errors (grid)', not errs, '; '.join(errs)[:200])
         await page.close()
 
@@ -174,6 +193,45 @@ async def main(base):
               f'holding {holding}, {inked} inked pixels, after Esc {down}')
         check('eyes: cross-eyed with the cursor on the nose', nose[0] > straight[0] + 1 and nose[1] < straight[1] - 1, f'{nose} vs straight {[round(v, 1) for v in straight]}')
         check('no script errors (script files)', not errs, '; '.join(errs)[:200])
+        await page.close()
+
+        # ---- the 90s sorts with real pictures, and 1999 mode ----
+        page = await b.new_page(viewport={'width': 1300, 'height': 760}); errs = []
+        page.on('pageerror', lambda e: errs.append(str(e)))
+        await page.goto(base + '/short/filter/illustration/?hc-sort=modem'); await page.wait_for_timeout(1800)
+        r = await page.evaluate("""() => ({ label: document.querySelector('.hc-sort-label').textContent, dial: document.querySelectorAll('.hc-dial').length,
+          going: document.querySelectorAll('.hc-dial.hc-go').length, imgs: document.querySelectorAll('.thumb_image img').length,
+          fact: (document.querySelector('.hc-sort-fact') || {}).textContent })""")
+        check('33.6k modem: every card dials up, only the ones on screen have started, "≈ N sec on 33.6k" on hover',
+              r['label'] == 'sorted by: 33.6k modem' and r['dial'] == r['imgs'] > 0 and 0 < r['going'] < r['dial'] and 'sec on 33.6k' in (r['fact'] or ''), str(r))
+        await page.goto(base + '/short/filter/illustration/?hc-sort=tiny'); await page.wait_for_timeout(1500)
+        r = await page.evaluate("""() => ({ label: document.querySelector('.hc-sort-label').textContent, px: document.querySelectorAll('canvas.hc-px').length,
+          imgs: document.querySelectorAll('.thumb_image img').length, hidden: [...document.querySelectorAll('img[data-hc-px]')].length,
+          fact: (document.querySelector('.hc-sort-fact') || {}).textContent })""")
+        check('tiny JPG, 1997: every picture pixelated, "…_SMALL.jpg · N KB" on hover', r['label'] == 'sorted by: tiny JPG, 1997'
+              and r['px'] == r['imgs'] == r['hidden'] > 0 and '_SMALL.jpg · ' in (r['fact'] or ''), str(r))
+        await page.click('#hc-sort button'); await page.wait_for_timeout(900)
+        px = await page.evaluate("[document.querySelector('.hc-sort-label').textContent, document.querySelectorAll('canvas.hc-px').length]")
+        check('tiny JPG: the pixels go when the overlords pick something else', px[0] == 'sorted by: tiny JPG, 1997' or px[1] == 0, str(px))
+        await page.goto(base + '/short/filter/artdirection/'); await page.wait_for_timeout(1200)
+        st = await page.evaluate("[document.documentElement.className, !!document.querySelector('.hc-award'), getComputedStyle(document.querySelector('.hc-back')).display]")
+        check('1999 mode is off by default; the award sits under the grid', 'hc-gc' not in st[0] and 'hc-ns' not in st[0] and st[1] and st[2] == 'none', str(st))
+        await page.click('.hc-award-pick button >> text=Netscape'); await page.wait_for_timeout(500)
+        st = await page.evaluate("[document.documentElement.classList.contains('hc-ns'), getComputedStyle(document.querySelector('.hc-ns-bar')).display, getComputedStyle(document.body).backgroundColor, getComputedStyle(document.querySelector('.hc-back')).display]")
+        check('award: Netscape turns the site grey with a status bar and a way back', st == [True, 'flex', 'rgb(192, 192, 192)', 'block'], str(st))
+        await page.click('.hc-award-pick button >> text=GeoCities'); await page.wait_for_timeout(500)
+        await page.goto(base + '/short/info-contact/'); await page.wait_for_timeout(1200)
+        st = await page.evaluate("[document.documentElement.classList.contains('hc-gc'), getComputedStyle(document.querySelector('.hc-gc-top')).display]")
+        check('GeoCities stays on from page to page for the visit', st == [True, 'block'], str(st))
+        await page.click('.hc-back'); await page.wait_for_timeout(300)
+        await page.goto(base + '/short/info-contact/?again=1'); await page.wait_for_timeout(1000)
+        st = await page.evaluate("document.documentElement.className")
+        check('"back to 2026" turns it off for good', 'hc-gc' not in st and 'hc-ns' not in st, st)
+        await page.goto(base + '/short/filter/artdirection/?r=2'); await page.wait_for_timeout(1200)
+        await page.evaluate("Math.random = () => 0.01"); await page.click('#hc-sort button'); await page.wait_for_timeout(600)
+        st = await page.evaluate("[document.querySelector('.hc-sort-label').textContent, document.documentElement.classList.contains('hc-gc')]")
+        check('the overlords can choose GeoCities, 1999, which switches the site over', st == ['sorted by: GeoCities, 1999', True], str(st))
+        check('no script errors (90s sorts and 1999 mode)', not errs, '; '.join(errs)[:300])
         await page.close()
 
         # ---- playthings: four cards over Cargo's fallback, the pond card in preview mode ----
@@ -251,11 +309,17 @@ if __name__ == '__main__':
     for d, html in [('short/blob-pond', PAGE.replace('ADDONS', tags)), ('the-blob-pond', PAGE.replace('ADDONS', tags)),
                     ('short/info-contact', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', '<div class="project_content"><img src="/Halli-Civelek-artist-portrait_300.jpg" width="300" height="359"></div>')),
                     ('short/filter/artdirection', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID)),
+                    ('short/filter/illustration', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID_IMG)),
                     ('short/playthings', PAGE.replace('ADDONS', tags)
                         .replace('</style>', '  .project_content a:hover { background-color: rgb(255, 255, 0); color: rgb(0, 0, 0); }\n</style>', 1)
                         .replace('<p>PAGE CONTENT</p>', '<p>Music Kontrapunkt Kontrol, Shakeskin, The Calculater, the blob-pond</p>')
                         .replace('</div></div>\n<script>', '</div>' + GRID + '</div>\n<script>', 1))]:
         (site / d).mkdir(parents=True); (site / d / 'index.html').write_text(html)
+    def png(w, h):   # a small striped test picture
+        rows = b''.join(b'\x00' + b''.join(bytes((x * 7 % 256, y * 5 % 256, 160)) for x in range(w)) for y in range(h))
+        chunk = lambda t, d: struct.pack('>I', len(d)) + t + d + struct.pack('>I', zlib.crc32(t + d) & 0xffffffff)
+        return b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', w, h, 8, 2, 0, 0, 0)) + chunk(b'IDAT', zlib.compress(rows)) + chunk(b'IEND', b'')
+    (site / 'px.png').write_bytes(png(120, 90))
     class Quiet(http.server.SimpleHTTPRequestHandler):
         def log_message(self, *a): pass
     handler = functools.partial(Quiet, directory=str(site))

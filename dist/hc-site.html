@@ -11,15 +11,31 @@
      Cargo builds three thumbnail columns; the site's CSS shows two side by side,
      so the third column ended up under the other two. This re-deals the cards
      into two columns in Cargo's own project order.
-     Random sort: each visit picks one of Halli's facts (src/facts.txt, filled in by the build)
-     and puts the matching projects first, with a line above the grid naming the sort ("sorted by: hands").
-     Clicking the line picks another. ?hc-sort=hands previews one.
+     Sorting: every visit starts in Halli's own order ("sorted by: Halli", the order set in Cargo).
+     "↻ try the random overlords" picks one of Halli's facts (src/facts.txt, filled in by the build), or one
+     of the 90s sorts worked out on the spot: 33.6k modem (smallest image file first, the pictures load like
+     dial-up as you scroll to them), Yahoo! directory, 1998 (A to Z), tiny JPG, 1997 (pixelated), and now
+     and then GeoCities, 1999 (switches on 1999 mode, see hc-retro). ?hc-sort=hands (or modem, yahoo, tiny,
+     geocities, halli) previews one.
+     On the front page an intro line sits above the sort line.
      The work stands on its own: a card's fact ("28 hands") only appears on hover, under Cargo's own
      hover title, and takes no space in the layout. -->
 <style>
   .hc-sort { margin: 0 0 28px; }
   .hc-sort button { font: inherit; font-size: 18px; color: rgb(73, 46, 70); background: none; border: 0; padding: 4px 0; cursor: pointer; text-align: inherit; }
-  .hc-sort-again { color: rgb(59, 191, 201); margin-left: .6em; white-space: nowrap; }
+  .hc-sort-again { color: rgb(14, 118, 128); font-weight: bold; text-decoration: underline; text-underline-offset: 4px;
+    text-decoration-thickness: 1.5px; margin-left: .6em; white-space: nowrap; }   /* dark teal: about 4:1 on the pink */
+  .hc-intro { font-size: 26px; line-height: 1.35; color: rgb(73, 46, 70); margin: 0 0 18px; max-width: 760px; text-align: left; }
+  @media (max-width: 600px) { .hc-intro { font-size: 20px; } }
+  /* 33.6k modem: each picture loads top to bottom in steps once it is on screen */
+  @keyframes hc-dial { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 0 0); } }
+  .hc-dial .thumb_image { background-image: repeating-linear-gradient(0deg, rgba(73, 46, 70, .05) 0 2px, transparent 2px 4px); }
+  .hc-dial .thumb_image img { clip-path: inset(0 0 100% 0); }
+  .hc-dial.hc-go .thumb_image img { animation: hc-dial var(--hc-d, 4s) steps(var(--hc-st, 12)) var(--hc-dl, 0s) forwards; }
+  @media (prefers-reduced-motion: reduce) { .hc-dial .thumb_image img { clip-path: none; animation: none !important; } }
+  /* tiny JPG: a small copy of the picture blown up without smoothing */
+  .hc-px-box { position: relative; }
+  .hc-px { position: absolute; image-rendering: pixelated; image-rendering: crisp-edges; pointer-events: none; }
   .hc-sort button:hover .hc-sort-again, .hc-sort button:focus-visible .hc-sort-again { text-decoration: underline; }
   .thumbnails .thumb_title, .thumbnails .thumb_title span { font-size: 20px; line-height: 1.4; color: rgb(73, 46, 70); }   /* plum: 9.1:1 on the site pink */
   /* long one-word titles ("Pungstöppuslayer") made the phone page wider than the screen, so Safari zoomed out */
@@ -39,7 +55,41 @@
   var MIN_WIDTH = 768;   // below this width Cargo's own columns are kept (only re-ordered)
   var SORTS = [{"name":"hands","label":"number of hands","badge":"{n} hands","badge1":"1 hand","low":false,"items":{"Cheerios":28,"Retro-Stefson-Kimbabwe":14,"Retro-Stefson-Montana":12,"Smite-The-World":2,"Automysophobia":2,"Uppskriftabok-skaldverk":1,"FM-Belfast-how-to-make-friends":1},"badges":{},"count":true},{"name":"stripes","label":"stripes","badge":"stripes","badge1":"","low":false,"items":{"FM-Belfast-how-to-make-friends":true,"Retro-Stefson-Kimbabwe":true},"badges":{},"count":false},{"name":"looking left","label":"looking left","badge":"looking left","badge1":"","low":false,"items":{"Icelandsmites":true,"Cheerios":true,"Sesar-A-Stormurinn-a-undan-logninu":true,"Retro-Stefson-Qween":true},"badges":{},"count":false},{"name":"black and white","label":"black and white","badge":"black and white","badge1":"","low":false,"items":{"Smite-The-World":true,"Uppskriftabok-skaldverk":true,"Retro-Stefson-Qween":true,"Icelandsmites":true,"Grapewaves":true,"Nothing-Ekkert":true,"Sesar-A-Gerdutadsjalfur-Doityourself":true,"Apparat-Organ-Quartet":true},"badges":{},"count":false},{"name":"lots of yellow","label":"lots of yellow","badge":"yellow","badge1":"","low":false,"items":{"Cheerios":true,"Apparat-Organ-Quartet-Romantika":true,"Unicef-Christmas-Card":true,"Pedro-Pilatus-album-artwork":true,"Retro-Stefson-Kimbabwe":true},"badges":{},"count":false},{"name":"halli-blue","label":"Halli-blue","badge":"Halli-blue","badge1":"","low":false,"items":{},"badges":{},"count":false},{"name":"speed","label":"speed, from sitting still to full tilt","badge":"{n}","badge1":"","low":true,"items":{"Sitjikall":1,"Krjupandi-blomakona":1,"Blue-walker":2,"Strollin-Into-The-Club-Like":3,"Skokkikona":4,"Fartrunner":5,"Swimbert-1":6,"Toasterman-On-The-Move":6},"badges":{"Sitjikall":"sitting","Krjupandi-blomakona":"kneeling","Blue-walker":"walking","Strollin-Into-The-Club-Like":"strolling","Skokkikona":"jogging","Fartrunner":"running","Swimbert-1":"swimming","Toasterman-On-The-Move":"on the move!"},"count":true},{"name":"gaze","label":"where they look: left, at you, right","badge":"{n}","badge1":"","low":true,"items":{"Icelandsmites":1,"Cheerios":1,"Sesar-A-Stormurinn-a-undan-logninu":1,"Retro-Stefson-Qween":1},"badges":{"Icelandsmites":"looking left","Cheerios":"looking left","Sesar-A-Stormurinn-a-undan-logninu":"looking left","Retro-Stefson-Qween":"looking left"},"count":true},{"name":"faces","label":"number of faces","badge":"{n} faces","badge1":"1 face","low":false,"items":{},"badges":{},"count":false},{"name":"colours","label":"number of colours","badge":"{n} colours","badge1":"1 colour","low":true,"items":{},"badges":{},"count":false},{"name":"hair","label":"hair","badge":"hair","badge1":"","low":false,"items":{"Firehair-1":true,"hairtower":true,"Fluffyhead":true,"Bluefluffy":true,"Beardgrumphead":true},"badges":{},"count":false},{"name":"food","label":"food","badge":"food","badge1":"","low":false,"items":{"Cheerios":true,"Pumpkinator":true,"Grapewaves":true,"Uppskriftabok-skaldverk":true,"Toasterman-On-The-Move":true,"Kronan":true},"badges":{},"count":false},{"name":"cats","label":"cats","badge":"cat","badge1":"","low":false,"items":{"Cat-family":true,"Adopt-this-cat":true},"badges":{},"count":false},{"name":"halli in it","label":"Halli in it","badge":"Halli","badge1":"","low":false,"items":{"Selfie-1":true,"The-Future-Selfie":true,"Halli-lettering":true},"badges":{},"count":false},{"name":"drops","label":"drops, squirts and crumbs","badge":"drops, squirts, crumbs","badge1":"","low":false,"items":{"Smite-The-World":true,"Uppskriftabok-skaldverk":true,"Millilending":true,"Retro-Stefson-Retro-Stefson":true,"FM-Belfast-how-to-make-friends":true,"Icelandsmites":true,"Grapewaves":true,"Automysophobia":true,"Pedro-Pilatus-album-artwork":true,"Unicef-Christmas-Card":true,"Halli-lettering":true,"Pungstoppuslayer":true,"Sitjikall":true,"Skokkikona":true,"Blue-sinker":true,"Beardgrumphead":true,"Swimbert-1":true,"Phuture-Joga":true},"badges":{},"count":false}];
   var FRAME = 'sorted by: ';
-  var USUAL = { name: 'usual', label: "Halli's taste", badge: '', items: {} };
+  var USUAL = { name: 'halli', label: 'Halli', badge: '', items: {} };
+  var FIRST = '↻ try the random overlords', AGAIN = '↻ ask the overlords again';
+  var INTRO = "Art director and illustrator. This is a collection of things I've made.";
+  var INTRO_PAGE = /^\/(filter\/[^/]+\/?)?$/;   // the front page (and its filters)
+  var GEO_CHANCE = 1 / 6;                     // how often the overlords choose GeoCities
+  var clicked = false;
+
+  // ---- the 90s sorts, worked out from the cards on the page ----
+  function titleOf(g) { var t = g.els[0].querySelector('.thumb_title'); return t ? t.textContent.trim() : g.slug; }
+  function imgOf(g) { return g.els[0].querySelector('.thumb_image img'); }
+  function bytesOf(g) {                       // the thumbnail's file size, or a guess from its pixels
+    var img = imgOf(g); if (!img) return 20000;
+    var src = img.currentSrc || img.src, e = performance.getEntriesByName(src)[0];
+    var n = e && (e.encodedBodySize || e.transferSize);
+    return n || (img.naturalWidth ? img.naturalWidth * img.naturalHeight * 0.12 : 20000);
+  }
+  function fileName(title) {
+    return title.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ð/g, 'd').replace(/þ/g, 'th')
+      .replace(/æ/g, 'ae').replace(/ö/g, 'o').replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 18) + '_SMALL.jpg';
+  }
+  function dialSeconds(bytes) { var sec = Math.max(1, Math.round(bytes / 3500)); return Math.min(3 + sec * 0.5, 12); }
+  var MODEM = { name: 'modem', label: '33.6k modem', computed: true, low: true, effect: 'dial', badge: '', items: {}, badges: {},
+    prepare: function (seq) { var s = this; s.items = {}; s.badges = {};
+      seq.forEach(function (g) { var b = bytesOf(g); s.items[g.slug] = b; s.badges[g.slug] = '≈ ' + Math.round(dialSeconds(b)) + ' sec on 33.6k'; }); } };
+  var YAHOO = { name: 'yahoo', label: 'Yahoo! directory, 1998', computed: true, low: true, badge: '', items: {}, badges: {},
+    prepare: function (seq) { var s = this; s.items = {}; s.badges = {};
+      seq.slice().sort(function (a, b) { return titleOf(a).localeCompare(titleOf(b), 'is'); })
+        .forEach(function (g, i) { s.items[g.slug] = i; s.badges[g.slug] = 'Yahoo! › Halli › ' + titleOf(g).charAt(0).toUpperCase(); }); } };
+  var TINY = { name: 'tiny', label: 'tiny JPG, 1997', computed: true, low: true, effect: 'pixel', badge: '', items: {}, badges: {},
+    prepare: function (seq) { var s = this; s.items = {}; s.badges = {};
+      seq.forEach(function (g) { var b = bytesOf(g); s.items[g.slug] = b;
+        s.badges[g.slug] = fileName(titleOf(g)) + ' · ' + Math.max(2, Math.round(b / 8192)) + ' KB'; }); } };
+  var GEO = { name: 'geocities', label: 'GeoCities, 1999', computed: true, badge: '', items: {}, badges: {},
+    prepare: function () {}, chosen: function () { if (window.__hcRetro) window.__hcRetro.set('gc'); } };
+  var COMPUTED = [MODEM, YAHOO, TINY];
   var current = null;    // the sort in use
   var gridIds = '';      // which projects the grid shows, to notice a filter change
   var dealt = '';        // the layout we last made, to tell our own changes from Cargo's
@@ -64,12 +114,15 @@
     var m = /[?&]hc-sort=([^&]*)/.exec(location.search);
     if (!m) return null;
     var name = decodeURIComponent(m[1].replace(/\+/g, ' ')).toLowerCase();
-    return SORTS.concat(USUAL).filter(function (s) { return s.name.toLowerCase() === name; })[0] || null;
+    return SORTS.concat(COMPUTED, [GEO, USUAL]).filter(function (s) { return s.name.toLowerCase() === name; })[0] || null;
   }
-  // a random sort with at least 2 projects on this page; clicking the line also offers the usual order
+  // the overlords: a fact with at least 2 projects on this page, a 90s sort, Halli's order, or now and then GeoCities
   function pick(seq, avoid) {
-    var ok = SORTS.filter(function (s) { return s !== avoid && matching(s, seq) >= 2; });
-    if (avoid && avoid !== USUAL) ok.push(USUAL);
+    var gc = window.__hcRetro && window.__hcRetro.mode() !== 'gc';
+    if (gc && avoid !== GEO && Math.random() < GEO_CHANCE) return GEO;
+    var ok = SORTS.filter(function (s) { return s !== avoid && matching(s, seq) >= 2; })
+      .concat(COMPUTED.filter(function (s) { return s !== avoid; }));
+    if (avoid !== USUAL) ok.push(USUAL);
     return ok.length ? ok[Math.floor(Math.random() * ok.length)] : USUAL;
   }
   function sorted(seq, sort) {
@@ -90,12 +143,21 @@
     if (!box) {
       box = document.createElement('div');
       box.id = 'hc-sort'; box.className = 'hc-sort'; box.setAttribute('aria-live', 'polite');
-      box.innerHTML = '<button type="button"><span class="hc-sort-label"></span><span class="hc-sort-again">↻ shuffle</span></button>';
+      box.innerHTML = '<button type="button"><span class="hc-sort-label"></span><span class="hc-sort-again"></span></button>';
+      box.querySelector('.hc-sort-again').textContent = FIRST;
       box.firstChild.addEventListener('click', function () {
-        current = pick(lastSeq, current); dealt = ''; glide = true; fix();
+        current = pick(lastSeq, current); dealt = ''; glide = true;
+        if (!clicked) { clicked = true; box.querySelector('.hc-sort-again').textContent = AGAIN; }
+        if (current.chosen) current.chosen();
+        fix();
       });
     }
     if (box.nextSibling !== th) th.parentNode.insertBefore(box, th);
+    var intro = document.getElementById('hc-intro');
+    if (INTRO_PAGE.test(location.pathname)) {
+      if (!intro) { intro = document.createElement('p'); intro.id = 'hc-intro'; intro.className = 'hc-intro'; intro.textContent = INTRO; }
+      if (intro.nextSibling !== box) box.parentNode.insertBefore(intro, box);
+    } else if (intro) intro.remove();
     var text = box.querySelector('.hc-sort-label');
     if (text.textContent !== FRAME + current.label) text.textContent = FRAME + current.label;
   }
@@ -144,8 +206,9 @@
     var ids = seq.map(function (g) { return g.id; }).sort().join();
     if (ids !== gridIds) {
       gridIds = ids;
-      current = wanted() || (current && current !== USUAL && matching(current, seq) >= 2 ? current : pick(seq));
+      current = wanted() || (current && (current.computed || matching(current, seq) >= 2) ? current : USUAL);
     }
+    if (current.prepare) current.prepare(seq);
     seq = sorted(seq, current);
     label(th);
 
@@ -195,8 +258,51 @@
         });
       });
     });
+    effects(seq);
     dealt = layoutOf(use);
     glide = false;
+  }
+
+  // ---- the 90s effects: dial-up loading and pixels ----
+  var watcher = null;
+  function clearEffects() {
+    if (watcher) { watcher.disconnect(); watcher = null; }
+    [].slice.call(document.querySelectorAll('.hc-dial')).forEach(function (c) { c.classList.remove('hc-dial', 'hc-go'); });
+    [].slice.call(document.querySelectorAll('.hc-px')).forEach(function (c) { c.remove(); });
+    [].slice.call(document.querySelectorAll('img[data-hc-px]')).forEach(function (i) { i.style.visibility = ''; i.removeAttribute('data-hc-px'); });
+  }
+  function pixelate(img) {
+    var go = function () {
+      var w = img.clientWidth, h = img.clientHeight;
+      if (!w || !h || current.effect !== 'pixel') return;
+      var cv = document.createElement('canvas'), blk = 14;
+      cv.width = Math.max(4, Math.round(w / blk)); cv.height = Math.max(4, Math.round(h / blk));
+      try { cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height); } catch (e) { return; }
+      cv.className = 'hc-px';
+      cv.style.width = w + 'px'; cv.style.height = h + 'px'; cv.style.left = img.offsetLeft + 'px'; cv.style.top = img.offsetTop + 'px';
+      img.parentElement.classList.add('hc-px-box'); img.parentElement.appendChild(cv);
+      img.style.visibility = 'hidden'; img.setAttribute('data-hc-px', '');
+    };
+    if (img.complete && img.naturalWidth) go(); else img.addEventListener('load', go, { once: true });
+  }
+  function effects(seq) {
+    clearEffects();
+    if (current.effect === 'pixel') seq.forEach(function (g) { var img = imgOf(g); if (img) pixelate(img); });
+    if (current.effect === 'dial' && !calm.matches && 'IntersectionObserver' in window) {
+      var n = 0;
+      watcher = new IntersectionObserver(function (es) {
+        es.forEach(function (e) {
+          if (!e.isIntersecting) return;
+          e.target.style.setProperty('--hc-dl', (0.3 + (n++ % 2) * 0.9) + 's');
+          e.target.classList.add('hc-go'); watcher.unobserve(e.target);
+        });
+      }, { threshold: 0.25 });
+      seq.forEach(function (g) {
+        var d = dialSeconds(current.items[g.slug] || 20000), card = g.els[0];
+        card.style.setProperty('--hc-d', d + 's'); card.style.setProperty('--hc-st', Math.max(10, Math.round(d * 3)));
+        card.classList.add('hc-dial'); watcher.observe(card);
+      });
+    }
   }
 
   // Cargo redraws the grid when you change filter, load more or resize: fix again each time
