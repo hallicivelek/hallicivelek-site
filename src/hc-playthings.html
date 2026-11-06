@@ -1,7 +1,7 @@
 <!-- Playthings for hallicivelek.com: builds the page whose address contains "playthings".
      Four big cards, each with a live preview of the project:
        Music Kontrapunkt Kontrol  the real blog, shown small, gliding slowly down and back up
-       Shakeskin                  friends' faces from the gallery, one at a time, each with a little shake
+       Shakeskin                  Halli and friends' faces from the gallery, one at a time, softly fading into the next
                                   (shakeskin.com doesn't allow being shown inside another page)
        The Calculater             the real calculator, shown small (its own background is animation enough)
        The blob-pond              the real pond in preview mode (?hc-preview: no wake screen, no controls, no sound)
@@ -22,13 +22,13 @@
   #hc-pt .hc-pt-win { position: relative; aspect-ratio: 4 / 3; border-radius: 16px; overflow: hidden; }
   #hc-pt .hc-pt-win iframe { position: absolute; left: 0; top: 0; width: 250%; height: 250%; transform: scale(.4); transform-origin: 0 0;
     border: 0; pointer-events: none; }
-  #hc-pt .hc-pt-win iframe.hc-pt-tall { height: 1000%; animation: hc-pt-glide 40s ease-in-out infinite alternate; }
-  @keyframes hc-pt-glide { 0%, 6% { top: 0; } 94%, 100% { top: -300%; } }
+  #hc-pt .hc-pt-win iframe.hc-pt-tall { height: 1000%; animation: hc-pt-glide 90s ease-in-out infinite alternate; }
+  @keyframes hc-pt-glide { 0%, 12% { top: 0; } 88%, 100% { top: -300%; } }   /* slow, with long rests at the top and bottom */
   #hc-pt .hc-pt-faces img { position: absolute; left: 12%; top: 12%; width: 76%; height: 76%; object-fit: cover; opacity: 0;
-    animation: hc-pt-face 8.4s infinite; }
-  @keyframes hc-pt-face { 0% { opacity: 0; } 1%, 8% { opacity: 1; transform: none; } 2% { transform: translateX(-6px) rotate(-2deg); }
-    3% { transform: translateX(6px) rotate(2deg); } 4% { transform: translateX(-4px); } 5% { transform: translateX(3px); } 6% { transform: none; }
-    8.3% { opacity: 1; } 8.4%, 100% { opacity: 0; } }
+    animation: hc-pt-face 42s linear infinite; }
+  /* calm: each face fades in over the last one, drifts very slightly closer for 3.5 s, and fades out */
+  @keyframes hc-pt-face { 0% { opacity: 0; transform: scale(1); } 2.4% { opacity: 1; } 8.3% { opacity: 1; } 10.7% { opacity: 0; transform: scale(1.04); }
+    100% { opacity: 0; transform: scale(1.04); } }
   #hc-pt h2 { font-family: inherit; font-size: 26px; font-weight: bold; line-height: 1.2; margin: 20px 0 6px; color: inherit; text-transform: none; }
   #hc-pt h2 .hc-pt-go { color: rgb(14, 118, 128); font-size: 22px; margin-left: 8px; }
   #hc-pt .hc-pt-line { font-size: 19px; line-height: 1.45; margin: 0; color: inherit; }
@@ -44,7 +44,7 @@
   window.__hcPlaythings = true;
   var PAGE = /playthings/i;
   var INTRO = "Things I've built and kept running (some since 2004).";
-  var FACES = ['3ffabdafe66c630', '42623ba9596b356', '7662eaad81b67246', 'cb90e1f3d0106863', 'ee05d41940906d', 'c49534a2653b6d53',
+  var FACES = ['ufd1236b1cbdd86', '42623ba9596b356', '7662eaad81b67246', 'cb90e1f3d0106863', 'ee05d41940906d', 'c49534a2653b6d53',
                '9384b19a7957c4e', '629bbdd38af4a7cf', '74f81e1515bb5625', 'e7ffdcebd88ec424', '4e494fd3add96bba', '9f1025e773392387'];
   var THINGS = [
     { title: 'Music Kontrapunkt Kontrol', href: 'https://kontrapunkt.hallicivelek.com/', bg: '#f3efe6', show: 'tall',
@@ -68,7 +68,7 @@
       win.classList.add('hc-pt-faces');
       FACES.forEach(function (f, i) {
         var img = el('img'); img.src = 'https://www.shakeskin.com/photos/' + f + '.jpg'; img.alt = ''; img.loading = 'lazy';
-        img.style.animationDelay = (i * 0.7).toFixed(1) + 's'; win.appendChild(img);
+        img.style.animationDelay = (i * 3.5).toFixed(1) + 's'; win.appendChild(img);
       });
     } else {
       var f = el('iframe', t.show === 'tall' ? 'hc-pt-tall' : '');
