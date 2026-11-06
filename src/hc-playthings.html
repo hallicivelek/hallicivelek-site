@@ -30,7 +30,10 @@
   @keyframes hc-pt-face { 0% { opacity: 0; transform: scale(1); } 2.4% { opacity: 1; } 8.3% { opacity: 1; } 10.7% { opacity: 0; transform: scale(1.04); }
     100% { opacity: 0; transform: scale(1.04); } }
   #hc-pt h2 { font-family: inherit; font-size: 26px; font-weight: bold; line-height: 1.2; margin: 20px 0 6px; color: inherit; text-transform: none; }
-  #hc-pt h2 .hc-pt-go { color: rgb(14, 118, 128); font-size: 22px; margin-left: 8px; }
+  /* one drawn arrow for both: straight (→, on this site) and turned up 45° (↗, opens another site); bold like the title */
+  #hc-pt h2 .hc-pt-go { display: inline-block; width: .78em; height: .78em; margin-left: .3em; vertical-align: -.04em; color: rgb(14, 118, 128); }
+  #hc-pt h2 .hc-pt-go svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  #hc-pt h2 .hc-pt-go.hc-pt-out svg { transform: rotate(-45deg); }
   #hc-pt .hc-pt-line { font-size: 19px; line-height: 1.45; margin: 0; color: inherit; }
   @media (prefers-reduced-motion: reduce) {
     #hc-pt .hc-pt-win iframe.hc-pt-tall { animation: none; }
@@ -76,8 +79,11 @@
       f.setAttribute('aria-hidden', 'true');
       win.appendChild(f);
     }
-    var h = el('h2', '', t.title); h.appendChild(el('span', 'hc-pt-go', outside ? '↗' : '→'));
-    h.lastChild.setAttribute('aria-hidden', 'true');
+    var h = el('h2', '', t.title), go = el('span', 'hc-pt-go' + (outside ? ' hc-pt-out' : ''));
+    go.setAttribute('aria-hidden', 'true');
+    go.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round">' +
+      '<path d="M3 12h17M13.5 5.5L20 12l-6.5 6.5"/></svg>';
+    h.appendChild(go);
     a.appendChild(win); a.appendChild(h); a.appendChild(el('p', 'hc-pt-line', t.line));
     return a;
   }
