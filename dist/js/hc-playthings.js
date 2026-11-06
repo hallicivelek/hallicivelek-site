@@ -5,7 +5,7 @@
   window.__hcPlaythings = true;
   var PAGE = /playthings/i;
   var INTRO = "Things I've built and kept running (some since 2004).";
-  var FACES = ['ufd1236b1cbdd86', '42623ba9596b356', '7662eaad81b67246', 'cb90e1f3d0106863', 'ee05d41940906d', 'c49534a2653b6d53',
+  var FACES = ['ufd1236b1cbdd86', '3ffabdafe66c630', '42623ba9596b356', '7662eaad81b67246', 'ee05d41940906d', 'c49534a2653b6d53',
                '9384b19a7957c4e', '629bbdd38af4a7cf', '74f81e1515bb5625', 'e7ffdcebd88ec424', '4e494fd3add96bba', '9f1025e773392387'];
   var THINGS = [
     { title: 'Music Kontrapunkt Kontrol', href: 'https://kontrapunkt.hallicivelek.com/', bg: '#f3efe6', show: 'tall',
@@ -69,4 +69,4 @@
   addEventListener('popstate', check);
   check();
 })();
-window.__hcBuild = "2026-11-06 23:31";
+window.__hcBuild = "2026-11-06 23:32";
