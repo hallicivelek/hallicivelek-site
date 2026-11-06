@@ -253,7 +253,7 @@ async def main(base):
           left: getComputedStyle(document.querySelector('#hc-mu p')).textAlign,
           loose: [...document.querySelector('.project_content').childNodes].filter(n => n.nodeType === 3 && n.textContent.trim()).length })""")
         check('music: Wanton Boys Club, remixes and four mixes on one page, left-aligned, grid and fallback hidden',
-              r['h'] == ['Wanton Boys Club', 'Remixes', 'Mixes'] and r['mixes'] == ['Italo! 24', 'Italo Rider 20', 'Hotplay (from Europe) – Minimix #1 8', 'Electronic Oddities 1969–1986 22']
+              r['h'] == ['Wanton Boys Club', 'Remixes as Halli Civelek', 'Mixes'] and r['mixes'] == ['Italo! 24', 'Italo Rider 20', 'Hotplay (from Europe) – Minimix #1 8', 'Electronic Oddities 1969–1986 22']
               and len(r['stores']) == 6 and 'Google Play' not in r['stores'] and r['fallback'] and r['grid'] and r['left'] == 'left' and r['loose'] == 0, str(r))
         check('music: page title and description for search engines', r['title'] == 'Music & mixes – Halli Civelek' and 'Italo disco mixes' in (r['desc'] or ''), r['title'])
         await page.click('#hc-mu .hc-mu-play >> nth=1'); await page.wait_for_timeout(300)

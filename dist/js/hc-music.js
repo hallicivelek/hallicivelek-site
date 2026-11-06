@@ -93,7 +93,7 @@
     cover.alt = 'You Are OK & The Mandarin, single cover'; rel.appendChild(cover);
     var t = el('div'); rel.appendChild(t);
     t.appendChild(el('p', 'hc-mu-name', 'You Are OK & The Mandarin'));
-    t.appendChild(el('p', 'hc-mu-small', 'A person from the label said that the songs were:'));
+    t.appendChild(el('p', 'hc-mu-small', 'A person from the label said that the single was:'));
     t.appendChild(el('blockquote', '', "A bouncy, space-disco epic with nods to Italo disco and early 90's house. The single also recalls the disco funk of acts like Eddie Grant and Lipps Inc with its delicately jittery instrumentation."));
     t.appendChild(el('p', 'hc-mu-small', 'Listen & buy:'));
     var ul = el('ul', 'hc-mu-stores');
@@ -103,9 +103,9 @@
     root.appendChild(rel);
 
     root.appendChild(plus());
-    root.appendChild(el('h2', '', 'Remixes'));
-    root.appendChild(el('p', '', 'As Halli Civelek, for FM Belfast, múm, Sin Fang, Retro Stefson, Moses Hightower and Sísí Ey (and two Led Zeppelin edits, which you can find using your Poirot brain).'));
-    var sc = el('p'); sc.appendChild(link('Listen on SoundCloud →', 'https://soundcloud.com/hallicivelek')); root.appendChild(sc);
+    root.appendChild(el('h2', '', 'Remixes as Halli Civelek'));
+    root.appendChild(el('p', '', 'For Ajax, FM Belfast, múm, Sin Fang, Retro Stefson, Moses Hightower, Sísí Ey and TZMP (and two Led Zeppelin edits, which you can find using your Poirot brain).'));
+    var sc = el('p'); sc.appendChild(link('Listen to some of these on SoundCloud →', 'https://soundcloud.com/hallicivelek')); root.appendChild(sc);
 
     root.appendChild(plus());
     root.appendChild(el('h2', 'hc-mu-big', 'Mixes'));   // as big as "Music": the mixes are what many visitors come for
@@ -134,4 +134,4 @@
   addEventListener('popstate', check);
   check();
 })();
-window.__hcBuild = "2026-11-06 23:25";
+window.__hcBuild = "2026-11-06 23:28";
