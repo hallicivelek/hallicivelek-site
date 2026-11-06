@@ -51,4 +51,4 @@
   document.addEventListener('DOMContentLoaded', check);
   check();
 })();
-window.__hcBuild = "2026-11-06 23:32";
+window.__hcBuild = "2026-11-06 23:34";

@@ -10,7 +10,7 @@
   var THINGS = [
     { title: 'Music Kontrapunkt Kontrol', href: 'https://kontrapunkt.hallicivelek.com/', bg: '#f3efe6', show: 'tall',
       line: 'An Italo Disco blog, and a map of who produced what. Since 2004.' },
-    { title: 'Shakeskin', href: 'https://www.shakeskin.com/', bg: '#e03a9e', show: 'faces',
+    { title: 'Shakeskin', href: 'https://www.shakeskin.com/', bg: '#086eb2', show: 'faces',   // Shakeskin's own blue
       line: 'A gallery of shaken faces. Since 2004.' },
     { title: 'The Calculater', href: 'https://www.thecalculater.net/', bg: '#a77bf0', show: 'still',
       line: 'Input digits and get results. Later.' },
@@ -69,4 +69,4 @@
   addEventListener('popstate', check);
   check();
 })();
-window.__hcBuild = "2026-11-06 23:32";
+window.__hcBuild = "2026-11-06 23:34";
