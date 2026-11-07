@@ -61,6 +61,7 @@ FIRST_BY_HANDS = ['Cheerios [28 hands]', 'Retro-Stefson-Kimbabwe [14 hands]', 'S
 BLOCK_RESIZE = "(function(){ const add = window.addEventListener; window.addEventListener = function (t, f, o) { if (t === 'resize') return; return add.call(this, t, f, o); }; })();"
 
 results = []
+PASTE = []
 def check(name, ok, detail=''):
     results.append(ok); print(('  PASS  ' if ok else '  FAIL  ') + name + (f'  ({detail})' if detail else ''))
 
@@ -324,6 +325,18 @@ async def main(base):
               and r['pair'] == 2 and r['loose'] == 0, str(r))
         v = await page.evaluate("(() => { const v = document.querySelector('#hc-pj .hc-pj-fig video'); return v && [v.muted, v.loop, v.closest('figure').querySelector('.hc-pj-label').textContent, v.closest('figure').style.maxWidth]; })()")
         check('project page: a video mark becomes a silent looping video with its label', v == [True, True, 'Logo', '700px'], str(v))
+        # every paste file Halli will put into Cargo lays out cleanly: opening line first, every mark used up
+        bad = []
+        for i, f in enumerate(PASTE):
+            await page.goto(base + f'/paste/{i}/Cheerios/'); await page.wait_for_timeout(900)
+            r = await page.evaluate("""() => { const pj = document.getElementById('hc-pj'); if (!pj) return 'not built';
+              const kids = [...pj.children], lede = kids.findIndex(e => e.classList.contains('hc-pj-lede'));
+              const pic = kids.findIndex(e => e.querySelector && e.querySelector('img, video'));
+              const loose = pj.querySelectorAll('.hc-pj-block > .hc-label, .hc-pj-block > .hc-big, .hc-pj-block > .hc-num, .hc-pj-block > .hc-cap').length;
+              const raw = /<\\/?(div|img)/.test(pj.innerText);
+              return lede < 0 ? 'no opening line' : lede > pic && pic >= 0 ? 'opening line below a picture' : loose ? loose + ' marks left loose' : raw ? 'raw html showing' : 'ok'; }""")
+            if r != 'ok': bad.append(f.name + ': ' + r)
+        check(f'paste files: all {len(PASTE)} lay out cleanly (opening line first, marks used up)', not bad, '; '.join(bad))
         await page.goto(base + '/short/info-contact/'); await page.wait_for_timeout(1000)
         check('project page: ordinary pages are left alone', await page.evaluate("!document.getElementById('hc-pj')"))
         check('no script errors (project pages)', not errs, '; '.join(errs)[:300])
@@ -424,6 +437,10 @@ if __name__ == '__main__':
         rows = b''.join(b'\x00' + b''.join(bytes((x * 7 % 256, y * 5 % 256, 160)) for x in range(w)) for y in range(h))
         chunk = lambda t, d: struct.pack('>I', len(d)) + t + d + struct.pack('>I', zlib.crc32(t + d) & 0xffffffff)
         return b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', w, h, 8, 2, 0, 0, 0)) + chunk(b'IDAT', zlib.compress(rows)) + chunk(b'IEND', b'')
+    PASTE[:] = sorted((ROOT.parent / 'paste-files').glob('*.txt'))
+    for i, f in enumerate(PASTE):
+        html = PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', f.read_text().replace('\n', '<br>')).replace('</div></div>\n<script>', '</div>' + GRID + '</div>\n<script>', 1)
+        (site / 'paste' / str(i) / 'Cheerios').mkdir(parents=True); (site / 'paste' / str(i) / 'Cheerios' / 'index.html').write_text(html)
     (site / 'px.png').write_bytes(png(120, 90))
     (site / 'halli_apparat_fold_stort.jpg').write_bytes(png(45, 94))
     (site / 'assets' / 'apparat').mkdir(parents=True)
