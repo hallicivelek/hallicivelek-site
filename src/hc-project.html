@@ -3,7 +3,7 @@
        ← things I've made, the title (Cargo's), and the first paragraph as a larger opening line above the pictures
        text joined into real paragraphs, left-aligned, max 700px (Cargo's line breaks were made for centred text)
        a short one-line text right before a picture becomes a small label above it ("Close up", "1 – Frequency")
-       pictures at their own size up to 940px; small pictures side by side in pairs
+       pictures at their own size up to 940px; small pictures side by side in pairs (both may have labels)
        Cargo's tags as rounded buttons, then ← previous / next → in Halli's project order
      SEQUENCE projects keep Halli's one-after-another order: no pairs, pictures up to 702px (full width if bigger).
      PROJECTS holds per-project changes Halli asked for. -->
@@ -216,7 +216,7 @@
       if (tk.block) { var b = el('div', 'hc-pj-block'); if (tk.block.classList.contains('hc-fold')) root.appendChild(tk.block); else { b.appendChild(tk.block); if (tk.cap) b.appendChild(tk.cap); root.appendChild(b); } continue; }
       // pairs of small pictures (not in sequence projects)
       var nx = list[k + 1];
-      if (!seq && nx && nx.img && !nx.label && widthOf(tk.img) && widthOf(tk.img) < SMALL && widthOf(nx.img) < SMALL) {
+      if (!seq && nx && nx.img && (!nx.label || tk.label) && widthOf(tk.img) && widthOf(tk.img) < SMALL && widthOf(nx.img) < SMALL) {
         var pair = el('div', 'hc-pj-pair'); pair.appendChild(figure(tk, false)); pair.appendChild(figure(nx, false));
         [].forEach.call(pair.children, function (f) { f.style.maxWidth = ''; });
         root.appendChild(pair); k++; continue;

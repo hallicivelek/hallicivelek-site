@@ -145,7 +145,7 @@
       if (tk.block) { var b = el('div', 'hc-pj-block'); if (tk.block.classList.contains('hc-fold')) root.appendChild(tk.block); else { b.appendChild(tk.block); if (tk.cap) b.appendChild(tk.cap); root.appendChild(b); } continue; }
       // pairs of small pictures (not in sequence projects)
       var nx = list[k + 1];
-      if (!seq && nx && nx.img && !nx.label && widthOf(tk.img) && widthOf(tk.img) < SMALL && widthOf(nx.img) < SMALL) {
+      if (!seq && nx && nx.img && (!nx.label || tk.label) && widthOf(tk.img) && widthOf(tk.img) < SMALL && widthOf(nx.img) < SMALL) {
         var pair = el('div', 'hc-pj-pair'); pair.appendChild(figure(tk, false)); pair.appendChild(figure(nx, false));
         [].forEach.call(pair.children, function (f) { f.style.maxWidth = ''; });
         root.appendChild(pair); k++; continue;
@@ -223,4 +223,4 @@
   document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href]')) setTimeout(look, 50); }, true);
   look();
 })();
-window.__hcBuild = "2026-11-07 13:08";
+window.__hcBuild = "2026-11-07 14:45";
