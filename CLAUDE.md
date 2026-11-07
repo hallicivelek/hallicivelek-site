@@ -175,6 +175,9 @@ and live. Front page built 2026-11-04 (intro, sorted by: Halli, overlords, 90s s
 makes it live straight away, so push only when Halli says. Launch day in Cargo: nav labels, hand-picked order,
 header.css, remove "Other projects" from about me.
 
+## Checked by Halli (2026-11-07)
+The redesign looks fine on his iPhone and speed is fine. Wanton Boys Club GIF stays out for now.
+
 ## Where we left off (2026-11-04)
 - **Waiting on Halli:** a new `?hc-debug` screenshot from his iPhone (hallicivelek.com/info-contact?hc-debug, scrolled
   to the bottom) after build `2026-11-03 22:09` reached his phone. His last screenshot still showed the blob layer
