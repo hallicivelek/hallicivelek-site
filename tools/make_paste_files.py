@@ -149,7 +149,8 @@ PAGES['Apparat-Organ-Quartet-Romantika'] = [
   label('Inside spread, the fold was inspired by MAD Magazine'),
   img(AP + 'hallicivelek-apparat-romantika-machines-large_940.jpg', 940, 317),
   img(AP + 'halli_apparat_fold_stort.jpg', 450, 944),
-  p("Limited edition of 500 copies. In collaboration with Jeff Ramsey."),
+  p("Limited edition of 500 copies. Made with Jeff Ramsey.",
+    "Recognised for album cover design at the FÍT design awards in 2004, together with Jeff Ramsey."),
 ]
 
 PAGES['Apparat-Organ-Quartet'] = [
