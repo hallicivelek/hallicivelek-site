@@ -1,5 +1,5 @@
 /* hc-project for hallicivelek.com: built from src/hc-project.html by build.py, do not edit here */
-(function () { var s = document.createElement("style"); s.textContent = "\n  #hc-pj { width: min(940px, 92vw); position: relative; left: 50%; transform: translateX(-50%); padding-bottom: 40px;\n    font-family: pacaembu, sans-serif; color: rgb(73, 46, 70); text-align: left; }\n  #hc-pj * { text-align: left; }\n  #hc-pj a.hc-pj-back { display: inline-block; font-size: 15px; font-weight: bold; color: rgb(14, 118, 128); text-decoration: none; margin: 0 0 28px; }\n  #hc-pj a.hc-pj-back:hover { background: none !important; color: rgb(14, 118, 128) !important; text-decoration: underline; }\n  #hc-pj h1 { font-family: inherit; font-size: 44px; line-height: 1.1; margin: 0 0 14px; font-weight: bold; color: inherit; text-transform: none; }\n  #hc-pj .hc-pj-lede { font-size: 22px; line-height: 1.35; margin: 0 0 44px; max-width: 700px; }\n  #hc-pj .hc-pj-text { max-width: 700px; margin: 0 0 40px; }\n  #hc-pj .hc-pj-text p { font-size: 18px; line-height: 1.6; margin: 0 0 16px; color: inherit; }\n  #hc-pj .hc-pj-text a, #hc-pj .hc-pj-lede a { color: rgb(14, 118, 128); }\n  #hc-pj .hc-pj-text a:hover, #hc-pj .hc-pj-lede a:hover { background: none !important; color: rgb(14, 118, 128) !important; }\n  #hc-pj .hc-pj-fig { margin: 0 0 44px; }\n  #hc-pj .hc-pj-fig img { display: block; width: 100%; height: auto; margin: 0 !important; float: none !important; }   /* Cargo's align= floats them */\n  #hc-pj .hc-pj-crop { position: relative; overflow: hidden; max-width: 100%; margin: 0;\n    box-shadow: 0 1px 2px rgba(73, 46, 70, .12), 0 14px 30px -14px rgba(73, 46, 70, .35); }\n  #hc-pj .hc-pj-crop img { position: absolute; max-width: none; height: auto; }\n  #hc-pj .hc-pj-label { font-size: 17px; line-height: 1.4; margin: 0 0 10px; font-weight: bold; }\n  #hc-pj .hc-pj-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin: 0 0 44px; align-items: end; }\n  #hc-pj .hc-pj-pair .hc-pj-fig { margin: 0; }\n  #hc-pj .hc-pj-block { margin: 0 0 44px; max-width: 100%; }\n  #hc-pj .hc-pj-block iframe { max-width: 100%; }\n  #hc-pj .hc-pj-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 56px; padding: 0; list-style: none; }\n  #hc-pj .hc-pj-tags a { display: inline-block; font-size: 14px; font-weight: bold; text-decoration: none; padding: 6px 13px; border-radius: 999px;\n    background: rgba(255, 255, 255, .55); color: rgb(73, 46, 70); }\n  #hc-pj .hc-pj-tags a:hover, #hc-pj .hc-pj-tags a:focus-visible { background: #fff !important; color: rgb(73, 46, 70) !important; }\n  #hc-pj .hc-pj-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; border-top: 1px solid rgba(73, 46, 70, .18); padding-top: 24px; }\n  #hc-pj .hc-pj-pn a { display: flex; gap: 14px; align-items: center; text-decoration: none; color: rgb(73, 46, 70); }\n  #hc-pj .hc-pj-pn a:hover { background: none !important; color: rgb(73, 46, 70) !important; }\n  #hc-pj .hc-pj-pn a.hc-pj-next { justify-content: flex-end; }\n  #hc-pj .hc-pj-pn a.hc-pj-next * { text-align: right; }\n  #hc-pj .hc-pj-pn img { width: 72px; height: 72px; object-fit: cover; background: #fff; padding: 4px; box-shadow: 0 1px 2px rgba(73, 46, 70, .15); flex: none; }\n  #hc-pj .hc-pj-pn small { display: block; font-size: 13px; opacity: .75; margin-bottom: 2px; }\n  #hc-pj .hc-pj-pn b { font-size: 17px; line-height: 1.25; }\n  #hc-pj a:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n  html.hc-pj-on .project_footer, html.hc-pj-on .project_header { display: none !important; }\n  @media (max-width: 600px) {\n    #hc-pj h1 { font-size: 32px; } #hc-pj .hc-pj-lede { font-size: 19px; }\n    #hc-pj .hc-pj-pair, #hc-pj .hc-pj-pn { grid-template-columns: 1fr; }\n    #hc-pj .hc-pj-pn a.hc-pj-next { justify-content: flex-start; flex-direction: row-reverse; }\n    #hc-pj .hc-pj-pn a.hc-pj-next * { text-align: left; }\n  }\n"; document.head.appendChild(s); })();
+(function () { var s = document.createElement("style"); s.textContent = "\n  #hc-pj { width: min(940px, 92vw); position: relative; left: 50%; transform: translateX(-50%); padding-bottom: 40px;\n    font-family: pacaembu, sans-serif; color: rgb(73, 46, 70); text-align: left; }\n  #hc-pj * { text-align: left; }\n  #hc-pj a.hc-pj-back { display: inline-block; font-size: 15px; font-weight: bold; color: rgb(14, 118, 128); text-decoration: none; margin: 0 0 28px; }\n  #hc-pj a.hc-pj-back:hover { background: none !important; color: rgb(14, 118, 128) !important; text-decoration: underline; }\n  #hc-pj h1 { font-family: inherit; font-size: 44px; line-height: 1.1; margin: 0 0 14px; font-weight: bold; color: inherit; text-transform: none; }\n  #hc-pj .hc-pj-lede { font-size: 22px; line-height: 1.35; margin: 0 0 44px; max-width: 700px; }\n  #hc-pj .hc-pj-text { max-width: 700px; margin: 0 0 40px; }\n  #hc-pj .hc-pj-text p { font-size: 18px; line-height: 1.6; margin: 0 0 16px; color: inherit; }\n  #hc-pj .hc-pj-text a, #hc-pj .hc-pj-lede a { color: rgb(14, 118, 128); }\n  #hc-pj .hc-pj-text a:hover, #hc-pj .hc-pj-lede a:hover { background: none !important; color: rgb(14, 118, 128) !important; }\n  #hc-pj .hc-pj-fig { margin: 0 0 44px; }\n  #hc-pj .hc-pj-fig img { display: block; width: 100%; height: auto; margin: 0 !important; float: none !important; }   /* Cargo's align= floats them */\n  #hc-pj .hc-pj-crop { position: relative; overflow: hidden; max-width: 100%; margin: 0;\n    box-shadow: 0 1px 2px rgba(73, 46, 70, .12), 0 14px 30px -14px rgba(73, 46, 70, .35); }\n  #hc-pj .hc-pj-crop img { position: absolute; max-width: none; height: auto; }\n  #hc-pj .hc-pj-label { font-size: 17px; line-height: 1.4; margin: 0 0 10px; font-weight: bold; }\n  #hc-pj .hc-pj-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin: 0 0 44px; align-items: end; }\n  #hc-pj .hc-pj-pair .hc-pj-fig { margin: 0; }\n  #hc-pj .hc-pj-block { margin: 0 0 44px; max-width: 100%; }\n  #hc-pj .hc-pj-block iframe { max-width: 100%; float: none !important; margin: 0 !important; }\n  #hc-pj .hc-pj-block h1, #hc-pj .hc-pj-block h2 { font-family: inherit; font-size: 27px; line-height: 1.2; margin: 0; color: inherit; }   /* Halli's own headings (mix pages) */\n  #hc-pj .hc-pj-block h3, #hc-pj .hc-pj-block h4 { font-family: inherit; font-size: 17px; line-height: 1.4; margin: 0; color: inherit; }\n  #hc-pj .hc-pj-block:has(> h1, > h2, > h3, > h4) { margin-bottom: 10px; }\n  #hc-pj .hc-pj-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 56px; padding: 0; list-style: none; }\n  #hc-pj .hc-pj-tags a { display: inline-block; font-size: 14px; font-weight: bold; text-decoration: none; padding: 6px 13px; border-radius: 999px;\n    background: rgba(255, 255, 255, .55); color: rgb(73, 46, 70); }\n  #hc-pj .hc-pj-tags a:hover, #hc-pj .hc-pj-tags a:focus-visible { background: #fff !important; color: rgb(73, 46, 70) !important; }\n  #hc-pj .hc-pj-pn { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; border-top: 1px solid rgba(73, 46, 70, .18); padding-top: 24px; }\n  #hc-pj .hc-pj-pn a { display: flex; gap: 14px; align-items: center; text-decoration: none; color: rgb(73, 46, 70); }\n  #hc-pj .hc-pj-pn a:hover { background: none !important; color: rgb(73, 46, 70) !important; }\n  #hc-pj .hc-pj-pn a.hc-pj-next { justify-content: flex-end; }\n  #hc-pj .hc-pj-pn a.hc-pj-next * { text-align: right; }\n  #hc-pj .hc-pj-pn img { width: 72px; height: 72px; object-fit: cover; background: #fff; padding: 4px; box-shadow: 0 1px 2px rgba(73, 46, 70, .15); flex: none; }\n  #hc-pj .hc-pj-pn small { display: block; font-size: 13px; opacity: .75; margin-bottom: 2px; }\n  #hc-pj .hc-pj-pn b { font-size: 17px; line-height: 1.25; }\n  #hc-pj a:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n  html.hc-pj-on .project_footer, html.hc-pj-on .project_header { display: none !important; }\n  @media (max-width: 600px) {\n    #hc-pj h1 { font-size: 32px; } #hc-pj .hc-pj-lede { font-size: 19px; }\n    #hc-pj .hc-pj-pair, #hc-pj .hc-pj-pn { grid-template-columns: 1fr; }\n    #hc-pj .hc-pj-pn a.hc-pj-next { justify-content: flex-start; flex-direction: row-reverse; }\n    #hc-pj .hc-pj-pn a.hc-pj-next * { text-align: left; }\n  }\n"; document.head.appendChild(s); })();
 (function () {
   if (window.__hcProject) return;
   window.__hcProject = true;
@@ -94,8 +94,9 @@
     return f;
   }
 
+  function titleHere() { return document.title.replace(/\s+-\s+Halli Civelek\s*$/, ''); }
   function build(box, slug, idx) {
-    var seq = SEQUENCE.indexOf(slug) >= 0, extra = PROJECTS[slug] || {}, ms = models(), m = ms[idx].attributes || {};
+    var seq = SEQUENCE.indexOf(slug) >= 0, extra = PROJECTS[slug] || {}, ms = models(), m = idx >= 0 ? (ms[idx].attributes || {}) : { title: titleHere() };
     var list = tokens(box);
     var root = el('div'); root.id = 'hc-pj';
     var back = el('a', 'hc-pj-back', "← things I've made"); back.href = '/'; root.appendChild(back);
@@ -148,8 +149,19 @@
       });
       root.appendChild(ul);
     }
-    // previous / next in Halli's order
-    if (ms.length > 1) {
+    var keep = el('div'); keep.setAttribute('data-hc-pj-rest', ''); keep.style.display = 'none';
+    while (box.firstChild) keep.appendChild(box.firstChild);
+    box.appendChild(root); box.appendChild(keep);
+    addNav();
+  }
+
+  // previous / next in Halli's order: Cargo's project list can arrive after the page, so this is added when it's there
+  function addNav() {
+    var root = document.getElementById('hc-pj');
+    if (!root || root.querySelector('.hc-pj-pn')) return;
+    var ms = models(), idx = projectIndex(slugHere());
+    if (idx < 0 || ms.length < 2) return;
+    {
       var pn = el('nav', 'hc-pj-pn'); pn.setAttribute('aria-label', 'more projects');
       [[-1, '← previous', 'hc-pj-prev'], [1, 'next →', 'hc-pj-next']].forEach(function (d) {
         var mm = ms[(idx + d[0] + ms.length) % ms.length], at = mm.attributes || {};
@@ -162,36 +174,38 @@
       });
       root.appendChild(pn);
     }
-    var keep = el('div'); keep.setAttribute('data-hc-pj-rest', ''); keep.style.display = 'none';
-    while (box.firstChild) keep.appendChild(box.firstChild);
-    box.appendChild(root); box.appendChild(keep);
   }
 
   function ready() { if (window.__hcPjReady) window.__hcPjReady(); }
+  // A project page is known from Cargo's mark on <body> (set before the page is shown), or from its project list
+  // (which can arrive seconds later). Using the mark lets the layout happen before anyone sees the page.
   function check() {
     var slug = slugHere(), idx = slug ? projectIndex(slug) : -1;
-    var box = idx >= 0 ? visibleContent() : null;
+    var type = document.body ? document.body.getAttribute('data-pagetype') : null;
+    var isProject = !!slug && (type === 'project' || idx >= 0);
+    var box = isProject ? visibleContent() : null;
     document.documentElement.classList.toggle('hc-pj-on', !!box);
     if (box && !box.querySelector('#hc-pj')) {
       // wait until Cargo has put the project's content in (it arrives after the page changes)
       if (!box.querySelector('img, iframe, video') && !box.textContent.trim()) return;
-      build(box, String(models()[idx].attributes.project_url), idx);
+      build(box, idx >= 0 ? String(models()[idx].attributes.project_url) : slug, idx);
     }
-    if (box || (models().length && idx < 0)) ready();   // laid out, or not a project: show the page
+    if (box) { addNav(); ready(); }                                   // laid out: show the page
+    else if (type === 'page' || (models().length && idx < 0)) ready(); // not a project: show the page
   }
   var pending = null;
   new MutationObserver(function () { clearTimeout(pending); pending = setTimeout(check, 30); })
-    .observe(document.documentElement, { childList: true, subtree: true });
+    .observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-pagetype'] });
   // Cargo can fill in the page quietly after its project list arrives, with no further changes to notice:
   // keep looking for a few seconds after every page change
   var poll = null;
   function look() {
-    clearInterval(poll); var until = Date.now() + 4000;
-    poll = setInterval(function () { check(); if (document.getElementById('hc-pj') || Date.now() > until) clearInterval(poll); }, 100);
+    clearInterval(poll); var until = Date.now() + 8000;
+    poll = setInterval(function () { check(); if (document.querySelector('#hc-pj .hc-pj-pn') || Date.now() > until) clearInterval(poll); }, 100);
     check();
   }
   addEventListener('popstate', function () { setTimeout(look, 50); });
   document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href]')) setTimeout(look, 50); }, true);
   look();
 })();
-window.__hcBuild = "2026-11-07 01:31";
+window.__hcBuild = "2026-11-07 02:20";
