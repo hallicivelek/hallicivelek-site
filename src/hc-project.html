@@ -49,7 +49,9 @@
      <div class="hc-cap">    caption under the picture or row just before it
      <div class="hc-num" data-n="1">  section heading, numbered in a circle (no data-n: no circle)
      <div class="hc-big">    big statement inside the text column
-     <div class="hc-row">    a row of small pictures, each <div><img><div class="hc-rc">year<br>name</div></div> */
+     <div class="hc-row">    a row of small pictures, each <div><img><div class="hc-rc">year<br>name</div></div>
+     <div class="hc-video" data-src="…mp4" data-poster="…jpg" data-w="700">  a silent looping video, plays while on screen */
+  #hc-pj .hc-pj-fig video { display: block; width: 100%; height: auto; background: #000; }
   #hc-pj .hc-pj-text .hc-num { font-size: 17px; line-height: 1.4; font-weight: bold; margin: 8px 0 10px; }
   #hc-pj .hc-pj-text .hc-num[data-n]::before { content: attr(data-n); display: inline-block; width: 1.6em; height: 1.6em; line-height: 1.6em;
     text-align: center; border-radius: 50%; background: rgb(73, 46, 70); color: #fff; font-size: .8em; margin-right: 8px; vertical-align: .08em; }
@@ -186,6 +188,16 @@
 
     // Halli's own marks (see the styles): labels and captions join their picture, headings join the text column
     function mark(t, c) { return t && t.block && t.block.classList && t.block.classList.contains(c); }
+    // a video mark becomes a picture-like video: silent, looping, playing only while it's on screen
+    list.forEach(function (t) {
+      if (!mark(t, 'hc-video')) return;
+      var d = t.block, v = document.createElement('video');
+      v.src = d.getAttribute('data-src'); if (d.getAttribute('data-poster')) v.poster = d.getAttribute('data-poster');
+      v.setAttribute('width', d.getAttribute('data-w') || '700'); v.muted = true; v.loop = true; v.playsInline = true;
+      v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.preload = 'metadata';
+      v.setAttribute('aria-label', d.getAttribute('data-alt') || ''); v.setAttribute('data-hc-video', '');
+      delete t.block; t.img = v;
+    });
     for (var j = 0; j < list.length; j++) {
       if (mark(list[j], 'hc-label') && list[j + 1] && list[j + 1].img) {
         list[j].block.className = 'hc-pj-label'; list[j + 1].label = list[j].block; list.splice(j, 1); j--; continue;
@@ -195,7 +207,7 @@
     // a short one-line paragraph right before a picture is that picture's label
     for (var i = 0; i < list.length - 1; i++) {
       var t = list[i], n = list[i + 1];
-      if (t.para && t.para.length === 1 && n.img && paraText(t).length <= 60) {
+      if (t.para && t.para.length === 1 && n.img && !n.label && paraText(t).length <= 60) {
         n.label = paraNode(t, 'p', 'hc-pj-label'); list.splice(i, 1); i--;
       }
     }
@@ -237,6 +249,14 @@
     var keep = el('div'); keep.setAttribute('data-hc-pj-rest', ''); keep.style.display = 'none';
     while (box.firstChild) keep.appendChild(box.firstChild);
     box.appendChild(root); box.appendChild(keep);
+    var vids = root.querySelectorAll('video[data-hc-video]');
+    if (vids.length) {
+      var still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var io = new IntersectionObserver(function (es) { es.forEach(function (e) {
+        var v = e.target; if (e.isIntersecting && !still) { var p = v.play(); if (p && p.catch) p.catch(function () {}); } else v.pause();
+      }); }, { threshold: 0.25 });
+      [].forEach.call(vids, function (v) { io.observe(v); if (still) { v.controls = true; } });
+    }
     addNav();
   }
 
