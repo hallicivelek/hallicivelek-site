@@ -129,7 +129,7 @@ PAGES['Pedro-Pilatus-album-artwork'] = [
 ]
 
 SA = '4441214/'
-PAGES['Sesar-A-Stormurinn-a-undan-logninu'] = [
+PAGES['Sesar-A-Stormurinn-a-eftir-logninu'] = [
   p("Visual identity, art direction and design for Sesar A's Stormurinn á eftir logninu (The Storm After the Calm), the first hip hop album in Icelandic, 2001."),
   img(SA + 'SesarA-StormurinnLP.jpg', 670, 603, 'The album cover.'),
   big('A hip hop album for people who don\'t listen to hip hop.'),
@@ -199,7 +199,7 @@ PAGES['Magse-Maximum-Weights-Vol-1 (new project)'] = [
   p("Homemade hip hop, homemade artwork. Two friends having fun: South Park was everywhere, so we made the cover a comment on that, with Magse and the crew drawn South Park style."),
   label('Back'),
   img(G + 'magse/magse-back.jpg', 599, 523, 'Maximum Weights Vol. 1, back: two characters at the decks, and the track list.'),
-  p('Part of my early years in Icelandic hip hop, followed by <a href="/Sesar-A-Stormurinn-a-undan-logninu">Sesar A\'s Stormurinn á eftir logninu</a> (2001) and <a href="/rimnamin">Rímnamín</a> (2002), the first Icelandic hip hop compilation.'),
+  p('Part of my early years in Icelandic hip hop, followed by <a href="/Sesar-A-Stormurinn-a-eftir-logninu">Sesar A\'s Stormurinn á eftir logninu</a> (2001) and <a href="/rimnamin">Rímnamín</a> (2002), the first Icelandic hip hop compilation.'),
 ]
 
 PAGES['Fastland-soccer-uniform'] = [
