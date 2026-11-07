@@ -44,11 +44,28 @@
   #hc-pj .hc-pj-pn img { width: 72px; height: 72px; object-fit: cover; background: #fff; padding: 4px; box-shadow: 0 1px 2px rgba(73, 46, 70, .15); flex: none; }
   #hc-pj .hc-pj-pn small { display: block; font-size: 13px; opacity: .75; margin-bottom: 2px; }
   #hc-pj .hc-pj-pn b { font-size: 17px; line-height: 1.25; }
+  /* Halli's own marks in a project's content (Þroskahjálp calendar and later):
+     <div class="hc-label">  label above the next picture (any length)
+     <div class="hc-cap">    caption under the picture or row just before it
+     <div class="hc-num" data-n="1">  section heading, numbered in a circle (no data-n: no circle)
+     <div class="hc-big">    big statement inside the text column
+     <div class="hc-row">    a row of small pictures, each <div><img><div class="hc-rc">year<br>name</div></div> */
+  #hc-pj .hc-pj-text .hc-num { font-size: 17px; line-height: 1.4; font-weight: bold; margin: 8px 0 10px; }
+  #hc-pj .hc-pj-text .hc-num[data-n]::before { content: attr(data-n); display: inline-block; width: 1.6em; height: 1.6em; line-height: 1.6em;
+    text-align: center; border-radius: 50%; background: rgb(73, 46, 70); color: #fff; font-size: .8em; margin-right: 8px; vertical-align: .08em; }
+  #hc-pj .hc-pj-text .hc-big { font-size: 30px; line-height: 1.2; font-weight: bold; margin: 0 0 18px; }
+  #hc-pj .hc-cap { font-size: 14px; line-height: 1.45; margin: 10px 0 0; opacity: .75; }
+  #hc-pj .hc-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 22px 18px; align-items: end; }
+  #hc-pj .hc-row img { display: block; width: 100%; height: auto; margin: 0 !important; float: none !important; box-shadow: 0 2px 10px rgba(0, 0, 0, .12); }
+  #hc-pj .hc-row .hc-rc { font-size: 13px; line-height: 1.35; margin: 8px 0 0; }
+  #hc-pj .hc-row .hc-rc span { opacity: .7; }
   #hc-pj a:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }
   html.hc-pj-on .project_footer, html.hc-pj-on .project_header { display: none !important; }
   @media (max-width: 600px) {
     #hc-pj h1 { font-size: 32px; } #hc-pj .hc-pj-lede { font-size: 19px; }
     #hc-pj .hc-pj-pair, #hc-pj .hc-pj-pn { grid-template-columns: 1fr; }
+    #hc-pj .hc-row { grid-template-columns: repeat(3, 1fr); }
+    #hc-pj .hc-pj-text .hc-big { font-size: 25px; }
     #hc-pj .hc-pj-pn a.hc-pj-next { justify-content: flex-start; flex-direction: row-reverse; }
     #hc-pj .hc-pj-pn a.hc-pj-next * { text-align: left; }
   }
@@ -142,9 +159,11 @@
       t.img.style.width = (crop.size[0] / cw * 100) + '%';
       t.img.style.left = (-b[0] / cw * 100) + '%'; t.img.style.top = (-b[1] / ch * 100) + '%';
       box.appendChild(t.link || t.img); f.appendChild(box);
+      if (t.cap) f.appendChild(t.cap);
       return f;
     }
     f.appendChild(t.link || t.img);
+    if (t.cap) f.appendChild(t.cap);
     return f;
   }
 
@@ -165,6 +184,14 @@
       root.appendChild(lede);
     } else if (extra.lede) root.appendChild(el('p', 'hc-pj-lede', extra.lede));
 
+    // Halli's own marks (see the styles): labels and captions join their picture, headings join the text column
+    function mark(t, c) { return t && t.block && t.block.classList && t.block.classList.contains(c); }
+    for (var j = 0; j < list.length; j++) {
+      if (mark(list[j], 'hc-label') && list[j + 1] && list[j + 1].img) {
+        list[j].block.className = 'hc-pj-label'; list[j + 1].label = list[j].block; list.splice(j, 1); j--; continue;
+      }
+      if (mark(list[j], 'hc-cap') && j > 0 && (list[j - 1].img || list[j - 1].block)) { list[j - 1].cap = list[j].block; list.splice(j, 1); j--; }
+    }
     // a short one-line paragraph right before a picture is that picture's label
     for (var i = 0; i < list.length - 1; i++) {
       var t = list[i], n = list[i + 1];
@@ -180,9 +207,13 @@
         if (!text) { text = el('div', 'hc-pj-text'); root.appendChild(text); }
         text.appendChild(paraNode(tk, 'p')); continue;
       }
+      if (mark(tk, 'hc-num') || mark(tk, 'hc-big')) {
+        if (!text) { text = el('div', 'hc-pj-text'); root.appendChild(text); }
+        text.appendChild(tk.block); continue;
+      }
       text = null;
       if (tk.hidden) { root.appendChild(tk.hidden); continue; }
-      if (tk.block) { var b = el('div', 'hc-pj-block'); if (tk.block.classList.contains('hc-fold')) root.appendChild(tk.block); else { b.appendChild(tk.block); root.appendChild(b); } continue; }
+      if (tk.block) { var b = el('div', 'hc-pj-block'); if (tk.block.classList.contains('hc-fold')) root.appendChild(tk.block); else { b.appendChild(tk.block); if (tk.cap) b.appendChild(tk.cap); root.appendChild(b); } continue; }
       // pairs of small pictures (not in sequence projects)
       var nx = list[k + 1];
       if (!seq && nx && nx.img && !nx.label && widthOf(tk.img) && widthOf(tk.img) < SMALL && widthOf(nx.img) < SMALL) {

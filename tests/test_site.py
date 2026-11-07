@@ -306,6 +306,22 @@ async def main(base):
               bool(r) and r['title'] == 'Cheerios' and r['back'] == '/' and r['ledeBeforeImg'] and r['lede'] == 'Visual identity and design for Cheerios'
               and r['story'] == ['Some story line one line two', 'Credits here'] and r['label'] == 'Close up' and r['pairs'] == 2
               and r['tags'] == ['art direction'] and r['pn'] == ['FM-Belfast-how-to-make-friends', 'Icelandsmites'] and r['footer'] == 'none' and r['left'] == 'left' and r['stacked'], str(r))
+        # Halli's own marks (the Þroskahjálp calendar, pasted as almanak-cargo-PASTE-THIS.txt)
+        await page.goto(base + '/short/Icelandsmites/'); await page.wait_for_timeout(1800)
+        r = await page.evaluate("""() => { const pj = document.getElementById('hc-pj'); if (!pj) return null;
+          return { lede: pj.querySelector('.hc-pj-lede').textContent.slice(0, 20),
+            labels: [...pj.querySelectorAll('.hc-pj-fig > .hc-pj-label')].map(l => l.textContent.slice(0, 12)),
+            nums: [...pj.querySelectorAll('.hc-pj-text > .hc-num')].map(n => (n.dataset.n || '-') + ' ' + n.textContent.slice(0, 10)),
+            circle: getComputedStyle(pj.querySelector('.hc-num[data-n]'), '::before').content,
+            bigs: pj.querySelectorAll('.hc-pj-text > .hc-big').length, bigSize: getComputedStyle(pj.querySelector('.hc-big')).fontSize,
+            figCaps: pj.querySelectorAll('.hc-pj-fig > .hc-cap').length, rowCap: !!pj.querySelector('.hc-pj-block > .hc-row + .hc-cap'),
+            rowCols: getComputedStyle(pj.querySelector('.hc-row')).gridTemplateColumns.split(' ').length,
+            pair: pj.querySelectorAll('.hc-pj-pair .hc-pj-fig > .hc-cap').length, loose: pj.querySelectorAll(':scope > .hc-pj-block > .hc-cap:only-child, :scope > .hc-pj-block > .hc-label').length,
+            texts: pj.querySelectorAll('.hc-pj-text p').length }; }""")
+        check("project page: Halli's marks (labels, captions, numbered headings, big lines, a row of covers, a captioned pair)",
+              bool(r) and r['lede'].startswith('Redesign') and len(r['labels']) == 2 and r['nums'][:2] == ['1 The design', '2 The editor'] and len(r['nums']) == 4
+              and r['circle'] == '"1"' and r['bigs'] == 3 and r['bigSize'] == '30px' and r['figCaps'] == 4 and r['rowCap'] and r['rowCols'] == 5
+              and r['pair'] == 2 and r['loose'] == 0, str(r))
         await page.goto(base + '/short/info-contact/'); await page.wait_for_timeout(1000)
         check('project page: ordinary pages are left alone', await page.evaluate("!document.getElementById('hc-pj')"))
         check('no script errors (project pages)', not errs, '; '.join(errs)[:300])
@@ -391,6 +407,9 @@ if __name__ == '__main__':
                     ('short/Cheerios', PAGE.replace('ADDONS', tags).replace('</style>', (ROOT / 'custom-css' / 'no-jump.css').read_text() + '</style>', 1).replace('<p>PAGE CONTENT</p>',
                         '<img src="/px.png?a" width="1000" height="600" align="left"><br><br>Visual identity and design<br>for Cheerios<br><br>Some story line one<br>line two<br><br>'
                         'Close up<br><img src="/px.png?b" width="400" height="300"><img src="/px.png?c" width="400" height="300"><br>Credits here')
+                        .replace('</div></div>\n<script>', '</div><div class="project_footer"><a href="/filter/artdirection">artdirection</a></div>' + GRID + '</div>\n<script>', 1)),
+                    ('short/Icelandsmites', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>',
+                        re.sub(r'src="[^"]+"', 'src="/px.png"', (ROOT.parent / 'almanak-cargo-PASTE-THIS.txt').read_text()).replace('\n', '<br>'))
                         .replace('</div></div>\n<script>', '</div><div class="project_footer"><a href="/filter/artdirection">artdirection</a></div>' + GRID + '</div>\n<script>', 1)),
                     ('music-mixes', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', 'loose text from Cargo <br><p>I make music as Wanton Boys Club</p> + + +')
                         .replace('</div></div>\n<script>', '</div>' + GRID + '</div>\n<script>', 1)),
