@@ -95,6 +95,7 @@ PAGES['Retro-Stefson-visual-identity'] = [
   p("It became the band's logo, on every album, t-shirt, poster, promo and video."),
   label('Over the years I polished the edges, removed the fishbones…'),
   '<div class="hc-video" data-src="' + G + 'retro-stefson/logo-flip.mp4" data-poster="' + G + 'retro-stefson/logo-flip.jpg" data-w="700" data-alt="The Retro Stefson logo flipping through its uses over the years"></div>',
+  p('<i>“He’s a no-compromises kind-of-guy, and it might seem like we’re preoccupied with the visual aspects of our albums, but it’s all him.”</i> Logi Pedro, in <a href="https://grapevine.is/music/2013/04/26/on-a-date-with-retro-stefson/" target="_blank">the Reykjavík Grapevine</a>, 2013'),
 ]
 
 FM = '4441114/'
