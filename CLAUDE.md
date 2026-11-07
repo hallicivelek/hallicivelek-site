@@ -70,6 +70,8 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   and the four mixes with in-place Mixcloud players and tracklists (the four /filter/mix/ pages stay for old links).
   Hides Cargo's content (fallback) and grid; sets the title "Music & mixes – Halli Civelek" and a meta description
   (Cargo's Title field is also the nav label, so it stays "music").
+- `custom-css/no-jump.css` — hides `.project_content` on first paint until `html.hc-pj-ready` (set by hc-nav-active
+  for non-project pages, by hc-project once laid out; 2.5 s fallback in CSS and JS). Must be in Cargo's Custom CSS.
 - `custom-css/header.css` — the bigger logo (~300px), for Cargo's Custom CSS on launch day.
 - `src/hc-fold.html` — on the Romantika project page, swaps Halli's four-step fold drawing
   (`halli_apparat_fold_stort.jpg`) for `assets/apparat/fold.mp4` (rendered from the drawing's top panel: 72 frames,

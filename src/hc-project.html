@@ -218,14 +218,20 @@
     box.appendChild(root); box.appendChild(keep);
   }
 
+  function ready() { if (window.__hcPjReady) window.__hcPjReady(); }
   function check() {
     var slug = slugHere(), idx = slug ? projectIndex(slug) : -1;
     var box = idx >= 0 ? visibleContent() : null;
     document.documentElement.classList.toggle('hc-pj-on', !!box);
-    if (box && !box.querySelector('#hc-pj')) build(box, String(models()[idx].attributes.project_url), idx);
+    if (box && !box.querySelector('#hc-pj')) {
+      // wait until Cargo has put the project's content in (it arrives after the page changes)
+      if (!box.querySelector('img, iframe, video') && !box.textContent.trim()) return;
+      build(box, String(models()[idx].attributes.project_url), idx);
+    }
+    if (box || (models().length && idx < 0)) ready();   // laid out, or not a project: show the page
   }
   var pending = null;
-  new MutationObserver(function () { clearTimeout(pending); pending = setTimeout(check, 150); })
+  new MutationObserver(function () { clearTimeout(pending); pending = setTimeout(check, 30); })
     .observe(document.documentElement, { childList: true, subtree: true });
   addEventListener('popstate', function () { setTimeout(check, 150); });
   check();

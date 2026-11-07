@@ -216,6 +216,7 @@ async def main(base):
           fact: (document.querySelector('.hc-sort-fact') || {}).textContent })""")
         check('tiny JPG, 1997: every picture pixelated, "…_SMALL.jpg · N KB" on hover', r['label'] == 'sorted by: tiny JPG, 1997'
               and r['px'] == r['imgs'] == r['hidden'] > 0 and '_SMALL.jpg · ' in (r['fact'] or ''), str(r))
+        await page.evaluate("Math.random = () => 0.99")   # not the 1-in-6 GeoCities pick here
         await page.click('#hc-sort button'); await page.wait_for_timeout(900)
         px = await page.evaluate("[document.querySelector('.hc-sort-label').textContent, document.querySelectorAll('canvas.hc-px').length]")
         check('tiny JPG: the pixels go when the overlords pick something else', px[0] == 'sorted by: tiny JPG, 1997' or px[1] == 0, str(px))
@@ -285,7 +286,12 @@ async def main(base):
         # ---- project pages ----
         page = await b.new_page(viewport={'width': 1300, 'height': 900}); errs = []
         page.on('pageerror', lambda e: errs.append(str(e)))
+        await page.add_init_script("""window.__flash = 0; new MutationObserver(() => { const c = document.querySelector('.project_content');
+          if (c && document.body && getComputedStyle(c).opacity !== '0' && !document.getElementById('hc-pj') && c.querySelector('img')) window.__flash++; })
+          .observe(document, { childList: true, subtree: true, attributes: true });""")
         await page.goto(base + '/short/Cheerios/'); await page.wait_for_timeout(1800)
+        fl = await page.evaluate("[window.__flash, document.documentElement.classList.contains('hc-pj-ready'), getComputedStyle(document.querySelector('.project_content')).opacity]")
+        check('project page: the content stays hidden until it is laid out, then shows (no jump)', fl == [0, True, '1'], str(fl))
         r = await page.evaluate("""() => { const pj = document.getElementById('hc-pj'); if (!pj) return null; const kids = [...pj.children];
           return { title: pj.querySelector('h1').textContent, back: pj.querySelector('.hc-pj-back').getAttribute('href'),
             ledeBeforeImg: kids.findIndex(e => e.classList.contains('hc-pj-lede')) < kids.findIndex(e => e.querySelector && e.querySelector('img')),
@@ -380,7 +386,7 @@ if __name__ == '__main__':
                     ('short/filter/artdirection', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID)),
                     ('short/filter/illustration', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID_IMG)),
                     ('short/romantika', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', '<p>Inside spread</p><img src="/halli_apparat_fold_stort.jpg" width="450" height="944">')),
-                    ('short/Cheerios', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>',
+                    ('short/Cheerios', PAGE.replace('ADDONS', tags).replace('</style>', (ROOT / 'custom-css' / 'no-jump.css').read_text() + '</style>', 1).replace('<p>PAGE CONTENT</p>',
                         '<img src="/px.png?a" width="1000" height="600" align="left"><br><br>Visual identity and design<br>for Cheerios<br><br>Some story line one<br>line two<br><br>'
                         'Close up<br><img src="/px.png?b" width="400" height="300"><img src="/px.png?c" width="400" height="300"><br>Credits here')
                         .replace('</div></div>\n<script>', '</div><div class="project_footer"><a href="/filter/artdirection">artdirection</a></div>' + GRID + '</div>\n<script>', 1)),

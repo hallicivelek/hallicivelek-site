@@ -460,6 +460,39 @@ StatCounter"></a></div></noscript>
   check();
 })();
 </script>
+<!-- Project pages: keep a project's content out of sight until hc-project has laid it out, so it doesn't first show
+     centred and then jump. The very first paint is covered by custom-css/no-jump.css in Cargo's Custom CSS (scripts
+     arrive too late for that); this covers the rest, including projects opened without a reload. The page shows when
+     html gets .hc-pj-ready: at once on pages that are never projects, else when hc-project has laid it out or decided
+     it isn't a project, and in any case after 2.5 s. -->
+<style>
+  html:not(.hc-pj-ready) .project_content { opacity: 0 !important; }
+  .project_content { transition: opacity .25s ease; }
+</style>
+<script>
+(function () {
+  if (window.__hcPjWait) return;
+  window.__hcPjWait = true;
+  var PAGES = /^\/(playthings|music(-?mixes)?(-\d+)?|about-me|info-contact|the-blob-pond|blob-?pond|filter\/[^/]+)?\/?$/i;   // never projects
+  var timer = null, root = document.documentElement;
+  function ready() { clearTimeout(timer); root.classList.add('hc-pj-ready'); }
+  function wait(path) {
+    if (PAGES.test(path)) { ready(); return; }
+    root.classList.remove('hc-pj-ready');
+    clearTimeout(timer); timer = setTimeout(ready, 2500);
+  }
+  window.__hcPjReady = ready;
+  wait(location.pathname);
+  // Cargo opens projects without reloading: hide as soon as a link to one is clicked
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a || a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    var u; try { u = new URL(a.href, location.href); } catch (x) { return; }
+    if (u.host === location.host && u.pathname !== location.pathname) wait(u.pathname);
+  }, true);
+  addEventListener('popstate', function () { wait(location.pathname); });
+})();
+</script>
 
 <!-- Floating blobs for hallicivelek.com — paste into Cargo's Custom HTML -->
 <script>

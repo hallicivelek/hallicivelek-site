@@ -1,0 +1,5 @@
+/* Project pages: hide the content for the first moment, until the add-ons have laid it out (they add
+   .hc-pj-ready to <html>). Paste at the END of Cargo's Custom CSS. If the add-ons never load, everything
+   shows by itself after 2.5 seconds. */
+html:not(.hc-pj-ready) .project_content { opacity: 0; animation: hc-show 0s 2.5s forwards; }
+@keyframes hc-show { to { opacity: 1; } }

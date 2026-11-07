@@ -1,4 +1,5 @@
 /* hc-nav-active for hallicivelek.com: built from src/hc-nav-active.html by build.py, do not edit here */
+(function () { var s = document.createElement("style"); s.textContent = "\n  html:not(.hc-pj-ready) .project_content { opacity: 0 !important; }\n  .project_content { transition: opacity .25s ease; }\n"; document.head.appendChild(s); })();
 (function () {
   if (window.__hcNav) return;
   window.__hcNav = true;
@@ -51,4 +52,26 @@
   document.addEventListener('DOMContentLoaded', check);
   check();
 })();
-window.__hcBuild = "2026-11-07 00:55";
+(function () {
+  if (window.__hcPjWait) return;
+  window.__hcPjWait = true;
+  var PAGES = /^\/(playthings|music(-?mixes)?(-\d+)?|about-me|info-contact|the-blob-pond|blob-?pond|filter\/[^/]+)?\/?$/i;   // never projects
+  var timer = null, root = document.documentElement;
+  function ready() { clearTimeout(timer); root.classList.add('hc-pj-ready'); }
+  function wait(path) {
+    if (PAGES.test(path)) { ready(); return; }
+    root.classList.remove('hc-pj-ready');
+    clearTimeout(timer); timer = setTimeout(ready, 2500);
+  }
+  window.__hcPjReady = ready;
+  wait(location.pathname);
+  // Cargo opens projects without reloading: hide as soon as a link to one is clicked
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href]');
+    if (!a || a.target === '_blank' || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    var u; try { u = new URL(a.href, location.href); } catch (x) { return; }
+    if (u.host === location.host && u.pathname !== location.pathname) wait(u.pathname);
+  }, true);
+  addEventListener('popstate', function () { wait(location.pathname); });
+})();
+window.__hcBuild = "2026-11-07 01:04";
