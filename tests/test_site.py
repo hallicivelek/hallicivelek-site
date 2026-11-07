@@ -143,6 +143,8 @@ async def main(base):
         check("grid: every visit starts in Halli's order, with the overlords offered and no intro line", r['label'] == 'sorted by: Halli'
               and again == ['↻ try the random overlords', None]
               and order[:3] == GRID_SLUGS[:3], f"{r['label']} | {again} | {order[:3]}")
+        tag = await page.evaluate("(() => { const t = document.getElementById('hc-tag'); return t && [t.querySelector('a').getAttribute('href'), t.querySelector('h1').textContent, t.querySelector('p').textContent, t.nextElementSibling.id]; })()")
+        check("tag page: ← things I've made, the tag as a title and how many things, right above the sort line", tag == ['/', 'art direction', '15 things', 'hc-sort'], str(tag))
         await page.click('#hc-sort button'); await page.wait_for_timeout(900)
         again = await page.evaluate("[document.querySelector('.hc-sort-label').textContent, document.querySelector('.hc-sort-again').textContent]")
         check('grid: after the first click it says "ask the overlords again"', again[0] != 'sorted by: Halli' and again[1] == '↻ ask the overlords again', str(again))

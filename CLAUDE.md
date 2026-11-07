@@ -122,6 +122,10 @@ on hover, under Cargo's hover title (`.thumb_title`), never as a permanent tag. 
 are kept, only re-ordered. Project addresses come from Cargo's models (`project_url`); all addresses in facts.txt
 were checked against the 70 live projects on 2026-11-03 — a renamed project in Cargo can change its address.
 
+## Tag pages (hc-columns)
+On /filter/<tag> (where Cargo's tags lead): "← things I've made", the tag as a 44px title (TAG_NAMES fixes
+"artdirection" and the "iillustration" typo) and "N things", right above the sort line. No "clear filter" control.
+
 ## The pinboard (hc-columns CSS)
 Halli's choice 2026-11-04 over rounded white boxes: three columns from 1000px (two from 768px, Cargo's own below),
 44px between columns, 64px between prints; each picture a white-bordered print (10px), square corners, soft
@@ -138,6 +142,8 @@ with a spinning star) and the overlords' GeoCities pick. "⏻ back to 2026" sits
 a mode is on. The mode lasts for the visit (sessionStorage `hc-1999`). `window.__hcRetro.set('ns'|'gc'|'off')`.
 
 ## Things learned the hard way
+- **Never put `@keyframes` (and test anything new) in Cargo's Custom CSS without trying it**: on 2026-11-07 a pasted
+  `@keyframes` line made Cargo serve /stylesheet empty and the whole site lost its styles until it was removed.
 - **Cargo adds the phone viewport tag late**, with a script, after our scripts have started. Anything that reads
   `innerWidth`/`innerHeight` at start-up sees a 980px desktop page on phones. Safari also doesn't reliably fire
   `resize` for it. Both the pond and the background blobs therefore **measure their own drawing area every frame**

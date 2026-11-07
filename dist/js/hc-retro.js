@@ -79,7 +79,7 @@
     var onGrid = th && getComputedStyle(th).display !== 'none' && !/blob-?pond|playthings/i.test(location.pathname);
     if (onGrid) { if (award.previousSibling !== th) th.parentNode.insertBefore(award, th.nextSibling); }
     else if (award.isConnected) award.remove();
-    var first = document.getElementById('hc-intro') || document.getElementById('hc-sort');
+    var first = document.getElementById('hc-tag') || document.getElementById('hc-intro') || document.getElementById('hc-sort');
     if (first) { if (top.nextSibling !== first) first.parentNode.insertBefore(top, first); }
     else { var pc = document.querySelector('.project_content'); if (pc && top.parentNode !== pc) pc.insertBefore(top, pc.firstChild); }
     // NEW! on the first three projects in Halli's order
@@ -112,4 +112,4 @@
   addEventListener('popstate', function () { setTimeout(place, 150); });
   if (document.body) set(mode); else document.addEventListener('DOMContentLoaded', function () { set(mode); });
 })();
-window.__hcBuild = "2026-11-07 01:13";
+window.__hcBuild = "2026-11-07 01:21";
