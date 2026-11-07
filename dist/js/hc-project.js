@@ -182,7 +182,16 @@
   var pending = null;
   new MutationObserver(function () { clearTimeout(pending); pending = setTimeout(check, 30); })
     .observe(document.documentElement, { childList: true, subtree: true });
-  addEventListener('popstate', function () { setTimeout(check, 150); });
-  check();
+  // Cargo can fill in the page quietly after its project list arrives, with no further changes to notice:
+  // keep looking for a few seconds after every page change
+  var poll = null;
+  function look() {
+    clearInterval(poll); var until = Date.now() + 4000;
+    poll = setInterval(function () { check(); if (document.getElementById('hc-pj') || Date.now() > until) clearInterval(poll); }, 100);
+    check();
+  }
+  addEventListener('popstate', function () { setTimeout(look, 50); });
+  document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href]')) setTimeout(look, 50); }, true);
+  look();
 })();
-window.__hcBuild = "2026-11-07 01:04";
+window.__hcBuild = "2026-11-07 01:13";
