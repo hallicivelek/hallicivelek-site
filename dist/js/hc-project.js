@@ -196,7 +196,10 @@
     {
       var pn = el('nav', 'hc-pj-pn'); pn.setAttribute('aria-label', 'more projects');
       [[-1, '← previous', 'hc-pj-prev'], [1, 'next →', 'hc-pj-next']].forEach(function (d) {
-        var mm = ms[(idx + d[0] + ms.length) % ms.length], at = mm.attributes || {};
+        // step past anything that isn't a real project (Cargo's 'index' page, an untitled draft)
+        var j = idx, mm, at, guard = 0;
+        do { j = (j + d[0] + ms.length) % ms.length; mm = ms[j]; at = mm.attributes || {}; guard++; }
+        while (guard < ms.length && (!at.project_url || /^(index|untitled.*)$/i.test(String(at.project_url)) || /^(index|untitled)$/i.test(String(at.title || '').trim())));
         var a = el('a', d[2]); a.href = '/' + at.project_url;
         var th = document.querySelector('.thumbnail[name="' + mm.id + '"] img');
         var words = el('span'); words.appendChild(el('small', '', d[1])); words.appendChild(el('b', '', String(at.title || at.project_url).replace(/ - /g, ' – ')));
@@ -241,4 +244,4 @@
   document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href]')) setTimeout(look, 50); }, true);
   look();
 })();
-window.__hcBuild = "2026-11-07 16:06";
+window.__hcBuild = "2026-11-07 16:24";
