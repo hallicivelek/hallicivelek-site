@@ -20,7 +20,7 @@ PAGES['Retro-Stefson-Retro-Stefson'] = [
   p("Visual identity, concept, art direction and design for Retro Stefson's self-titled album, 2012."),
   img('4441525/RetroStefson-RECD020-Packshot-2-litil.jpg', 670, 389, "Retro Stefson's self-titled album: the CD and the cards."),
   big('Seven members, seven covers.'),
-  p("I had a rule for Retro Stefson's artwork: the whole band is always on it. With seven members, that made seven covers.",
+  p("My rule for Retro Stefson's artwork was that the whole band should always be visible. There were seven members.",
     "On the limited die-cut CD, each member's photograph came on four double-sided cards, and you arranged them to choose your own front. The eighth side held the credits.",
     "The digipaks each showed a different member on the front. You couldn't swap those, but you chose your cover at the shop."),
   num('Choose your cover'),
@@ -46,7 +46,7 @@ PAGES['Retro-Stefson-Qween'] = [
   img('4441563/retroqweenfront.jpg', 600, 600, 'The picture disc, band side.'),
   big('The whole band, and the logo.'),
   p("I had two rules for Retro Stefson's artwork. The whole band is always on it, and so is the logo, the core of who they are.",
-    "My first sketches for this picture disc went in another direction. Then I remembered my own rules. So: one side has the band, the other side has the logo."),
+    "I started with sketches in another direction, but remembered (and reminded myself) of my own rules. So one side has the band members, and the other side the logo."),
   img('4441563/RetroStefson-Qweensticker.jpg', 600, 271),
   img('4441563/RetroStefson-Qweenback.jpg', 600, 600, 'The picture disc, logo side.'),
   p("Photography: Ari Magg."),
@@ -63,8 +63,8 @@ PAGES['Retro-Stefson-Kimbabwe'] = [
   label('The limited edition: one sheet of paper'),
   img('4441031/retrostefson_kimbabwe1.jpg', 600, 526),
   img('4441031/retrostefson_kimbabwe2.jpg', 600, 526),
-  p("A one-of-a-kind place deserved one-of-a-kind packaging. The limited CD came in a single sheet of paper. No box, no case.",
-    "I worked out the fold myself, from prototypes, not from a template: where it folds, where it's perforated, and how it works twice. Fresh from the shop, it holds the disc. Tear off the poster, and the rest folds back into a sleeve. A clever piece of paper manoeuvring.",
+  p("A special place deserved its own packaging. The limited edition CD came in a single sheet of paper.",
+    "I made it myself, from prototypes, not from an existing template. I worked out the fold, where it should be perforated, and how it would work both fresh from the store, as a CD holder, and after you tore off the poster and folded it again. It was a clever piece of paper manoeuvring. :)",
     "Released as a limited poster-pack, a digipak and vinyl."),
 ]
 
@@ -115,11 +115,11 @@ PAGES['Pedro-Pilatus-album-artwork'] = [
   label('Calia'),
   img('4440727/PedroPilatus-lettering1.jpg', 670, 670),
   big('No photos, so I drew him.'),
-  p("Pedro Pilatus is the artist's alias, and we had no photographs. So I drew him a character.",
-    "The label's template had a circle on it, and I turned it into a gangsta-style necklace. That set his attitude."),
+  p("Pedro Pilatus is the artist's alias, and we had no photographs, so I created this illustrated character.",
+    "The label had a template for the artwork, with a circular form, which I turned into a necklace. Gangsta style, hence the attitude of the character."),
   label('Christmas release'),
   img('4440727/hallicivelek-PedroPilatus-TheGoGettin_670.jpg', 670, 670),
-  p("The same character came back as Santa, with the same angry street face."),
+  p("The same character appeared as Santa on the Christmas release. Same angry (street) face as before. :)"),
 ]
 
 SA = '4441214/'
@@ -127,8 +127,8 @@ PAGES['Sesar-A-Stormurinn-a-undan-logninu'] = [
   p("Visual identity, art direction and design for Sesar A's Stormurinn á eftir logninu (The Storm After the Calm), the first hip hop album in Icelandic, 2001."),
   img(SA + 'SesarA-StormurinnLP.jpg', 670, 603, 'The album cover.'),
   big('The first hip hop album in Icelandic.'),
-  p("Sesar A is known as the grandfather of Icelandic hip hop, and this was where it started.",
-    "The hip hop heads would hear about the album, buy it and listen to it, whatever the cover looked like. So I made the artwork for everyone else: people who listen to other music, and would never pick up a hip-hop-looking album.",
+  p("Sesar A is known as the grandfather of Icelandic hip hop.",
+    "My thinking was that the hip hop heads would hear about the album, buy it and listen to it, regardless of the design. So I focused on artwork that would get listeners of other kinds of music to pick it up and check it out. People who would never pick up a hip-hop-looking album.",
     "The booklet folds out. On each page is a painting of one of Sesar A's favourite things."),
   label('His favourite things'),
   img(SA + 'hallicivelek-sesara-hat_386.jpg', 386, 386), img(SA + 'hallicivelek-sesara-shoes_386.jpg', 386, 386),
@@ -159,10 +159,9 @@ PAGES['Breakbeat'] = [
   p("Poster for Breakbeat, a monthly drum'n'bass night, 2006."),
   img('4440996/hallicivelek-breakbeat_940.jpg', 940, 1030, 'The Breakbeat poster.'),
   big("For the people who weren't coming yet."),
-  p("Most people who knew about Breakbeat came every month anyway. They didn't need a poster to tell them.",
-    "So I made the poster for everyone else: people who would walk straight past the usual drum'n'bass visuals. Less a reminder, more an invitation."),
+  p("My thinking was that most people who knew about Breakbeat would come anyway. The poster was meant to remind them, but more importantly to invite a new crowd: people who wouldn't necessarily respond to the usual drum'n'bass visuals."),
   num('The series'),
-  p("Breakbeat's posters were a relay. Each designer made a poster, then nominated the next one in line, and everyone had free rein."),
+  p("Breakbeat's posters were made by a different designer each month. Once you were nominated by the previous designer, you did your poster and then nominated the next one. Every designer had free rein."),
 ]
 
 RM = '4441021/'
@@ -170,16 +169,16 @@ PAGES['rimnamin'] = [
   p("Visual identity, art direction, concept, illustration and design for Rímnamín, the first Icelandic hip hop compilation, 2002."),
   img(RM + 'halli_rimnamin_front.jpg', 450, 450, 'The Rímnamín cover: a vitamin bottle with a new label.'),
   big('A vitamin bottle for Icelandic hip hop.'),
-  p("The working titles were things like rapp.is and Ice Rap. Names like that would have pushed away everyone but the hip hop heads, and they would have found the album anyway. I wanted it to reach everyone else.",
-    "So I came up with a new name: Rímnamín, a twist on vítamín. I saw the album as a container for brilliant stöff, and the packaging grew from the name. I bought a vitamin bottle and designed a new label for it."),
+  p("I came up with the idea of naming this compilation something other than rapp.is or Ice Rap. A title like that would push away everyone but the hip hop heads.",
+    "Rímnamín is a twist on the word vítamín. I saw the album as a container for brilliant stöff, and the name and the packaging came from that. I bought a vitamin bottle, then designed a new label for it."),
   label('The label'),
   img(RM + 'halli_rimnamin_detail.jpg', 450, 450),
-  p("The wording is tongue-in-cheek. The front promises a new, <i>bragbætt</i> blend of the finest Icelandic ingredients. Bragbætt is a word I made up: flavour-enhanced (bragðbætt) turned into rhyme-enhanced (brag). The back says to keep it in a warm and sunny place, which no packaging ever recommends."),
+  p("The wording on the bottle is tongue-in-cheek. The front says it's a new and <i>bragbætt</i> blend of Icelandic ingredients. Flavour-enhanced in Icelandic is bragðbætt, and a rhyme is brag, so bragbætt is a new word: rhyme-enhanced, really. On the back it says to keep it in a warm and sunny place, which is usually not what any packaging recommends."),
   label('Left behind, like everyday things'),
   img(RM + 'halli_rimnamin_bus.jpg', 339, 339), img(RM + 'halli_rimnamin_carpark.jpg', 339, 339),
   img(RM + 'halli_rimnamin_stytta.jpg', 339, 339), img(RM + 'halli_rimnamin_sun.jpg', 339, 339),
   img(RM + 'halli_rimnamin_trash.jpg', 339, 339),
-  p("In the booklet, the bottle turns up where ordinary things get left: in a car park, at a bus stop, on top of a rubbish bin, next to the banana peels and sandwich wrappers. You don't find rare things in those places. You find household products. And that was the point: this album, and Icelandic hip hop with it, should be a household thing.",
+  p("In the booklet, the bottle sits in abandoned places: a car park, a bus stop, on top of a rubbish bin. Like something people had left behind, easy to overlook, the way everyday things are. Those are the places where you find household products, plastic bottles and biscuit wrappers, not rare things. The message being that this album, and Icelandic hip hop, should be a household thing.",
     "Photography: Haraldur Jónasson. Layout in collaboration with Sveinbjörn Pálsson."),
 ]
 
