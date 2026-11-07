@@ -197,6 +197,14 @@ PAGES['Magse-Maximum-Weights-Vol-1 (new project)'] = [
   p('Part of my early years in Icelandic hip hop, followed by <a href="/Sesar-A-Stormurinn-a-undan-logninu">Sesar A\'s Stormurinn á eftir logninu</a> (2001) and <a href="/rimnamin">Rímnamín</a> (2002), the first Icelandic hip hop compilation.'),
 ]
 
+PAGES['Fastland-soccer-uniform'] = [
+  p("Soccer uniform for Fastland, a former ad agency and design house (RIP), 2004."),
+  img('4440861/halli_fastland_uniform.gif', 215, 350, 'The Fastland soccer uniform.'),
+  big("Perhaps the world's first soccer uniform in CMYK."),
+  p("Our <i>team</i> sucked. Our <i>design</i> got a recognition at the FÍT design awards.",
+    "Made with Árni Þór Árnason."),
+]
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     for slug, parts in PAGES.items():
