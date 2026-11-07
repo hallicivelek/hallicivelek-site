@@ -51,7 +51,7 @@
      <div class="hc-big">    big statement inside the text column
      <div class="hc-row">    a row of small pictures, each <div><img><div class="hc-rc">year<br>name</div></div>
      <div class="hc-video" data-src="…mp4" data-poster="…jpg" data-w="700">  a silent looping video, plays while on screen */
-  #hc-pj .hc-pj-fig video { display: block; width: 100%; height: auto; background: #000; }
+  #hc-pj .hc-pj-fig video { display: block; width: 100% !important; height: auto !important; margin: 0 !important; background: #000; }   /* Cargo sets its own margin on videos */
   #hc-pj .hc-pj-text .hc-num { font-size: 17px; line-height: 1.4; font-weight: bold; margin: 8px 0 10px; }
   #hc-pj .hc-pj-text .hc-num[data-n]::before { content: attr(data-n); display: inline-block; width: 1.6em; height: 1.6em; line-height: 1.6em;
     text-align: center; border-radius: 50%; background: rgb(73, 46, 70); color: #fff; font-size: .8em; margin-right: 8px; vertical-align: .08em; }
