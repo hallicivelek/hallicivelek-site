@@ -71,12 +71,13 @@ StatCounter"></a></div></noscript>
      7. 1999 mode           Netscape or GeoCities, from the award under the grid or the overlords
      8. Music               the music page: Wanton Boys Club, remixes, mixes that play in place
      9. Fold                the Romantika cover fold as a video with a "see the magic" button
+    10. Project pages       every project page laid out like about me: title, opening line, pictures, tags, previous / next
      Each is its own script file, so if one ever breaks (or GitHub is down) the others and the site keep working.
      ================================================================ -->
 <script>
 (function () {
   var base = 'https://hallicivelek.github.io/hallicivelek-site/dist/js/';
-  ['hc-columns', 'hc-nav-active', 'hc-blobs', 'hc-pond', 'hc-eyes', 'hc-playthings', 'hc-retro', 'hc-music', 'hc-fold', 'hc-debug'].forEach(function (name) {
+  ['hc-columns', 'hc-nav-active', 'hc-blobs', 'hc-pond', 'hc-eyes', 'hc-playthings', 'hc-retro', 'hc-music', 'hc-fold', 'hc-project', 'hc-debug'].forEach(function (name) {
     var s = document.createElement('script');
     s.src = base + name + '.js';
     s.async = false;

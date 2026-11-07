@@ -282,6 +282,26 @@ async def main(base):
         check('no script errors (fold)', not errs, '; '.join(errs)[:300])
         await page.close()
 
+        # ---- project pages ----
+        page = await b.new_page(viewport={'width': 1300, 'height': 900}); errs = []
+        page.on('pageerror', lambda e: errs.append(str(e)))
+        await page.goto(base + '/short/Cheerios/'); await page.wait_for_timeout(1800)
+        r = await page.evaluate("""() => { const pj = document.getElementById('hc-pj'); if (!pj) return null; const kids = [...pj.children];
+          return { title: pj.querySelector('h1').textContent, back: pj.querySelector('.hc-pj-back').getAttribute('href'),
+            ledeBeforeImg: kids.findIndex(e => e.classList.contains('hc-pj-lede')) < kids.findIndex(e => e.querySelector && e.querySelector('img')),
+            lede: pj.querySelector('.hc-pj-lede').textContent, story: [...pj.querySelectorAll('.hc-pj-text p')].map(p => p.textContent),
+            label: (pj.querySelector('.hc-pj-label') || {}).textContent, pairs: pj.querySelectorAll('.hc-pj-pair .hc-pj-fig').length,
+            tags: [...pj.querySelectorAll('.hc-pj-tags a')].map(a => a.textContent), pn: [...pj.querySelectorAll('.hc-pj-pn b')].map(b => b.textContent),
+            footer: getComputedStyle(document.querySelector('.project_footer')).display, left: getComputedStyle(pj.querySelector('.hc-pj-text p')).textAlign }; }""")
+        check('project page: back link, title, opening line above the pictures, joined paragraphs, label, pair, tags, previous/next',
+              bool(r) and r['title'] == 'Cheerios' and r['back'] == '/' and r['ledeBeforeImg'] and r['lede'] == 'Visual identity and design for Cheerios'
+              and r['story'] == ['Some story line one line two', 'Credits here'] and r['label'] == 'Close up' and r['pairs'] == 2
+              and r['tags'] == ['art direction'] and r['pn'] == ['FM-Belfast-how-to-make-friends', 'Icelandsmites'] and r['footer'] == 'none' and r['left'] == 'left', str(r))
+        await page.goto(base + '/short/info-contact/'); await page.wait_for_timeout(1000)
+        check('project page: ordinary pages are left alone', await page.evaluate("!document.getElementById('hc-pj')"))
+        check('no script errors (project pages)', not errs, '; '.join(errs)[:300])
+        await page.close()
+
         # ---- playthings: four cards over Cargo's fallback, the pond card in preview mode ----
         page = await b.new_page(viewport={'width': 1300, 'height': 900}); errs = []
         page.on('pageerror', lambda e: errs.append(str(e)))
@@ -359,6 +379,10 @@ if __name__ == '__main__':
                     ('short/filter/artdirection', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID)),
                     ('short/filter/illustration', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID_IMG)),
                     ('short/romantika', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', '<p>Inside spread</p><img src="/halli_apparat_fold_stort.jpg" width="450" height="944">')),
+                    ('short/Cheerios', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>',
+                        '<img src="/px.png?a" width="1000" height="600"><br><br>Visual identity and design<br>for Cheerios<br><br>Some story line one<br>line two<br><br>'
+                        'Close up<br><img src="/px.png?b" width="400" height="300"><img src="/px.png?c" width="400" height="300"><br>Credits here')
+                        .replace('</div></div>\n<script>', '</div><div class="project_footer"><a href="/filter/artdirection">artdirection</a></div>' + GRID + '</div>\n<script>', 1)),
                     ('music-mixes', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', 'loose text from Cargo <br><p>I make music as Wanton Boys Club</p> + + +')
                         .replace('</div></div>\n<script>', '</div>' + GRID + '</div>\n<script>', 1)),
                     ('short/playthings', PAGE.replace('ADDONS', tags)

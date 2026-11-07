@@ -75,6 +75,12 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   (`halli_apparat_fold_stort.jpg`) for `assets/apparat/fold.mp4` (rendered from the drawing's top panel: 72 frames,
   25 fps, 940×500; open→closed by 1.44 s, closed→open to the end) with a "see the magic" / "and back again" button and
   no video controls. Plays straight through without seeking (the test server can't seek). Video error → drawing stays.
+- `src/hc-project.html` — **project pages** (any address ending in a Cargo project_url): Cargo's content is moved,
+  not retyped, into an about-me-style layout: ← things I've made, title, first paragraph as the opening line (moved
+  above the first picture), lines joined into paragraphs, a one-line paragraph right before a picture becomes its
+  label, small pictures (<560px) in pairs, Cargo's tags as buttons, previous/next in Halli's order. `SEQUENCE`
+  (Retro Stefson, FM Belfast) keeps one-after-another at ≤702px. `PROJECTS` holds per-project changes (FM Belfast
+  opening line without "illustration"; Retro Stefson band photos cropped to their drawn white card).
 - `src/hc-debug.html` — screen measurements overlay, **only with `?hc-debug`** in the address (for diagnosing phones).
 - `src/parts/before.html`, `src/parts/after.html` — **Halli's own** Custom HTML (Cargo filter script, StatCounter,
   Typekit link that loads the site font Pacaembu; mobile menu fixes). Keep as he gives them.

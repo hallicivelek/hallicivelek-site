@@ -693,9 +693,9 @@
   addEventListener('popstate', check);
   check();
 })();
-window.__hcBuild = "2026-11-06 23:41";
+window.__hcBuild = "2026-11-07 00:52";
 /* add-ons added after the Custom HTML was pasted, loaded from the same folder */
 (function () { var me = document.currentScript; if (!me || !me.src) return;
-  ["hc-eyes", "hc-playthings", "hc-retro", "hc-music", "hc-fold", "hc-debug"].forEach(function (name) {
+  ["hc-eyes", "hc-playthings", "hc-retro", "hc-music", "hc-fold", "hc-project", "hc-debug"].forEach(function (name) {
     var s = document.createElement("script"); s.src = new URL(name + ".js", me.src).href; s.async = false;
     document.head.appendChild(s); }); })();
