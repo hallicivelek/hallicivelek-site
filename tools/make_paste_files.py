@@ -205,6 +205,14 @@ PAGES['Fastland-soccer-uniform'] = [
     "Made with Árni Þór Árnason."),
 ]
 
+PAGES['kronan'] = [
+  p("Illustrations for Krónan supermarkets, 2003."),
+  img('4441131/pigfly.gif', 670, 429, 'A flying pig, one of the Krónan illustrations.'),
+  img('4441131/Kronan-illustrations-collage.jpg', 670, 401, 'A collage of the Krónan illustrations.'),
+  img('4441131/kronan_rollulaukur.png', 450, 225),
+  p("These illustrations won the FÍT award for illustration in 2003."),
+]
+
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     for slug, parts in PAGES.items():
