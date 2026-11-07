@@ -1,4 +1,7 @@
-"""Writes the Cargo paste files for the project pages Halli reviewed in 'Project texts: review'.
+"""Voice: non-grandiose, inviting, friendly, clear. Halli telling you about the project in his own words,
+not selling it. No slogans, no punchy reveals.
+
+Writes the Cargo paste files for the project pages Halli reviewed in 'Project texts: review'.
 Each file is pasted as plain text into a Cargo project's HTML editor (it replaces the old content).
 Marks: hc-label (above a picture), hc-big (big line), hc-num (section heading), hc-cap (under a picture)."""
 import os
@@ -19,7 +22,7 @@ PAGES = {}
 PAGES['Retro-Stefson-Retro-Stefson'] = [
   p("Visual identity, concept, art direction and design for Retro Stefson's self-titled album, 2012."),
   img('4441525/RetroStefson-RECD020-Packshot-2-litil.jpg', 670, 389, "Retro Stefson's self-titled album: the CD and the cards."),
-  big('Seven members, seven covers.'),
+  big('A cover for every band member.'),
   p("My rule for Retro Stefson's artwork was that the whole band should always be visible. There were seven members.",
     "On the limited die-cut CD, each member's photograph came on four double-sided cards, and you arranged them to choose your own front. The eighth side held the credits.",
     "The digipaks each showed a different member on the front. You couldn't swap those, but you chose your cover at the shop."),
@@ -44,7 +47,7 @@ PAGES['Retro-Stefson-Retro-Stefson'] = [
 PAGES['Retro-Stefson-Qween'] = [
   p("Logo illustration and graphic design for Retro Stefson's 7-inch picture vinyl, Qween."),
   img('4441563/retroqweenfront.jpg', 600, 600, 'The picture disc, band side.'),
-  big('The whole band, and the logo.'),
+  big('The band on one side, the logo on the other.'),
   p("I had two rules for Retro Stefson's artwork. The whole band is always on it, and so is the logo, the core of who they are.",
     "I started with sketches in another direction, but remembered (and reminded myself) of my own rules. So one side has the band members, and the other side the logo."),
   img('4441563/RetroStefson-Qweensticker.jpg', 600, 271),
@@ -126,7 +129,7 @@ SA = '4441214/'
 PAGES['Sesar-A-Stormurinn-a-undan-logninu'] = [
   p("Visual identity, art direction and design for Sesar A's Stormurinn á eftir logninu (The Storm After the Calm), the first hip hop album in Icelandic, 2001."),
   img(SA + 'SesarA-StormurinnLP.jpg', 670, 603, 'The album cover.'),
-  big('The first hip hop album in Icelandic.'),
+  big('A hip hop album for people who don\'t listen to hip hop.'),
   p("Sesar A is known as the grandfather of Icelandic hip hop.",
     "My thinking was that the hip hop heads would hear about the album, buy it and listen to it, regardless of the design. So I focused on artwork that would get listeners of other kinds of music to pick it up and check it out. People who would never pick up a hip-hop-looking album.",
     "The booklet folds out. On each page is a painting of one of Sesar A's favourite things."),
@@ -158,7 +161,7 @@ PAGES['Apparat-Organ-Quartet'] = [
 PAGES['Breakbeat'] = [
   p("Poster for Breakbeat, a monthly drum'n'bass night, 2006."),
   img('4440996/hallicivelek-breakbeat_940.jpg', 940, 1030, 'The Breakbeat poster.'),
-  big("For the people who weren't coming yet."),
+  big('A poster for a new crowd.'),
   p("My thinking was that most people who knew about Breakbeat would come anyway. The poster was meant to remind them, but more importantly to invite a new crowd: people who wouldn't necessarily respond to the usual drum'n'bass visuals."),
   num('The series'),
   p("Breakbeat's posters were made by a different designer each month. Once you were nominated by the previous designer, you did your poster and then nominated the next one. Every designer had free rein."),

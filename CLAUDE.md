@@ -215,3 +215,6 @@ The redesign looks fine on his iPhone and speed is fine. Wanton Boys Club GIF st
 - Saved ideas: splitting blob (cell division); a discovered-blobs tally ("3 of 8 found"); a hungry blob that swallows a
   project image; **visitors leaving a blob in a shared pond** — needs a small server with HTTPS. Note: hallicivelek.com
   uses Cargo's certificate, and both free certificates in Halli's Ionos package are already in use.
+
+## Voice for project texts
+Non-grandiose, inviting, friendly, clear. Halli tells you about the project in his own words; he is not selling it. No slogans, no punchy setup-and-reveal lines, no advertising tone. Edit his words for flow and grammar only.
