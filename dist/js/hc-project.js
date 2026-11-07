@@ -194,7 +194,8 @@
     else if (type === 'page' || (models().length && idx < 0)) ready(); // not a project: show the page
   }
   var pending = null;
-  new MutationObserver(function () { clearTimeout(pending); pending = setTimeout(check, 30); })
+  // checked straight away when the page changes (not a moment later), so the layout is done before the next paint
+  new MutationObserver(function () { if (!document.getElementById('hc-pj') || !document.querySelector('#hc-pj .hc-pj-pn')) check(); })
     .observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-pagetype'] });
   // Cargo can fill in the page quietly after its project list arrives, with no further changes to notice:
   // keep looking for a few seconds after every page change
@@ -208,4 +209,4 @@
   document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href]')) setTimeout(look, 50); }, true);
   look();
 })();
-window.__hcBuild = "2026-11-07 02:20";
+window.__hcBuild = "2026-11-07 03:19";
