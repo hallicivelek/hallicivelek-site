@@ -77,7 +77,9 @@ def later_loader(names):
     return ('/* add-ons added after the Custom HTML was pasted, loaded from the same folder */\n'
             '(function () { var me = document.currentScript; if (!me || !me.src) return;\n'
             '  ' + json.dumps(names) + '.forEach(function (name) {\n'
-            '    var s = document.createElement("script"); s.src = new URL(name + ".js", me.src).href; s.async = false;\n'
+            '    var src = new URL(name + ".js", me.src).href;\n'
+            '    if ([].some.call(document.scripts, function (x) { return x.src.split("?")[0] === src; })) return;   /* a newer Custom HTML loads it already */\n'
+            '    var s = document.createElement("script"); s.src = src; s.async = false;\n'
             '    document.head.appendChild(s); }); })();\n')
 
 
