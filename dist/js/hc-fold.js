@@ -52,4 +52,4 @@
     .observe(document.documentElement, { childList: true, subtree: true });
   scan();
 })();
-window.__hcBuild = "2026-11-07 20:08";
+window.__hcBuild = "2026-11-07 20:32";

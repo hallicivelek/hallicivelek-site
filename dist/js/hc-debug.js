@@ -50,4 +50,4 @@
   }
   if (document.body) show(); else document.addEventListener('DOMContentLoaded', show);
 })();
-window.__hcBuild = "2026-11-07 20:08";
+window.__hcBuild = "2026-11-07 20:32";
