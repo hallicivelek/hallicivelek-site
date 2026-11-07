@@ -20,7 +20,7 @@
   #hc-pj .hc-pj-text a, #hc-pj .hc-pj-lede a { color: rgb(14, 118, 128); }
   #hc-pj .hc-pj-text a:hover, #hc-pj .hc-pj-lede a:hover { background: none !important; color: rgb(14, 118, 128) !important; }
   #hc-pj .hc-pj-fig { margin: 0 0 44px; }
-  #hc-pj .hc-pj-fig img { display: block; width: 100%; height: auto; margin: 0; }
+  #hc-pj .hc-pj-fig img { display: block; width: 100%; height: auto; margin: 0 !important; float: none !important; }   /* Cargo's align= floats them */
   #hc-pj .hc-pj-crop { position: relative; overflow: hidden; max-width: 100%; margin: 0;
     box-shadow: 0 1px 2px rgba(73, 46, 70, .12), 0 14px 30px -14px rgba(73, 46, 70, .35); }
   #hc-pj .hc-pj-crop img { position: absolute; max-width: none; height: auto; }
@@ -132,7 +132,7 @@
     var cap = seq ? (w >= 940 ? 940 : Math.min(w || 702, 702)) : Math.min(w || 940, 940);
     f.style.maxWidth = cap + 'px';
     if (t.label) f.appendChild(t.label);
-    t.img.removeAttribute('style');
+    t.img.removeAttribute('style'); t.img.removeAttribute('align');
     if (crop && crop.match.test(t.img.getAttribute('src') || '')) {
       var b = crop.box, cw = b[2] - b[0], ch = b[3] - b[1], box = el('div', 'hc-pj-crop');
       box.style.width = cw + 'px'; box.style.aspectRatio = cw + ' / ' + ch;
