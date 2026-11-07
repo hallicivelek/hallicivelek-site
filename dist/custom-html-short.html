@@ -74,6 +74,8 @@ StatCounter"></a></div></noscript>
     10. Project pages       every project page laid out like about me: title, opening line, pictures, tags, previous / next
      Each is its own script file, so if one ever breaks (or GitHub is down) the others and the site keep working.
      ================================================================ -->
+<style>html:not(.hc-pj-ready) body[data-pagetype="project"] .project_content { opacity: 0 !important; }</style>
+<script>setTimeout(function () { document.documentElement.classList.add('hc-pj-ready'); }, 2500);</script>
 <script>
 (function () {
   var base = 'https://hallicivelek.github.io/hallicivelek-site/dist/js/';

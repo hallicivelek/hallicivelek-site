@@ -51,7 +51,13 @@ def to_js(path):
 def loader(base):
     """Adds the four script files in order (async = false keeps the order, like plain script tags)."""
     names = ', '.join(f"'{p.stem}'" for p in ADDONS)
-    js = f"""<script>
+    # Project pages: hidden from the very first paint until hc-project has laid them out (it adds .hc-pj-ready);
+    # inline, so it works before the add-ons arrive and doesn't go through Cargo's Custom CSS (which a pasted
+    # @keyframes once emptied). Shows by itself after 2.5 s if the add-ons never come.
+    nojump = """<style>html:not(.hc-pj-ready) body[data-pagetype="project"] .project_content { opacity: 0 !important; }</style>
+<script>setTimeout(function () { document.documentElement.classList.add('hc-pj-ready'); }, 2500);</script>
+"""
+    js = nojump + f"""<script>
 (function () {{
   var base = '{base}';
   [{names}].forEach(function (name) {{
