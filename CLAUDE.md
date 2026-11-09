@@ -32,7 +32,7 @@ Everything reaches the live site through Cargo's **Custom HTML** setting. Two wa
 ## Build and test
 ```
 python3 build.py              # src/ → dist/hc-columns.html, dist/hc-pond.html, dist/custom-html.html; syntax-checks every script
-python3 tests/test_site.py    # 34 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, phone)
+python3 tests/test_site.py    # 72 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, phone)
 ```
 Tests need `python3 -m pip install --user playwright` (this Mac has no bare `pip`) and `python3 -m playwright install chromium`.
 The build was verified to reproduce the installed files byte-for-byte when this project was set up.
@@ -83,6 +83,11 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   label, small pictures (<560px) in pairs, Cargo's tags as buttons, previous/next in Halli's order. `SEQUENCE`
   (Retro Stefson, FM Belfast) keeps one-after-another at ≤702px. `PROJECTS` holds per-project changes (FM Belfast
   opening line without "illustration"; Retro Stefson band photos cropped to their drawn white card).
+- `src/hc-stylecheck.html` — **safety net for Cargo's own stylesheet**: once `/stylesheet` has arrived, if it is empty or
+  failed, fetches it again with `cache: 'reload'` (which also replaces the browser's bad saved copy) and inserts it as
+  `<style data-hc-stylecheck>` right after Cargo's link; up to 3 tries. `window.__hcStyleCheck` shows what it did.
+  Loaded by hc-pond.js (no paste). Tested on the real site in Firefox, Chromium and WebKit with the first
+  /stylesheet answer emptied (2026-11-09).
 - `src/hc-debug.html` — screen measurements overlay, **only with `?hc-debug`** in the address (for diagnosing phones).
 - `src/parts/before.html`, `src/parts/after.html` — **Halli's own** Custom HTML (Cargo filter script, StatCounter,
   Typekit link that loads the site font Pacaembu; mobile menu fixes). Keep as he gives them.
@@ -144,6 +149,10 @@ a mode is on. The mode lasts for the visit (sessionStorage `hc-1999`). `window._
 ## Things learned the hard way
 - **Never put `@keyframes` (and test anything new) in Cargo's Custom CSS without trying it**: on 2026-11-07 a pasted
   `@keyframes` line made Cargo serve /stylesheet empty and the whole site lost its styles until it was removed.
+- **Cargo outage 2026-11-09 (not our code):** Cargo's server gave 504s and once served `/stylesheet` empty (200, 0 bytes)
+  with `max-age=3600`; browsers that caught it showed a pink page with three huge white bars (Cargo's ☰ menu icon,
+  unstyled) for up to an hour. Check: `document.styleSheets[0].cssRules.length` is 0. `src/hc-stylecheck.html` now
+  repairs this by itself (see Files).
 - **Cargo adds the phone viewport tag late**, with a script, after our scripts have started. Anything that reads
   `innerWidth`/`innerHeight` at start-up sees a 980px desktop page on phones. Safari also doesn't reliably fire
   `resize` for it. Both the pond and the background blobs therefore **measure their own drawing area every frame**

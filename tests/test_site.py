@@ -371,6 +371,19 @@ async def main(base):
         check('no script errors (playthings)', not errs, '; '.join(errs)[:300])
         await page.close()
 
+        # ---- Cargo's own stylesheet arriving empty (Cargo's outage 2026-11-09) ----
+        page = await b.new_page(viewport={'width': 1300, 'height': 900}); errs = []
+        page.on('pageerror', lambda e: errs.append(str(e)))
+        await page.goto(base + '/short/stylecheck-empty/'); await page.wait_for_timeout(2500)
+        r = await page.evaluate("""() => [getComputedStyle(document.body).wordSpacing, window.__hcStyleCheck && window.__hcStyleCheck.fixed,
+          document.querySelectorAll('style[data-hc-stylecheck]').length]""")
+        check("stylesheet check: an empty Cargo stylesheet is fetched again and put in place", r == ['7px', True, 1], str(r))
+        await page.goto(base + '/short/stylecheck-ok/'); await page.wait_for_timeout(1500)
+        r = await page.evaluate("[getComputedStyle(document.body).wordSpacing, window.__hcStyleCheck.checked, window.__hcStyleCheck.broken, document.querySelectorAll('style[data-hc-stylecheck]').length]")
+        check('stylesheet check: a good stylesheet is left alone', r == ['7px', True, False, 0], str(r))
+        check('no script errors (stylesheet check)', not errs, '; '.join(errs)[:300])
+        await page.close()
+
         # ---- phone, with Cargo's late viewport switch and the resize signal blocked (closest to Safari) ----
         ctx = await b.new_context(viewport={'width': 390, 'height': 760}, device_scale_factor=3, is_mobile=True, has_touch=True)
         await ctx.add_init_script(BLOCK_RESIZE)
@@ -428,6 +441,8 @@ if __name__ == '__main__':
                         .replace('</div></div>\n<script>', '</div><div class="project_footer"><a href="/filter/artdirection">artdirection</a></div>' + GRID + '</div>\n<script>', 1)),
                     ('music-mixes', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', 'loose text from Cargo <br><p>I make music as Wanton Boys Club</p> + + +')
                         .replace('</div></div>\n<script>', '</div>' + GRID + '</div>\n<script>', 1)),
+                    ('short/stylecheck-empty', PAGE.replace('ADDONS', tags).replace('</head>', '<link rel="stylesheet" href="/stylesheet?empty-once"></head>', 1)),
+                    ('short/stylecheck-ok', PAGE.replace('ADDONS', tags).replace('</head>', '<link rel="stylesheet" href="/stylesheet?ok"></head>', 1)),
                     ('short/playthings', PAGE.replace('ADDONS', tags)
                         .replace('</style>', '  .project_content a:hover { background-color: rgb(255, 255, 0); color: rgb(0, 0, 0); }\n</style>', 1)
                         .replace('<p>PAGE CONTENT</p>', '<p>Music Kontrapunkt Kontrol, Shakeskin, The Calculater, the blob-pond</p>')
@@ -445,8 +460,17 @@ if __name__ == '__main__':
     (site / 'halli_apparat_fold_stort.jpg').write_bytes(png(45, 94))
     (site / 'assets' / 'apparat').mkdir(parents=True)
     for f in (ROOT / 'assets' / 'apparat').iterdir(): (site / 'assets' / 'apparat' / f.name).write_bytes(f.read_bytes())
+    served = {'empty-once': 0}
     class Quiet(http.server.SimpleHTTPRequestHandler):
         def log_message(self, *a): pass
+        def do_GET(self):   # Cargo's /stylesheet: '?empty-once' is empty the first time (like Cargo's outage), then whole
+            if self.path.startswith('/stylesheet'):
+                q = self.path.partition('?')[2]
+                body = b'' if q == 'empty-once' and served['empty-once'] == 0 else b'body { word-spacing: 7px; }'
+                if q == 'empty-once': served['empty-once'] += 1
+                self.send_response(200); self.send_header('Content-Type', 'text/css'); self.send_header('Cache-Control', 'public, max-age=3600')
+                self.send_header('Content-Length', str(len(body))); self.end_headers(); self.wfile.write(body); return
+            return super().do_GET()
     handler = functools.partial(Quiet, directory=str(site))
     srv = http.server.ThreadingHTTPServer(('127.0.0.1', 0), handler)
     threading.Thread(target=srv.serve_forever, daemon=True).start()
