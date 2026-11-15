@@ -9,8 +9,8 @@
        loudness above 1         rain
        anything else            soft calm clouds
      Not in the table: gentle calm default. Seeded by the address, so the same project always gets the same sky.
-     One fixed canvas right behind the blob layer (same z-index -1), aria-hidden, no pointer events, no text. Cloud
-     colours are lightened until Halli's plum text keeps at least 5:1 over them. Reduced motion: a still arrangement.
+     One fixed canvas right behind the blob layer (same z-index -1), aria-hidden, no pointer events, no text. Each cloud has its own seeded outline,
+     opacity (0.45-0.95) and colour (sky/sky2/accent mixed); plum text keeps 5:1 because clouds fade out behind words. Reduced motion: a still arrangement.
      Follows "pause blobs" (html.hc-blobs-paused). Off in 1999 mode. Stops while the tab is hidden.
      window.hcProjectColours.get(address) is the shared table lookup (also defined by the retired hc-weather).
      window.__hcWeather shows what it decided. Replaces hc-weather (the small strip), which is no longer loaded.
@@ -71,8 +71,8 @@
   function lin(v) { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); }
   function lum(c) { return 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]); }
   function contrast(a, b) { var x = lum(a), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
-  // lighten a colour (towards white) until plum text over it keeps `ratio`
-  function keepReadable(c, ratio) { var t = 0; while (contrast(mix(c, WHITE, t), PLUM) < ratio && t < 1) t += 0.02; return mix(c, WHITE, t); }
+  function punch(c, k) { var g = luma(c) * 255; return c.map(function (v) { return Math.max(0, Math.min(255, g + (v - g) * k)); }); }   // more (k>1) or less colour, same lightness
+  function notDark(c, floor) { var t = 0; while (luma(mix(c, PINK, t)) < floor && t < 1) t += 0.05; return mix(c, PINK, t); }   // only the very dark ones are lifted, hue kept
   function quant(c) { return c.map(function (v) { var q = Math.round(v / 32) * 32; return q > 255 ? 255 : q; }); }
 
   /* ---------- the canvas: fixed, full screen, right behind the blobs ---------- */
@@ -109,19 +109,62 @@
     var p = info ? { A: info.sky, B: info.sky2, accent: info.accent, light: info.light }
                  : { A: [150, 190, 210], B: [240, 220, 210], accent: [255, 200, 120], light: [255, 255, 255] };
     var GREY = [132, 128, 140], ICE = [214, 224, 238];
-    if (kind === 'calm') pal = { cloud: mix(mix(p.light, WHITE, 0.72), PINK, 0.12), shade: mix(mix(p.A, PINK, 0.5), PLUM, 0.1), cloudA: 0.82, shadeA: 0.2 };
-    else if (kind === 'rain') pal = { cloud: mix(mix(p.A, GREY, 0.62), PLUM, 0.12), shade: mix(mix(p.A, GREY, 0.5), PLUM, 0.3), cloudA: 0.94, shadeA: 0.9,
-      drop: mix(mix(p.A, [86, 98, 122], 0.65), PLUM, 0.1) };
-    else if (kind === 'snow') pal = { cloud: mix(mix(p.A, ICE, 0.82), WHITE, 0.25), shade: mix(mix(p.A, ICE, 0.6), [120, 130, 150], 0.35), cloudA: 0.95, shadeA: 0.85,
-      flake: WHITE, rim: mix(p.A, [110, 120, 145], 0.6) };
-    else pal = { cloud: quant(mix(p.light, WHITE, 0.72)), shade: quant(mix(mix(p.light, WHITE, 0.4), p.A, 0.35)), cloudA: 1, shadeA: 1,
-      drop: quant(mix(p.A, [86, 98, 122], 0.65)), flake: WHITE, rim: [128, 128, 160] };
-    // never in the way: plum text keeps 5:1 over a cloud body, 4.5:1 over its darker belly (both before the pink shows through)
-    pal.cloud = keepReadable(pal.cloud, 5); pal.shade = keepReadable(pal.shade, 4.5);
-    clouds = []; W = H = 0; textAge = 99; calm();
+    // the colours of each cloud are mixed per cloud in makeClouds from the project's sky / sky2 / accent; here only what is shared
+    var GREY = [132, 128, 140], ICE = [214, 224, 238];
+    pal = { A: p.A, B: p.B, acc: p.accent, drop: kind === 'pixel' ? quant(mix(p.A, [86, 98, 122], 0.65)) : mix(mix(p.A, [86, 98, 122], 0.65), PLUM, 0.1),
+            flake: WHITE, rim: kind === 'pixel' ? [128, 128, 160] : mix(p.A, [110, 120, 145], 0.6), grey: GREY, ice: ICE };
+    clouds = []; W = H = 0; textAge = 99; textFade = 0.6; calm();
     report.slug = address; report.source = info ? 'table' : 'default'; report.kind = kind; report.precip = precip;
     report.year = info ? info.year : null; report.loud = info ? info.loud : null;
-    report.contrast = { body: +contrast(pal.cloud, PLUM).toFixed(2), belly: +contrast(pal.shade, PLUM).toFixed(2) };
+  }
+
+  // Clouds are designed, not random: every cloud is perfect circles on one system. Base unit RU; puff radii only from
+  // {1, 0.8, 0.62, 0.5}; the puffs stand on one line (bottoms aligned), so the radii profile is the skyline, rising to a
+  // tallest puff near (not at) the middle; neighbours sit a fixed ratio apart (distance = K * (r1 + r2)), so the top is a clean
+  // run of arcs. A tier puff sits on a parent puff at the same ratio. The underside is a flat-ish belly (a wide band between the
+  // end puffs' circles, sagging a little in the middle). Variety = template, mirror, scale, stretch of the spacing, colour, opacity.
+  var RU = 11, K = 0.72, SAG = 0.16;
+  var TEMPLATES = [
+    { name: 'wisp',     r: [0.62, 0.5] },                                                    // tiny, 2 puffs
+    { name: 'duo',      r: [1, 0.8] },                                                       // two big round puffs
+    { name: 'small3',   r: [0.8, 1, 0.62] },
+    { name: 'classic4', r: [0.62, 1, 0.8, 0.5] },
+    { name: 'leaning4', r: [1, 0.8, 0.62, 0.5] },                                            // lopsided: heavy on one side
+    { name: 'long5low', r: [0.5, 0.62, 0.8, 0.8, 0.5] },                                     // long and low
+    { name: 'tall3',    r: [0.8, 1, 0.8, 0.5], tier: [{ on: 1, a: -25, r: 0.8 }, { on: 2, a: 20, r: 0.62 }] },   // towering cumulus: a big puff on one shoulder, stepping down the other side
+    { name: 'tower',    r: [0.8, 1, 0.8, 0.62], tier: [{ on: 1, a: 30, r: 1 }, { on: 0, a: -20, r: 0.8 }] },       // broad cumulus rising to one side, steps on the other
+    { name: 'wide6',    r: [0.5, 0.8, 1, 0.8, 0.62, 0.5], tier: [{ on: 3, a: 24, r: 0.62 }] },       // wide with a second tier
+    { name: 'bank7',    r: [0.5, 0.62, 0.8, 0.62, 0.8, 0.62, 0.5] }                          // a long low bank, 7 puffs
+  ];
+  function genShape(ti, mirror, stretch) {   // template index, mirrored?, spacing stretch (1.0-1.18); circles stay circles
+    var t = TEMPLATES[ti], circles = [], x = 0, i, sg = mirror ? -1 : 1;
+    for (i = 0; i < t.r.length; i++) {
+      if (i) x += K * stretch * (t.r[i - 1] + t.r[i]);
+      circles.push({ dx: x, dy: -t.r[i], r: t.r[i] });
+    }
+    var mid = x / 2;
+    (t.tier || []).forEach(function (u) {
+      var par = circles[u.on], d = K * (par.r + u.r), an = u.a * Math.PI / 180;
+      circles.push({ dx: par.dx + Math.sin(an) * d, dy: par.dy - Math.cos(an) * d, r: u.r });
+    });
+    var xl = circles[0].dx, xr = circles[t.r.length - 1].dx, rmin = 9;
+    t.r.forEach(function (r) { rmin = Math.min(rmin, r); });
+    circles.forEach(function (c) { c.dx = (c.dx - mid) * sg * RU; c.dy *= RU; c.r *= RU; });
+    var bx0 = (sg > 0 ? xl : xr) , bx1 = (sg > 0 ? xr : xl);
+    bx0 = (bx0 - mid) * sg * RU; bx1 = (bx1 - mid) * sg * RU;
+    if (bx0 > bx1) { var tm = bx0; bx0 = bx1; bx1 = tm; }
+    return { circles: circles, bx0: bx0, bx1: bx1, by0: -rmin * 0.9 * RU, sag: SAG * RU, sig: t.name + (mirror ? '-m' : ''), ti: ti, mirror: mirror };
+  }
+  function cloudColour(Rl) {   // sky / sky2 / accent mixed by a different recipe for each cloud, so one page's clouds differ a little
+    var m = Rl(), w = [Rl() * 0.3, Rl() * 0.3, Rl() * 0.2], tot;   // one of the three leads, the others only tint it (mixing all gives grey)
+    w[m < 0.4 ? 0 : m < 0.75 ? 1 : 2] += 0.7 + Rl() * 0.3; tot = w[0] + w[1] + w[2];
+    var c = [0, 1, 2].map(function (k) { return (pal.A[k] * w[0] + pal.B[k] * w[1] + pal.acc[k] * w[2]) / tot; });
+    c = punch(c, 1.3 + Rl() * 0.3);
+    if (kind === 'rain') c = mix(c, pal.grey, 0.28 + Rl() * 0.2);
+    else if (kind === 'snow') c = mix(c, pal.ice, 0.3 + Rl() * 0.25);
+    else c = mix(c, PINK, 0.06 + Rl() * 0.2);
+    c = notDark(c, 0.5);
+    return kind === 'pixel' ? quant(c) : c;
   }
 
   function makeClouds() {   // once the real screen size is known; the same layout for the same address
@@ -131,65 +174,78 @@
     var bands = []; for (i = 0; i < n; i++) bands.push(i);
     for (i = n - 1; i > 0; i--) { j = Math.floor(Rl() * (i + 1)); var t = bands[i]; bands[i] = bands[j]; bands[j] = t; }
     clouds = [];
+    var pool = [];   // a template is not used twice on a page until all ten are used (so never the same template+mirror twice)
+    for (i = 0; i < TEMPLATES.length; i++) pool.push(i);
+    for (i = pool.length - 1; i > 0; i--) { j = Math.floor(Rl() * (i + 1)); var tq = pool[i]; pool[i] = pool[j]; pool[j] = tq; }
     for (i = 0; i < n; i++) {
       var z = r2(0, 1), c = { z: z, depth: 0.04 + z * 0.12, xf: (i + r2(0.1, 0.9)) / n, yf: (bands[i] + r2(0.15, 0.75)) / n,
-        s: (phone ? 1.45 : 2.1) * (0.75 + z * 0.65) * r2(0.9, 1.1), puffs: [], parts: [], acc: 0, sprite: null };
+        s: (phone ? 1.45 : 2.1) * (0.6 + z * 0.8) * 0.8, parts: [], acc: 0, sprite: null };
       c.speed = (SPEED[kind][0] + (SPEED[kind][1] - SPEED[kind][0]) * z) * 0.6;   // drift slowed to 60%
-      var np = Math.round(r2(5, 8));
-      for (j = 0; j < np; j++) c.puffs.push({ dx: (j - (np - 1) / 2) * r2(8, 11) + r2(-2, 2), dy: -Math.sin(j / (np - 1 || 1) * Math.PI) * r2(4, 10) + r2(-1, 1),
-        r: r2(7.5, 12.5) * (1 - Math.abs(j - (np - 1) / 2) / np * 0.55) });
+      c.shape = genShape(pool[i % pool.length], Rl() < 0.5 ? 1 : 0, 1 + r2(0, 0.18));
+      c.col = cloudColour(Rl); c.shade = mix(c.col, PLUM, 0.3);
+      c.alpha = kind === 'pixel' ? r2(0.6, 1) : kind === 'calm' ? r2(0.45, 0.95) : r2(0.55, 0.95);
       c.fall = precip === 'snow' ? r2(200, 300) * (phone ? 0.8 : 1) : r2(170, 260) * (phone ? 0.75 : 1);
       clouds.push(c);
     }
     clouds.sort(function (a, b) { return a.z - b.z; });
+    // text stays readable by fading the clouds out behind words (draw()), not by washing their colour out:
+    // find the weakest fade that keeps plum text at 5:1 over the strongest cloud colour (two clouds overlapping) on the page
+    var fade = 0.5, worst = 99;
+    for (; fade <= 0.9; fade += 0.05) {
+      worst = 99;
+      clouds.forEach(function (c) { var a = (1 - Math.pow(1 - c.alpha, 2)) * (1 - fade); worst = Math.min(worst, contrast(mix(PINK, c.col, a), PLUM)); });
+      if (worst >= 5) break;
+    }
+    textFade = Math.min(0.9, fade);
+    report.contrast = { worst: +worst.toFixed(2), fade: +textFade.toFixed(2) };
+    report.shapes = clouds.map(function (c) { return c.shape.sig; });
+    report.alphas = clouds.map(function (c) { return +c.alpha.toFixed(2); });
+    report.colours = clouds.map(function (c) { return css(c.col, 1); });
   }
 
-  // cloud body: overlapping puffs sitting on a long rounded base, flat underneath, with a darker belly peeking out below.
-  // Pixel clouds are the same shape on a coarse grid.
+  function belly(sh, x) { var u = (x - sh.bx0) / (sh.bx1 - sh.bx0); u = Math.max(0, Math.min(1, u)); return sh.sag * 4 * u * (1 - u); }   // how far the underside sags below the baseline
   function cloudBox(c) {
-    var sc = c.s, x0 = 0, x1 = 0, y0 = 0;
-    c.puffs.forEach(function (p) { x0 = Math.min(x0, p.dx - p.r); x1 = Math.max(x1, p.dx + p.r); y0 = Math.min(y0, p.dy - p.r); });
-    return { w: (x1 - x0) * sc, x0: x0 * sc, top: -y0 * sc, bottom: 7 * sc };
-  }
-  function shapeOf(c) {   // in cloud units (the anchor is the base line's centre)
-    var f = c.puffs[0], l = c.puffs[c.puffs.length - 1], k = kind === 'pixel' ? 0.3 : 0.85;
-    return { puffs: c.puffs, bx0: f.dx - f.r * k, bx1: l.dx + l.r * k, by0: -7, by1: 4, br: 5.5 };
+    var sc = c.s, sh = c.shape, x0 = sh.bx0, x1 = sh.bx1, y0 = sh.by0, y1 = sh.sag / 1;
+    sh.circles.forEach(function (p) { x0 = Math.min(x0, p.dx - p.r); x1 = Math.max(x1, p.dx + p.r); y0 = Math.min(y0, p.dy - p.r); });
+    return { w: (x1 - x0) * sc, x0: x0 * sc, top: -y0 * sc, bottom: y1 * sc + (kind === 'pixel' ? U : 3) };
   }
   function inside(sh, x, y) {   // is a point (cloud units) inside the cloud body?
-    if (y > sh.by1) return false;
-    for (var i = 0; i < sh.puffs.length; i++) { var p = sh.puffs[i], dx = x - p.dx, dy = y - p.dy; if (dx * dx + dy * dy < p.r * p.r) return true; }
-    if (x < sh.bx0 || x > sh.bx1 || y < sh.by0) return false;
-    var cx = Math.max(sh.bx0 + sh.br, Math.min(sh.bx1 - sh.br, x)), cy = Math.max(sh.by0 + sh.br, Math.min(sh.by1 - sh.br, y));
-    return (x - cx) * (x - cx) + (y - cy) * (y - cy) <= sh.br * sh.br;
+    for (var i = 0; i < sh.circles.length; i++) { var p = sh.circles[i], dx = x - p.dx, dy = y - p.dy; if (dx * dx + dy * dy < p.r * p.r) return true; }
+    return x >= sh.bx0 && x <= sh.bx1 && y >= sh.by0 && y <= belly(sh, x);
   }
   function buildSprite(c) {
     var b = cloudBox(c), pad = 6, w = Math.ceil(b.w + pad * 2), h = Math.ceil(b.top + b.bottom + pad * 2);
     var s = document.createElement('canvas'); s.width = Math.ceil(w * DPR); s.height = Math.ceil(h * DPR);
     var x = s.getContext('2d'); x.setTransform(DPR, 0, 0, DPR, 0, 0);
-    var ox = pad + b.w / 2, oy = pad + b.top, sc = c.s, mx = ox - (b.x0 + b.w / 2), sh = shapeOf(c);
-    if (kind === 'pixel') {   // sample the same shape on a grid of big pixels; the belly is the shape one big pixel lower
+    var ox = pad + b.w / 2, oy = pad + b.top, sc = c.s, mx = ox - (b.x0 + b.w / 2), sh = c.shape;
+    if (kind === 'pixel') {   // the same circles sampled on a coarse grid, then tidied: no stray pixels, no one-pixel dents
       var u = U, gx0 = Math.floor(-mx / u) - 1, gx1 = Math.ceil((w - mx) / u) + 1, gy0 = Math.floor(-oy / u) - 1, gy1 = Math.ceil((h - oy) / u);
-      for (var gy = gy0; gy <= gy1; gy++) for (var gx = gx0; gx <= gx1; gx++) {
-        var cx = (gx + 0.5) * u / sc, cy = (gy + 0.5) * u / sc;
-        var isBody = inside(sh, cx, cy), belly = !isBody && inside(sh, cx, cy - u / sc);
-        if (!isBody && !belly) continue;
-        x.fillStyle = css(isBody ? pal.cloud : pal.shade);
-        x.fillRect(Math.round(mx + gx * u), Math.round(oy + gy * u), u, u);
+      var nx = gx1 - gx0 + 1, ny = gy1 - gy0 + 1, G = [], gx, gy, pass;
+      for (gy = 0; gy < ny; gy++) { G.push([]); for (gx = 0; gx < nx; gx++) G[gy].push(inside(sh, (gx + gx0 + 0.5) * u / sc, (gy + gy0 + 0.5) * u / sc) ? 1 : 0); }
+      function nb(g, X, Y) { return (Y > 0 && g[Y - 1][X] ? 1 : 0) + (Y < ny - 1 && g[Y + 1][X] ? 1 : 0) + (X > 0 && g[Y][X - 1] ? 1 : 0) + (X < nx - 1 && g[Y][X + 1] ? 1 : 0); }
+      for (pass = 0; pass < 2; pass++) {
+        var G2 = G.map(function (r) { return r.slice(); });
+        for (gy = 0; gy < ny; gy++) for (gx = 0; gx < nx; gx++) { var n4 = nb(G, gx, gy); if (G[gy][gx] && n4 < 2) G2[gy][gx] = 0; else if (!G[gy][gx] && n4 >= 3) G2[gy][gx] = 1; }
+        G = G2;
+      }
+      for (gy = 0; gy < ny; gy++) for (gx = 0; gx < nx; gx++) {
+        var body = G[gy][gx], bel = !body && gy > 0 && G[gy - 1][gx] && nb(G, gx, gy) >= 1;
+        if (!body && !bel) continue;
+        x.fillStyle = css(body ? c.col : quant(c.shade));
+        x.fillRect(Math.round(mx + (gx + gx0) * u), Math.round(oy + (gy + gy0) * u), u, u);
       }
     } else {
-      var path = function (dy) {
-        x.beginPath();
-        sh.puffs.forEach(function (p) { x.moveTo(mx + p.dx * sc + p.r * sc, oy + p.dy * sc + dy); x.arc(mx + p.dx * sc, oy + p.dy * sc + dy, p.r * sc, 0, 7); });
-        var X0 = mx + sh.bx0 * sc, X1 = mx + sh.bx1 * sc, Y0 = oy + sh.by0 * sc + dy, Y1 = oy + sh.by1 * sc + dy, r = sh.br * sc;
-        x.moveTo(X0 + r, Y0); x.arcTo(X1, Y0, X1, Y1, r); x.arcTo(X1, Y1, X0, Y1, r); x.arcTo(X0, Y1, X0, Y0, r); x.arcTo(X0, Y0, X1, Y0, r); x.closePath();
-      };
-      var body = function (dy, col) {
-        x.save(); x.beginPath(); x.rect(0, 0, w, oy + dy + sh.by1 * sc); x.clip();
-        x.fillStyle = col; path(dy); x.fill('nonzero'); x.restore();
-      };
-      body(2.6 * sc, css(pal.shade, pal.shadeA));
-      x.globalCompositeOperation = 'destination-out'; body(0, 'rgba(0,0,0,1)'); x.globalCompositeOperation = 'source-over';   // belly only below the body
-      body(0, css(pal.cloud, pal.cloudA));
+      x.beginPath();
+      sh.circles.forEach(function (p) { x.moveTo(mx + p.dx * sc + p.r * sc, oy + p.dy * sc); x.arc(mx + p.dx * sc, oy + p.dy * sc, p.r * sc, 0, 7); });
+      var X0 = mx + sh.bx0 * sc, X1 = mx + sh.bx1 * sc, Y0 = oy + sh.by0 * sc;   // the belly: flat-ish, sagging a little in the middle
+      x.moveTo(X0, Y0); x.lineTo(X1, Y0); x.lineTo(X1, oy); x.quadraticCurveTo((X0 + X1) / 2, oy + 2 * sh.sag * sc, X0, oy); x.closePath();
+      x.fillStyle = css(c.col); x.fill('nonzero');
+      // a very soft darkening towards the bottom (no hard edge, no shadow strip)
+      var yTop = oy - (b.top * 0.0) - sh.circles[0].r * sc * 0.6, yBot = oy + sh.sag * sc;
+      x.globalCompositeOperation = 'source-atop';
+      var g = x.createLinearGradient(0, yTop, 0, yBot); g.addColorStop(0, css(c.shade, 0)); g.addColorStop(1, css(c.shade, 0.3));
+      x.fillStyle = g; x.fillRect(0, 0, w, h);
+      x.globalCompositeOperation = 'source-over';
     }
     c.sprite = s; c.sw = w; c.sh = h; c.sox = ox; c.soy = oy; c.box = b;
   }
@@ -441,7 +497,7 @@
   report.wetCursor = function () { return wet.length + (cap ? 1 : 0); };
 
   /* ---------- text stays first: rain and snow fade almost away behind words ---------- */
-  var textBoxes = [], textAge = 99, FADED = 0.18;   // FADED: how much of a drop or flake still shows behind text
+  var textBoxes = [], textAge = 99, FADED = 0.18, textFade = 0.6;   // FADED: how much of a drop or flake still shows behind text
   function readText() {   // page coordinates, refreshed every ~15 frames (cheap), shifted by scroll in between
     textAge = 0; textBoxes = [];
     if (!root) return;
@@ -467,9 +523,24 @@
       var x = c.x, y = c.y;
       if (kind === 'pixel') { x = Math.round(x / U) * U; y = Math.round(y / U) * U; }   // moves in steps, like an old GIF
       if (x + c.sw < 0 || x - c.sw > W || y + c.sh < 0 || y - c.sh > H) return;
-      ctx.drawImage(c.sprite, x - c.sox, y - c.soy, c.sw, c.sh);
+      ctx.globalAlpha = c.alpha; ctx.drawImage(c.sprite, x - c.sox, y - c.soy, c.sw, c.sh); ctx.globalAlpha = 1;
     });
+    fadeBehindText();
     drawWet();
+  }
+  // clouds thin out behind words (the colour stays, it just shows less there), softly: three stacked feathered rectangles
+  function fadeBehindText() {
+    if (!textBoxes.length) return;
+    var a = 1 - Math.pow(1 - textFade, 1 / 3);
+    ctx.save(); ctx.globalCompositeOperation = 'destination-out'; ctx.fillStyle = 'rgba(0,0,0,' + a + ')';
+    textBoxes.forEach(function (b) {
+      var y0 = b[1] - window.scrollY, y1 = b[3] - window.scrollY; if (y1 < -20 || y0 > H + 20 || b[2] < 0 || b[0] > W) return;
+      [14, 7, 0].forEach(function (e) {
+        var x = b[0] - e, y = y0 - e, w = b[2] - b[0] + 2 * e, h = y1 - y0 + 2 * e;
+        if (ctx.roundRect) { ctx.beginPath(); ctx.roundRect(x, y, w, h, 8 + e); ctx.fill(); } else ctx.fillRect(x, y, w, h);
+      });
+    });
+    ctx.restore();
   }
   function drawFall(c) {
     var ps = c.parts; if (!ps.length) return;

@@ -377,14 +377,14 @@ async def main(base):
         SKY = """() => { const c = document.querySelectorAll('canvas.hc-weather-free'), s = c[0], cs = s && getComputedStyle(s), w = window.__hcWeather || {};
           return { n: c.length, strips: document.querySelectorAll('canvas.hc-weather').length, hidden: !!s && s.getAttribute('aria-hidden') === 'true',
             pos: cs ? cs.position : null, pe: cs ? cs.pointerEvents : null, z: cs ? cs.zIndex : null, w: s ? s.width : 0, text: s ? s.textContent : '',
-            kind: w.kind, source: w.source, layout: w.layout, contrast: w.contrast, pic: s ? s.toDataURL() : '' }; }"""
+            kind: w.kind, source: w.source, layout: w.layout, contrast: w.contrast, shapes: w.shapes, alphas: w.alphas, colours: w.colours, pic: s ? s.toDataURL() : '' }; }"""
         await page.goto(base + '/short/Cheerios/?w=1'); await page.wait_for_timeout(1800)
         one = await page.evaluate(SKY)
         check('weather: a project page has one fixed sky canvas behind the blobs (aria-hidden, no pointer events, no text) and no old strip',
               one['n'] == 1 and one['strips'] == 0 and one['hidden'] and one['pos'] == 'fixed' and one['pe'] == 'none' and one['z'] == '-1' and one['w'] > 0 and not one['text'],
               str({k: v for k, v in one.items() if k != 'pic'}))
-        check('weather: kind comes from the colour table (Cheerios is loud: rain), clouds keep plum text at 5:1',
-              one['kind'] == 'rain' and one['source'] == 'table' and one['contrast']['body'] >= 5 and one['contrast']['belly'] >= 4.5, f"{one['kind']} {one['source']} {one['contrast']}")
+        check('weather: kind comes from the colour table (Cheerios is loud: rain), clouds fade behind text so plum text keeps 5:1 (colour kept), each cloud has its own template (no template+mirror twice) and opacity',
+              one['kind'] == 'rain' and one['source'] == 'table' and one['contrast']['worst'] >= 5 and one['contrast']['fade'] <= 0.9 and len(set(one['shapes'])) == len(one['shapes']) > 3 and len(set(x.split('-')[0] for x in one['shapes'])) == len(one['shapes']) and min(one['alphas']) >= 0.45 and max(one['alphas']) <= 0.95 and max(one['alphas']) - min(one['alphas']) > 0.15 and len(set(one['colours'])) == len(one['colours']), f"{one['kind']} {one['source']} {one['contrast']} {one['shapes']} {one['alphas']}")
         await page.wait_for_timeout(900); later = await page.evaluate(SKY)
         check('weather: a still picture with reduced motion', later['pic'] == one['pic'])
         await page.goto(base + '/short/Cheerios/?w=2'); await page.wait_for_timeout(1800)

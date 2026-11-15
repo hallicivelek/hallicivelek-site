@@ -827,4 +827,4 @@
     spots: function () { return blobs.filter(function (b) { return b.state === 'float'; }).map(function (b) { return [b.x, viewY(b), b.d]; }); }
   };
 })();
-window.__hcBuild = "2026-11-15 22:44";
+window.__hcBuild = "2026-11-15 23:55";

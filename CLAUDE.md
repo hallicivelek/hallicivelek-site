@@ -107,8 +107,12 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   `~/Documents/hallicivelek.com/mockups/weather-free/`): on project pages only, clouds drift right to left in one fixed
   full-page canvas right behind the blob layer (z-index -1, aria-hidden, no pointer events). Kind from the colour table
   below: year before 2005 = pixel clouds, pale + cold colours = snow, loudness > 1 = rain, else calm; missing = gentle
-  calm default; seeded by address. Rain/snow falls only from clouds and fades behind text; cloud colours are lightened
-  until plum text keeps 5:1. Every frame it sends the falling columns to `window.hcBlobs.keepOut(...)` and hc-blobs makes
+  calm default; seeded by address. Rain/snow falls only from clouds and fades behind text; cloud colours mix the table's sky/sky2/accent (not `light`, which is
+  near-white for most projects); clouds fade behind text boxes just enough that plum text keeps 5:1 (`fadeBehindText`,
+  `__hcWeather.contrast`). Shapes: 10 hand-designed circles-only templates (wisp, duo, small3, classic4, leaning4,
+  long5low, tall3, tower, wide6, bank7), varied by mirror, scale, stretch, colour and per-cloud opacity 0.45–0.95; no
+  template repeats on a page until all are used. Pixel clouds rasterise the same templates. Sheet: `shots/cloud_sheet.py`
+  in the blob-site-umbrella copy (not in the repo). Every frame it sends the falling columns to `window.hcBlobs.keepOut(...)` and hc-blobs makes
   its blobs step aside (`hcBlobs.dodged()` for tests). Still with reduced motion, freezes with "pause blobs", stops while
   the tab is hidden, off in 1999 mode; measures its area every frame. `window.__hcWeather` shows what it decided
   (`variant: 'free'`). Sets `__hcWeatherOn` and removes any `canvas.hc-weather`, so there is only ever one weather.
