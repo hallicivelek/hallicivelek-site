@@ -556,6 +556,7 @@
   var root = document.documentElement;
   root.classList.add('hc-instant', 'hc-tinted');
   root.style.setProperty('--hc-bg', CFG.background);
+  root.classList.toggle('hc-blobs-paused', paused);              // for other add-ons (hc-strata) that also go still
   requestAnimationFrame(function () { requestAnimationFrame(function () { root.classList.remove('hc-instant'); }); });
   function tint(hex) {
     var n = parseInt(hex.slice(1), 16), c = [n >> 16, (n >> 8) & 255, n & 255];
@@ -927,6 +928,7 @@
       if (b.face) { b.face.blink = 0; lookAround(b, 0); }
     });
     try { localStorage.setItem('hc-blobs-paused', paused ? '1' : '0'); } catch (e) {}
+    root.classList.toggle('hc-blobs-paused', paused);
     drawButton();
   }
   btn.addEventListener('click', function () { setPaused(!paused); });

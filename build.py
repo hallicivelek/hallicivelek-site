@@ -4,9 +4,10 @@ Long version (everything inline): paste dist/custom-html.html over the whole of 
 import re, shutil, subprocess, sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent / 'tools'))
-import build_facts, build_pond_module, build_custom_html, build_scripts
+import build_facts, build_pond_module, build_custom_html, build_scripts, build_weather
 
 build_facts.build()
+build_weather.build()
 build_pond_module.build()
 build_custom_html.build()
 build_scripts.build()

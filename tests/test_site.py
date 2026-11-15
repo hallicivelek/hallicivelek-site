@@ -244,6 +244,33 @@ async def main(base):
         check('no script errors (90s sorts and 1999 mode)', not errs, '; '.join(errs)[:300])
         await page.close()
 
+        # ---- strata: the layered background behind the front page grid ----
+        page = await b.new_page(viewport={'width': 1300, 'height': 760}); errs = []
+        page.on('pageerror', lambda e: errs.append(str(e)))
+        LAYER = """(() => { const s = document.querySelector('.hc-strata'); if (!s) return null; const c = getComputedStyle(s);
+          return [c.display, s.getAttribute('aria-hidden'), c.pointerEvents, c.zIndex, s.querySelectorAll('.hc-strata-band').length]; })()"""
+        TY = "(() => { const m = getComputedStyle(document.querySelector('.hc-strata-col')).transform; return m === 'none' ? 0 : Math.round(+m.split(',')[5].slice(0, -1)); })()"
+        await page.goto(base + '/?strata=1'); await page.wait_for_timeout(1500)
+        st = await page.evaluate(LAYER)
+        check('strata: layers behind the front page grid, aria-hidden, no pointer events, below the blobs', st == ['block', 'true', 'none', '-2', 4], str(st))
+        await page.evaluate('scrollTo(0, 400)'); await page.wait_for_timeout(300)
+        moving = [await page.evaluate(TY), await page.evaluate('__hcStrata.info().r')]
+        await page.click('button.hc-pause'); await page.wait_for_timeout(300)
+        still = [await page.evaluate(TY), await page.evaluate('__hcStrata.info().r'), await page.evaluate("document.documentElement.classList.contains('hc-blobs-paused')")]
+        check('strata: moves slower than the page; "pause blobs" makes it still without a jump', moving[1] == 0.8 and moving[0] < 0 and still == [moving[0], 1, True], f'{moving} -> {still}')
+        await page.evaluate("__hcRetro.set('ns')"); await page.wait_for_timeout(300)
+        ns = await page.evaluate(LAYER)
+        await page.evaluate("__hcRetro.set('off')"); await page.wait_for_timeout(300)
+        off = await page.evaluate(LAYER)
+        check('strata: gone in 1999 mode, back when it goes off', ns is not None and ns[0] == 'none' and off is not None and off[0] == 'block', f'{ns} / {off}')
+        await page.goto(base + '/short/info-contact/'); await page.wait_for_timeout(1200)
+        other = await page.evaluate(LAYER)
+        await page.goto(base + '/short/filter/artdirection/'); await page.wait_for_timeout(1200)
+        tag = await page.evaluate(LAYER)
+        check('strata: not on another page, nor on a tag page', other is None and tag is None, f'{other} / {tag}')
+        check('no script errors (strata)', not errs, '; '.join(errs)[:300])
+        await page.close()
+
         # ---- music: everything on one page, mixes play in place ----
         page = await b.new_page(viewport={'width': 1300, 'height': 900}); errs = []
         page.on('pageerror', lambda e: errs.append(str(e)))
@@ -341,6 +368,31 @@ async def main(base):
         check('project page: ordinary pages are left alone', await page.evaluate("!document.getElementById('hc-pj')"))
         check('no script errors (project pages)', not errs, '; '.join(errs)[:300])
         await page.close()
+
+        # ---- project weather: one strip of sky under the opening line, on project pages only ----
+        ctx = await b.new_context(viewport={'width': 1300, 'height': 900}, reduced_motion='reduce')
+        page = await ctx.new_page(); errs = []
+        page.on('pageerror', lambda e: errs.append(str(e)))
+        STRIP = """() => { const c = document.querySelectorAll('canvas.hc-weather'), s = c[0];
+          return { n: c.length, afterLede: !!s && !!s.previousElementSibling && s.previousElementSibling.classList.contains('hc-pj-lede'),
+            hidden: !!s && s.getAttribute('aria-hidden') === 'true', pos: s ? getComputedStyle(s).position : null, pe: s ? getComputedStyle(s).pointerEvents : null,
+            w: s ? s.width : 0, text: s ? s.textContent : '', sig: (window.__hcWeather || {}).sig, kind: (window.__hcWeather || {}).kind, pic: s ? s.toDataURL() : '' }; }"""
+        await page.goto(base + '/short/Cheerios/?w=1'); await page.wait_for_timeout(1800)
+        one = await page.evaluate(STRIP)
+        check('weather: a project page has exactly one strip, right under the opening line, aria-hidden, static, no pointer events',
+              one['n'] == 1 and one['afterLede'] and one['hidden'] and one['pos'] == 'static' and one['pe'] == 'none' and one['w'] > 0 and not one['text'],
+              str({k: v for k, v in one.items() if k != 'pic'}))
+        await page.evaluate("document.querySelector('canvas.hc-weather').remove()"); await page.wait_for_timeout(300)   # Cargo rebuilding the layout
+        back = await page.evaluate("document.querySelectorAll('canvas.hc-weather').length")
+        await page.wait_for_timeout(800); later = await page.evaluate(STRIP)
+        check('weather: the strip puts itself back after the page is rebuilt, and is a still picture with reduced motion', back == 1 and later['pic'] == one['pic'], f'{back} strip(s)')
+        await page.goto(base + '/short/Cheerios/?w=2'); await page.wait_for_timeout(1800)
+        two = await page.evaluate(STRIP)
+        check('weather: the same project gives the same weather twice', two['n'] == 1 and two['sig'] == one['sig'] and two['pic'] == one['pic'] and two['kind'] == one['kind'], f"{one['kind']} {one['sig']} / {two['kind']} {two['sig']}")
+        await page.goto(base + '/short/info-contact/?w=3'); await page.wait_for_timeout(1200)
+        check('weather: a page that is not a project has no strip', await page.evaluate("document.querySelectorAll('canvas.hc-weather').length") == 0)
+        check('no script errors (weather)', not errs, '; '.join(errs)[:300])
+        await ctx.close()
 
         # ---- playthings: four cards over Cargo's fallback, the pond card in preview mode ----
         page = await b.new_page(viewport={'width': 1300, 'height': 900}); errs = []
@@ -456,6 +508,7 @@ if __name__ == '__main__':
     for i, f in enumerate(PASTE):
         html = PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', f.read_text().replace('\n', '<br>')).replace('</div></div>\n<script>', '</div>' + GRID + '</div>\n<script>', 1)
         (site / 'paste' / str(i) / 'Cheerios').mkdir(parents=True); (site / 'paste' / str(i) / 'Cheerios' / 'index.html').write_text(html)
+    (site / 'index.html').write_text(PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID))   # the front page (strata)
     (site / 'px.png').write_bytes(png(120, 90))
     (site / 'halli_apparat_fold_stort.jpg').write_bytes(png(45, 94))
     (site / 'assets' / 'apparat').mkdir(parents=True)

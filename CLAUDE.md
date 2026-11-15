@@ -32,7 +32,7 @@ Everything reaches the live site through Cargo's **Custom HTML** setting. Two wa
 ## Build and test
 ```
 python3 build.py              # src/ → dist/hc-columns.html, dist/hc-pond.html, dist/custom-html.html; syntax-checks every script
-python3 tests/test_site.py    # 72 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, phone)
+python3 tests/test_site.py    # 82 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, phone)
 ```
 Tests need `python3 -m pip install --user playwright` (this Mac has no bare `pip`) and `python3 -m playwright install chromium`.
 The build was verified to reproduce the installed files byte-for-byte when this project was set up.
@@ -88,6 +88,29 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   `<style data-hc-stylecheck>` right after Cargo's link; up to 3 tries. `window.__hcStyleCheck` shows what it did.
   Loaded by hc-pond.js (no paste). Tested on the real site in Firefox, Chromium and WebKit with the first
   /stylesheet answer emptied (2026-11-09).
+- `src/hc-strata.html` — **strata**: behind the front page grid (address `/` only; not on /filter/ tag pages, which
+  are too short) the background changes with depth: pink paper with grain, the ghost of a 1998 layout table, Netscape
+  grey, dial-up line noise (dropped scanlines, pixel bursts, faint `ATDT` / `NO CARRIER`) around the award. One fixed
+  aria-hidden layer at z-index -2 (under the blobs), moving at 0.8 of the page via a CSS scroll-driven animation
+  (keyframes rewritten when the page changes size; `?hc-strata=js` forces the scroll-handler fallback). Still (moves
+  with the page) with reduced motion or `html.hc-blobs-paused` (set by hc-blobs); switching keeps it in place. Cargo's
+  fixed header gets a grey `::before` overlay matching the depth; the award's teal links go darker (5.3:1 on the grey).
+  Off in 1999 mode. Loaded by hc-pond.js (no paste). Screenshots against the live site: `mockups/strata/build/shot.py`.
+- `src/hc-weather.html` — **project weather**: on every project page one small canvas of sky right under the opening
+  line (after the `h1` if there is none), drawn from the project's first picture: calm colours = slow clouds and a low
+  sun, loudness > 1 = a light storm with rain and the odd bolt, year before 2005 = dithered low-res sky with pixel clouds
+  (no year = never pixel). Seeded from the address, so the same project always gets the same sky. Blobs drifting
+  through: clouds lean away, a blob keeps rain off, pixel clouds hop. Still with reduced motion, follows "pause blobs"
+  (localStorage `hc-blobs-paused`), stops off screen. Forced `position: static` (Cargo makes project-page canvases
+  absolute); a MutationObserver puts it back when Cargo rebuilds the layout (Pedro Pilatus) or changes page.
+  `window.__hcWeather` shows what it decided; `window.hcProjectColours.get(address)` is the shared table lookup.
+  Loaded by hc-pond.js (no paste). **Colour table** `src/weather.txt` (one line per project: address, year, loudness,
+  four colours, a note on where the year came from): Cargo's image host has no CORS, so colours are read at build time.
+  Refresh with `python3 tools/build_weather.py --refresh` (Playwright; new projects, new pictures). A refresh keeps the
+  years already in the file, so **correct a year by hand there**; `--refresh --years` works them all out again.
+  Years: Cargo's `date`, a year in the title, or a dated year in the text ("…, 1999."). `tools/build_weather.py`
+  puts the table into `dist/hc-weather.html` (run by build.py; refuses a line it can't read). A project missing from
+  the table gets a gentle default sky. Screenshots: `~/Documents/hallicivelek.com/mockups/weather/build/` (its `shot.py`).
 - `src/hc-debug.html` — screen measurements overlay, **only with `?hc-debug`** in the address (for diagnosing phones).
 - `src/parts/before.html`, `src/parts/after.html` — **Halli's own** Custom HTML (Cargo filter script, StatCounter,
   Typekit link that loads the site font Pacaembu; mobile menu fixes). Keep as he gives them.

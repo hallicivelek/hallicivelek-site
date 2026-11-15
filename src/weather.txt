@@ -1,0 +1,99 @@
+# Project weather: one line per project, by project address (made by tools/build_weather.py --refresh).
+#   address  year  loudness  sky  sky2  accent  light   # where the year came from
+# year: 4 digits, or - for unknown. Correct it by hand if it is wrong; a refresh keeps it. Before 2005 = pixel sky.
+# loudness: how loud the first picture's colours are (above 1.00 = storm). Colours are #rrggbb from that picture.
+# A project missing here gets a gentle default sky.
+Troskahjalp-the-art-calendar  2022  0.40  #d0ad70  #b0704e  #d3ac53  #fefefe   # text "…first change I made, in 2022,"
+Retro-Stefson-Retro-Stefson  2012  0.76  #7753a6  #074d51  #0cb0b1  #fefefe   # text "…on's self-titled album, 2012."
+Cheerios  -  1.62  #fcef03  #f7ec93  #fcef03  #fcef03   # no year found
+FM-Belfast-how-to-make-friends  2008  0.88  #6a72ab  #d6e9b1  #f52a19  #fbe6b8   # text "…m, How to Make Friends, 2008."
+The-Mouse-Wrestler  -  0.26  #487391  #1b272c  #5d99c4  #fcfcfc   # no year found
+Retro-Stefson-Kimbabwe  2010  0.87  #4b97b4  #0e7190  #0e7190  #fafafa   # text "…second album, Kimbabwe, 2010."
+Sesar-A-Gerdutadsjalfur-Doityourself  -  0.06  #cfcfcf  #8e8e8e  #fefefe  #fefefe   # no year found
+Rimnamin  2002  0.68  #cee8f7  #90cce9  #fbcb04  #fdeeb4   # text "…ic hip hop compilation, 2002."
+Apparat-Organ-Quartet-Romantika  2004  0.70  #d7c8b3  #e9cd11  #e9cd11  #fcf4e3   # text "…he FÍT design awards in 2004,"
+Millilending  2019  0.29  #ccccd8  #6b706c  #4fb3e7  #fdfdfd   # text "…but novel, Milllending, 2019."
+Herbergi-i-odrum-heimi  -  0.16  #b7655a  #d4d3d1  #b45b4f  #fcfcfc   # no year found
+Blue-walker  -  0.27  #1ec6e5  #d0f1f7  #1ec6e5  #feffff   # no year found
+Retro-Stefson-visual-identity  2005  0.00  #000000  #000000  #000000  #000000   # text "…om a t-shirt drawing in 2005"
+Sesar-A-Stormurinn-a-eftir-logninu  2001  0.96  #d44815  #b0948c  #e74816  #fbfafa   # text "…hop album in Icelandic, 2001."
+Fastland-soccer-uniform  2004  0.78  #fdf002  #01adef  #fdf002  #fefefe   # text "…design house (RIP)) in 2004."
+Smite-The-World  2018  0.09  #d1d1d1  #909090  #fcfcfc  #fcfcfc   # text "…t the FIFA World Cup in 2018,"
+Liggikrutt  -  0.07  #acb6c7  #d6dbe3  #687a98  #fefefe   # no year found
+Fluffyhead  -  0.73  #90d8f7  #27aae0  #27aae0  #fafcfe   # no year found
+Retro-Stefson-Montana  2008  0.58  #6eadcf  #5077b8  #5077b8  #f0f6f9   # text "…s debut album, Montaña, 2008."
+Halli-lettering  -  1.84  #f5cb45  #ebd08c  #2cb7eb  #f6f6f0   # no year found
+Pungstoppuslayer  -  0.04  #ccd0d5  #9ba5b3  #8e98a8  #fdfdfd   # no year found
+Retro-Stefson-Qween  -  0.15  #2e2b2a  #524e4c  #e8e2df  #fdfdfd   # no year found
+Uppskriftabok-skaldverk  -  0.14  #d3cecb  #231b15  #6d645d  #f7f4f2   # no year found
+Fran-Lebowitz  -  1.90  #dda31d  #124464  #1fa2ed  #fdfdfd   # no year found
+Blomakona  -  0.46  #f6b4f5  #b2b0e8  #5294e5  #f8caf7   # no year found
+Magse-Maximum-Weights-vol-1  1999  1.13  #018990  #2a0706  #016cb2  #f8f7f8   # text "…Maximum Weights Vol. 1, 1999."
+Adventure-Girl  -  0.34  #ced2d0  #f1b731  #1da1f8  #fefefe   # no year found
+Joker-Classique  -  0.98  #f5da71  #2aab2c  #e9b651  #f5da71   # no year found
+Cat-family  -  0.12  #d1d2d2  #94aac9  #2d56ad  #f2f2ee   # no year found
+hairtower  -  0.29  #4f96e5  #b0cee7  #4f96e5  #fefefe   # no year found
+Sitjikall  -  0.04  #c9cfd9  #8c9ab0  #7888a3  #fefefe   # no year found
+Bluefluffy  -  1.36  #2aafe8  #1a526e  #2aafe8  #f8f9f9   # no year found
+Skokkikona  -  0.17  #c5d76c  #ced3d4  #c5d76c  #fdfdfd   # no year found
+Krjupandi-blomakona  -  0.16  #eecbd8  #96afc6  #4c7caa  #fdfdfd   # no year found
+Tyrole-and-the-crew  -  0.68  #34ace3  #16526f  #f4b538  #fafbfb   # no year found
+Boyband  -  0.13  #d6e6f2  #8bb7db  #12abea  #feffff   # no year found
+Main-Girl-1  -  0.60  #46a6ca  #58aa1a  #76c121  #ffffff   # no year found
+Adopt-this-cat  -  0.34  #ebcfaf  #ecb270  #f68b39  #fffefe   # no year found
+Blue-sinker  -  0.45  #b3e8f2  #1ec7e6  #1ec7e6  #f6f9fa   # no year found
+Icelandsmites  2016  0.11  #d1d1d1  #919191  #fdfdfd  #fdfdfd   # text "…d killed it at the Euro 2016." (only year)
+Nothing-Ekkert  2011  0.04  #d0d0d0  #979797  #fcfcfc  #fcfcfc   # text "…Real-Time Art Festival 2011" (only year)
+Grapewaves  2016  0.12  #d1d1d1  #2d2d2d  #fcfcfc  #fcfcfc   # Cargo date "November 2016"
+The-Future-Selfie  -  0.08  #d2d2d2  #929292  #fbfbfb  #fbfbfb   # no year found
+Pumpkinator  2008  0.94  #fd8d02  #fee9d3  #fd7301  #fffefd   # text "…ition Halloween Qee for 2008"
+Beardgrumphead  -  0.29  #fad6ca  #f9ad93  #37bdea  #fefefe   # no year found
+Things  -  2.10  #2daae4  #71c5ec  #2daae4  #cbeaf8   # no year found
+Blue-lady-1  -  0.58  #27c8e7  #cff2f9  #1fc7e6  #feffff   # no year found
+Selfie-1  -  0.52  #e8d4a6  #70ad9a  #380670  #e8d4a6   # no year found
+Fartrunner  -  0.27  #2e4f78  #f0cbd7  #da7796  #fdfcfd   # no year found
+Presidential-Election  -  0.05  #d0d0d0  #929292  #fbfbfb  #fbfbfb   # no year found
+Pedro-Pilatus-album-artwork  2012  1.38  #47abc7  #fcdc14  #fcdc14  #fdfdfd   # Cargo date "November 2012"
+Beardmen  -  1.02  #89c53f  #d3dd25  #d3dd25  #fffffe   # no year found
+Toasterman-On-The-Move  -  0.04  #e1c9dd  #c897c5  #c897c5  #fdfcfd   # no year found
+Swimbert-1  -  0.39  #49a4bc  #32758e  #4fabc2  #fefefe   # no year found
+Strollin-Into-The-Club-Like  -  0.11  #cdd8f6  #6c8ee7  #5e84e5  #fefeff   # no year found
+Charles-1  -  0.56  #d0dea7  #35668f  #a46e30  #93d2ef   # no year found
+Greek  -  0.38  #0976a9  #6db4d0  #0976a9  #fffeff   # no year found
+Halli-with-a-helmet-on  -  0.27  #6099ab  #89dafe  #89dafe  #9ce0fe   # no year found
+some-finger-drawings  -  1.60  #d1342d  #e5908b  #d1342d  #fefcfc   # no year found
+Healthy-Problems-1  -  0.75  #28609f  #91acc9  #275fa0  #fefefe   # no year found
+Firehair-1  -  0.46  #f0ab9f  #b08b93  #f0ab9f  #f9f8f9   # no year found
+Apparat-Organ-Quartet  2000  0.00  #121212  #121212  #121212  #121212   # text "…Apparat Organ Quartet, 2000."
+I-LOuVrE-U  -  1.02  #853101  #94496c  #853101  #fefefe   # no year found
+Man-With-Horns-aka-Horny-Hombre  -  0.75  #abd9fe  #3c669c  #3c83b5  #abd9fe   # no year found
+The-Lyrebird  2005  1.80  #8bb300  #f89cf0  #a3d505  #f89cf0   # text "…&Technology at Parsons, 2005"
+Purrrtay  -  0.58  #f39835  #b3694c  #f39835  #fffefe   # no year found
+sharkknife  -  1.53  #50dcff  #2b798d  #50dcff  #ffffff   # no year found
+Automysophobia  2012  0.52  #5bc4f2  #566789  #5bc4f2  #fdfefe   # Cargo date "March 2012"
+Phuture-Joga  -  0.26  #ecb4f8  #6e74b3  #315091  #feffff   # no year found
+DesignMarch  2013  0.14  #cfe9f6  #92d0ee  #7ac5eb  #fdfdfe   # Cargo date "February 2013"
+Kronan  2003  2.44  #ffe300  #f09798  #ffe300  #ffe300   # text "…or Krónan supermarkets, 2003."
+Unicef-Christmas-Card  -  1.51  #096a91  #4f92b5  #e8cf05  #ece7e6   # no year found
+I-barnastardum  -  0.40  #8a268f  #3b8fa9  #d7c503  #eaeaea   # no year found
+Breakbeat  2006  0.39  #94b085  #9dd0e3  #ad2f27  #fefefe   # text "…thly drum'n'bass night, 2006."
+Snake-shelf  -  0.53  #05a330  #89ced9  #05a330  #fdfefd   # no year found
+Santa-Ogre  -  1.14  #2db0e2  #cfebf6  #1ba9df  #eff7fb   # no year found
+6-train-head  -  1.90  #8f542e  #34bb01  #00a2ca  #f88181   # no year found
+Ornament-Boy  -  1.73  #c49051  #66d6e6  #ff9a01  #ff9a01   # no year found
+Rejected-Tortilla-Lord  -  1.40  #f3e879  #91cc01  #91cc01  #f3e879   # no year found
+The-Flash-Game  2006  0.62  #99ccf1  #6e8913  #41cc03  #99ccf1   # Cargo date "2006"
+Morkinskinka  2011  1.81  #019dd3  #026c90  #04a1d8  #f2f8f8   # text "…}    Made with Flash in 2011"
+Idea-for-a-fireworks-company-Fuse  -  0.04  #d1d1d1  #919091  #c0bebf  #fefefe   # no year found
+Italo-Disco-Opal  -  0.95  #48afe2  #b19587  #eb3d1f  #f9fafa   # no year found
+A-Mix-of-Oddities-and-Rarities  -  1.22  #f6c53a  #f87648  #f6c53a  #fcfcfb   # no year found
+Hotplay-from-Europe-Minimix  2008  0.14  #2d2d2f  #264a73  #2e588a  #a7a6a8   # text "…Europe)  - Minimix #1  (2008)"
+Italo-mix-2007  2007  0.85  #6d4e2e  #56b0c6  #2fcfe7  #2fcfe7   # title
+Italo-Rider-mix  2007  1.66  #d68a4a  #2d4f0f  #cb2a13  #f0ab68   # text "…i Civelek  Italo Rider (2007)"
+Hey  -  0.15  #ced7c7  #938e8b  #442f3e  #ced7c7   # no year found
+Idea-Shoelaces  2012  0.07  #2e2e2e  #535353  #fefefe  #fefefe   # Cargo date "November 2012"
+Idea-Remembering-Measure-Tape  2009  0.07  #2e2e2e  #535353  #fefefe  #fefefe   # Cargo date "June 2009"
+Best-GIF-I-ve-ever-made-2006  2006  0.20  #d7cdb1  #d6e6ee  #896911  #fdfefe   # title
+The-Office-Chair  -  0.21  #95908b  #2e2d2e  #a28d7b  #e7e7e6   # no year found
+Fletcher  -  0.20  #bce2ed  #f6cfcc  #7bc6d2  #fefefe   # no year found
+Duckrador  -  0.23  #fbe1b1  #231f20  #efcd94  #fcfcfc   # no year found
