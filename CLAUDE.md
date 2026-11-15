@@ -32,7 +32,7 @@ Everything reaches the live site through Cargo's **Custom HTML** setting. Two wa
 ## Build and test
 ```
 python3 build.py              # src/ → dist/hc-columns.html, dist/hc-pond.html, dist/custom-html.html; syntax-checks every script
-python3 tests/test_site.py    # 82 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, phone)
+python3 tests/test_site.py    # 105 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, weather, umbrella, phone)
 ```
 Tests need `python3 -m pip install --user playwright` (this Mac has no bare `pip`) and `python3 -m playwright install chromium`.
 The build was verified to reproduce the installed files byte-for-byte when this project was set up.
@@ -103,7 +103,30 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   with the page) with reduced motion or `html.hc-blobs-paused` (set by hc-blobs); switching keeps it in place. Cargo's
   fixed header gets a grey `::before` overlay matching the depth; the award's teal links go darker (5.3:1 on the grey).
   Off in 1999 mode. Loaded by hc-pond.js (no paste). Screenshots against the live site: `mockups/strata/build/shot.py`.
-- `src/hc-weather.html` — **project weather**: on every project page one small canvas of sky right under the opening
+- `src/hc-weather-free.html` — **project weather (free clouds)**, the one loaded since 2026-11-15 (ported from
+  `~/Documents/hallicivelek.com/mockups/weather-free/`): on project pages only, clouds drift right to left in one fixed
+  full-page canvas right behind the blob layer (z-index -1, aria-hidden, no pointer events). Kind from the colour table
+  below: year before 2005 = pixel clouds, pale + cold colours = snow, loudness > 1 = rain, else calm; missing = gentle
+  calm default; seeded by address. Rain/snow falls only from clouds and fades behind text; cloud colours are lightened
+  until plum text keeps 5:1. Every frame it sends the falling columns to `window.hcBlobs.keepOut(...)` and hc-blobs makes
+  its blobs step aside (`hcBlobs.dodged()` for tests). Still with reduced motion, freezes with "pause blobs", stops while
+  the tab is hidden, off in 1999 mode; measures its area every frame. `window.__hcWeather` shows what it decided
+  (`variant: 'free'`). Sets `__hcWeatherOn` and removes any `canvas.hc-weather`, so there is only ever one weather.
+  `tools/build_weather.py` puts the table into `dist/hc-weather-free.html`. Loaded by hc-pond.js (no paste).
+  **Blob umbrella and wet cursor (built 2026-11-15 in the `blob-site-umbrella` copy, approved by Halli; not live):**
+  rest the cursor still ~0.8 s in falling rain or snow (phone: long press ~0.6 s) and the nearest blob (not a `made`
+  one; small ones under 56px only if much nearer) glides over on a damped, speed-limited spring and hovers just above
+  it, slightly flattened; rain/snow splashes off its top. Moving out lets it go after 0.4 s (1.5 s when the weather
+  drifts away from a still cursor; at once when the finger lifts); it keeps its momentum and drifts on. Not over
+  pictures (the canvas is behind them), nor when the blob's spot above would be hidden. Wet cursor (mouse): after ~1 s
+  in rain without an umbrella, one or two drops hang under the arrow and fall off one at a time as it moves (landing on
+  a blob = tiny wobble); snow = a small white cap that melts into a drop. Phone: a drop runs down from where the finger
+  lifted in the rain. Rest of 7–14 s before the cursor gets wet again. All on the weather canvas, passive listeners,
+  nothing prevented; none while still (reduced motion / paused). hc-blobs hooks: `hcBlobs.shelter({x,y}|null)` (sent
+  every frame; stale after 0.3 s), `umbrella()`, `nudge(x, y)`. Test helpers: `__hcWeather.wetSpot()`, `isWet(x, y)`,
+  `wetCursor()`, `splashes`. Wet-cursor drops are water blue (#6fb7e6, darker edge, light glint), ~1.8x the first size; clouds drift at 60% of the first speed (rain/snow fall unchanged). hc-blobs fades a blob's face while it would sit over text (`textBoxes`/`faceOverText`), so faces never overlap words. Screenshots: `shots/shot.py` (draws a stand-in cursor/fingertip; phone 402px).
+- `src/hc-weather.html` — **retired from loading 2026-11-15** (replaced by hc-weather-free; still built to
+  `dist/hc-weather.html`, no longer in `ADDONS`; the old `dist/js/hc-weather.js` is left in place). **Project weather (strip)**: on every project page one small canvas of sky right under the opening
   line (after the `h1` if there is none), drawn from the project's first picture: calm colours = slow clouds and a low
   sun, loudness > 1 = a light storm with rain and the odd bolt, year before 2005 = dithered low-res sky with pixel clouds
   (no year = never pixel). Seeded from the address, so the same project always gets the same sky. Blobs drifting
@@ -218,6 +241,8 @@ header.css, remove "Other projects" from about me.
 The redesign looks fine on his iPhone and speed is fine. Wanton Boys Club GIF stays out for now.
 
 ## Where we left off (2026-11-04)
+- **2026-11-15:** hc-weather-free (free clouds behind the blobs) replaces the hc-weather strip in the later-add-on list;
+  95/95 tests pass. Built, **not committed or pushed**; not yet checked on the live site or a real iPhone.
 - **Waiting on Halli:** a new `?hc-debug` screenshot from his iPhone (hallicivelek.com/info-contact?hc-debug, scrolled
   to the bottom) after build `2026-11-03 22:09` reached his phone. His last screenshot still showed the blob layer
   at 714px tall, i.e. the iOS stretch had not applied: either his phone still had the old script cached (GitHub Pages

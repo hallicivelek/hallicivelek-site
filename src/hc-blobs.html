@@ -381,8 +381,25 @@
         return { el: e, cx: +e.getAttribute('cx'), cy: +e.getAttribute('cy') };
       }) };
   }
+  // a face never sits on text: it fades out while its eyes and mouth would be over words, and comes back once clear
+  var textBoxes = [], textAge = 99;
+  function readText() {
+    textAge = 0; textBoxes = [];
+    var els = document.body.querySelectorAll('h1, h2, h3, h4, p, li, a, figcaption, label, button, .hc-pj-lede, .hc-pj-label');
+    for (var i = 0; i < els.length; i++) {
+      var e = els[i]; if (e.closest('.hc-blobs') || e.querySelector('img') || !e.textContent.trim()) continue;
+      var r = e.getBoundingClientRect(); if (r.width && r.height && r.bottom > -50 && r.top < H + 50) textBoxes.push([r.left - 4, r.top - 4, r.right + 4, r.bottom + 4]);
+    }
+  }
+  function faceOverText(b) {
+    var x = b.x, y = viewY(b), R = 30;   // the face sits inside about this radius of the blob's middle
+    for (var i = 0; i < textBoxes.length; i++) { var q = textBoxes[i]; if (x + R > q[0] && x - R < q[2] && y + R > q[1] && y - R < q[3]) return true; }
+    return false;
+  }
   function lookAround(b, dt) {
     var f = b.face, tx = 0, ty = 0;
+    if (f.vis == null) f.vis = 1;
+    f.vis += ((faceOverText(b) ? 0 : 1) - f.vis) * Math.min(1, dt * 8); f.g.style.opacity = f.vis.toFixed(2);
     if (ptr) {
       var dx = ptr.x - b.x, dy = ptr.y - viewY(b), d = Math.sqrt(dx * dx + dy * dy) || 1, k = Math.min(1, d / 250);
       tx = dx / d * k; ty = dy / d * k;
@@ -582,7 +599,7 @@
     if (wasWide && W < 700) {        // started out thinking it was a desktop: trim to the phone count
       for (var i = blobs.length - 1; i >= 0 && blobs.length > CFG.countMobile; i--) {
         var b = blobs[i];
-        if (b.state !== 'float' || b.prey || b.kind === 'made' || b === babbling || b === printing || b === held) continue;
+        if (b.state !== 'float' || b.prey || b.kind === 'made' || b === babbling || b === printing || b === held || b === umb) continue;
         b.el.parentNode.removeChild(b.el); blobs.splice(i, 1);
       }
     }
@@ -620,12 +637,50 @@
     if (Math.abs(g.ox) > dodged) dodged = Math.abs(g.ox);
   }
 
+  /* ---------- a blob umbrella (hc-weather-free asks for one) ----------
+     window.hcBlobs.shelter({ x, y }) in screen px, sent every frame while someone rests the cursor (or a long press) in
+     the rain or snow; shelter(null), or nothing for 0.3 s, lets it go. The nearest floating blob (not a newborn from
+     Birth a blob, not a small one (under 56px) unless it is much nearer) glides over on a damped spring with a speed limit (never a
+     jump) and hovers just above the point, a little flattened, bobbing gently; it doesn't step aside from the rain while
+     it is the umbrella. Let go, it keeps its momentum and drifts on as before. One umbrella at a time. Nothing while
+     paused or with reduced motion. umbrella() is [x, y, d] of the umbrella blob on screen, or null. */
+  var shelterAt = null, shelterTime = -1e9, umb = null;
+  function pickUmbrella(p) {
+    var best = null, bestD = Infinity;
+    blobs.forEach(function (o) {
+      if (o.state !== 'float' || o.goTo || o.prey || o === held) return;
+      var dd = Math.hypot(o.x - p.x, viewY(o) - p.y) + (o.kind === 'made' ? 1e5 : 0) + (o.d < 56 ? 400 : 0);   // a tiny blob makes a poor umbrella
+      if (dd < bestD) { bestD = dd; best = o; }
+    });
+    return best;
+  }
+  function letGo(b) {
+    if (b.u) { b.ox = b.u.vx - b.vx * drift; b.oy = b.u.vy - b.vy * drift; }   // keeps its momentum, then eases into its own drift
+    b.u = null; b.tx = b.ty = b.grow; umb = null;
+  }
+  function chooseUmbrella(now) {   // once a frame, before the blobs move
+    var p = !paused && !reduce && now - shelterTime < 300 ? shelterAt : null;
+    if (umb && (!p || umb.state !== 'float')) letGo(umb);
+    if (p && !umb && (umb = pickUmbrella(p))) { umb.u = { vx: 0, vy: 0 }; umb.dg = null; }   // its sidestep is already in its place
+  }
+  function holdUmbrella(b, dt) {
+    var p = shelterAt, u = b.u, r = b.d / 2 * b.grow, K = 8, C = 2 * Math.sqrt(K), MAX = 420;
+    var tx = p.x + Math.sin(t * 0.9 + b.pod.ph) * 3, ty = p.y - r - 14 + Math.sin(t * 1.3 + b.pod.ang) * 2.5;
+    u.vx += ((tx - b.x) * K - u.vx * C) * dt; u.vy += ((ty - viewY(b)) * K - u.vy * C) * dt;
+    var sp = Math.hypot(u.vx, u.vy); if (sp > MAX) { u.vx *= MAX / sp; u.vy *= MAX / sp; }
+    b.x += u.vx * dt; b.y += u.vy * dt; b.ox = b.oy = 0;
+    b.tx = b.grow * 1.06; b.ty = b.grow * 0.94;                   // a little flatter, like an umbrella
+    b.rot += b.vr * drift * dt * 0.3;
+  }
+
   /* ---------- animation loop ---------- */
   var last = performance.now(), t = 0;
   function frame(now) {
     var dt = Math.min((now - last) / 1000, 0.05);
     fitToScreen();
     last = now; t += paused ? 0 : dt * drift;                    // paused: shapes stop changing
+    chooseUmbrella(now);
+    if (++textAge > 8) readText();
     curious = !paused && CFG.curiousAfter > 0 && !!ptr && now - lastMove > CFG.curiousAfter * 1000;
     if (curious) {
       // gathered blobs nudge each other apart rather than piling on top of one another
@@ -661,6 +716,8 @@
         var gk = Math.min(1, dt * 1.6);
         b.x += (b.goTo[0] - b.x) * gk; b.y += (b.goTo[1] + scrollY * dep(b) - b.y) * gk;
         if (Math.hypot(b.goTo[0] - b.x, b.goTo[1] + scrollY * dep(b) - b.y) < 0.5) b.goTo = null;
+      } else if (b === umb && b.state === 'float') {               // the umbrella (only ever set while not paused)
+        holdUmbrella(b, dt);
       } else if (b.state === 'float' && !paused) {                // paused: no drifting, dodging or gathering
         if (b.kind === 'shy' && ptr) {
           var dx = b.x - ptr.x, dy = viewY(b) - ptr.y, dist = Math.sqrt(dx * dx + dy * dy) || 1, reach = radius(b) + 70;
@@ -732,7 +789,9 @@
   /* ---------- newborn blobs (from hc-birth-a-blob) ----------
      window.hcBlobs.adopt({ color, d (px), waves, pod, wob, ink (SVG markup in the -60..60 box), at: [x, y, k], goTo: [x, y] })
      adds a blob to this layer. It lives as long as the page does (Cargo changes pages without reloading).
-     Also: paused(), spots() ([x, y, d] of each floating blob on screen), keepOut(list) and dodged() (see "stepping aside"). */
+     Also: paused(), spots() ([x, y, d] of each floating blob on screen), keepOut(list) and dodged() (see "stepping aside"),
+     shelter(point) and umbrella() (see "a blob umbrella"), nudge(x, y): a tiny wobble for the floating blob at that
+     screen point, if there is one (a drop falling off the wet cursor lands on it); true if it found one. */
   var born = 0;
   window.hcBlobs = {
     paused: function () { return paused; },
@@ -760,6 +819,12 @@
     },
     keepOut: function (list) { keepOut = list || []; keepOutAt = performance.now(); },
     dodged: function () { return Math.round(dodged); },   // the furthest any blob has stepped aside (px), for the tests
+    shelter: function (p) { shelterAt = p ? { x: +p.x, y: +p.y } : null; shelterTime = performance.now(); return window.hcBlobs.umbrella(); },
+    umbrella: function () { return umb ? [umb.x, viewY(umb), umb.d * umb.grow, umb.kind] : null; },
+    nudge: function (x, y) {
+      var b = !paused && !reduce && hit(x, y); if (!b) return false;
+      b.svx += 0.5; b.svy -= 0.65; return true;                  // the same springy scale a tap uses, much smaller
+    },
     spots: function () { return blobs.filter(function (b) { return b.state === 'float'; }).map(function (b) { return [b.x, viewY(b), b.d]; }); }
   };
 })();

@@ -264,4 +264,4 @@
   document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href]')) setTimeout(look, 50); }, true);
   look();
 })();
-window.__hcBuild = "2026-11-15 21:21";
+window.__hcBuild = "2026-11-15 22:44";

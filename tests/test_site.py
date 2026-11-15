@@ -370,29 +370,157 @@ async def main(base):
         check('no script errors (project pages)', not errs, '; '.join(errs)[:300])
         await page.close()
 
-        # ---- project weather: one strip of sky under the opening line, on project pages only ----
+        # ---- project weather (hc-weather-free): clouds in a fixed background canvas, on project pages only ----
         ctx = await b.new_context(viewport={'width': 1300, 'height': 900}, reduced_motion='reduce')
         page = await ctx.new_page(); errs = []
         page.on('pageerror', lambda e: errs.append(str(e)))
-        STRIP = """() => { const c = document.querySelectorAll('canvas.hc-weather'), s = c[0];
-          return { n: c.length, afterLede: !!s && !!s.previousElementSibling && s.previousElementSibling.classList.contains('hc-pj-lede'),
-            hidden: !!s && s.getAttribute('aria-hidden') === 'true', pos: s ? getComputedStyle(s).position : null, pe: s ? getComputedStyle(s).pointerEvents : null,
-            w: s ? s.width : 0, text: s ? s.textContent : '', sig: (window.__hcWeather || {}).sig, kind: (window.__hcWeather || {}).kind, pic: s ? s.toDataURL() : '' }; }"""
+        SKY = """() => { const c = document.querySelectorAll('canvas.hc-weather-free'), s = c[0], cs = s && getComputedStyle(s), w = window.__hcWeather || {};
+          return { n: c.length, strips: document.querySelectorAll('canvas.hc-weather').length, hidden: !!s && s.getAttribute('aria-hidden') === 'true',
+            pos: cs ? cs.position : null, pe: cs ? cs.pointerEvents : null, z: cs ? cs.zIndex : null, w: s ? s.width : 0, text: s ? s.textContent : '',
+            kind: w.kind, source: w.source, layout: w.layout, contrast: w.contrast, pic: s ? s.toDataURL() : '' }; }"""
         await page.goto(base + '/short/Cheerios/?w=1'); await page.wait_for_timeout(1800)
-        one = await page.evaluate(STRIP)
-        check('weather: a project page has exactly one strip, right under the opening line, aria-hidden, static, no pointer events',
-              one['n'] == 1 and one['afterLede'] and one['hidden'] and one['pos'] == 'static' and one['pe'] == 'none' and one['w'] > 0 and not one['text'],
+        one = await page.evaluate(SKY)
+        check('weather: a project page has one fixed sky canvas behind the blobs (aria-hidden, no pointer events, no text) and no old strip',
+              one['n'] == 1 and one['strips'] == 0 and one['hidden'] and one['pos'] == 'fixed' and one['pe'] == 'none' and one['z'] == '-1' and one['w'] > 0 and not one['text'],
               str({k: v for k, v in one.items() if k != 'pic'}))
-        await page.evaluate("document.querySelector('canvas.hc-weather').remove()"); await page.wait_for_timeout(300)   # Cargo rebuilding the layout
-        back = await page.evaluate("document.querySelectorAll('canvas.hc-weather').length")
-        await page.wait_for_timeout(800); later = await page.evaluate(STRIP)
-        check('weather: the strip puts itself back after the page is rebuilt, and is a still picture with reduced motion', back == 1 and later['pic'] == one['pic'], f'{back} strip(s)')
+        check('weather: kind comes from the colour table (Cheerios is loud: rain), clouds keep plum text at 5:1',
+              one['kind'] == 'rain' and one['source'] == 'table' and one['contrast']['body'] >= 5 and one['contrast']['belly'] >= 4.5, f"{one['kind']} {one['source']} {one['contrast']}")
+        await page.wait_for_timeout(900); later = await page.evaluate(SKY)
+        check('weather: a still picture with reduced motion', later['pic'] == one['pic'])
         await page.goto(base + '/short/Cheerios/?w=2'); await page.wait_for_timeout(1800)
-        two = await page.evaluate(STRIP)
-        check('weather: the same project gives the same weather twice', two['n'] == 1 and two['sig'] == one['sig'] and two['pic'] == one['pic'] and two['kind'] == one['kind'], f"{one['kind']} {one['sig']} / {two['kind']} {two['sig']}")
+        two = await page.evaluate(SKY)
+        check('weather: the same project gives the same sky twice', two['n'] == 1 and two['kind'] == one['kind'] and two['layout'] == one['layout'] and bool(one['layout']), f"{one['layout']} / {two['layout']}")
         await page.goto(base + '/short/info-contact/?w=3'); await page.wait_for_timeout(1200)
-        check('weather: a page that is not a project has no strip', await page.evaluate("document.querySelectorAll('canvas.hc-weather').length") == 0)
+        check('weather: a page that is not a project has no sky', await page.evaluate("document.querySelectorAll('canvas.hc-weather-free, canvas.hc-weather').length") == 0)
+        check('no script errors (weather, reduced motion)', not errs, '; '.join(errs)[:300])
+        await ctx.close()
+        ctx = await b.new_context(viewport={'width': 1300, 'height': 900})
+        page = await ctx.new_page(); errs = []
+        page.on('pageerror', lambda e: errs.append(str(e)))
+        await page.goto(base + '/short/Cheerios/?w=4'); await page.wait_for_timeout(1500)
+        a1 = await page.evaluate(SKY); await page.wait_for_timeout(400); a2 = await page.evaluate(SKY)
+        dodge = 0
+        for _ in range(20):   # the blobs drift in and out of the rain; wait until one has stepped aside
+            dodge = await page.evaluate('window.hcBlobs.dodged()')
+            if dodge > 5: break
+            await page.wait_for_timeout(500)
+        shafts = await page.evaluate('window.__hcWeather.shafts')
+        check('weather: clouds drift and rain falls (moving picture), the blobs step aside from the falling rain',
+              a1['pic'] != a2['pic'] and shafts > 0 and dodge > 5, f'{shafts} rain columns, furthest sidestep {dodge}px')
+        await page.click('button.hc-pause'); await page.wait_for_timeout(300)
+        p1 = await page.evaluate(SKY); await page.wait_for_timeout(600); p2 = await page.evaluate(SKY)
+        await page.click('button.hc-pause'); await page.wait_for_timeout(500); p3 = await page.evaluate(SKY)
+        check('weather: "pause blobs" freezes the sky, and it moves again after', p1['pic'] == p2['pic'] and p3['pic'] != p2['pic'])
+        await page.evaluate("window.__hcRetro.set('ns')"); await page.wait_for_timeout(300)
+        off = await page.evaluate("document.querySelectorAll('canvas.hc-weather-free').length")
+        await page.evaluate("window.__hcRetro.set('off')"); await page.wait_for_timeout(300)
+        back = await page.evaluate("document.querySelectorAll('canvas.hc-weather-free').length")
+        check('weather: off in 1999 mode, back after', off == 0 and back == 1, f'{off} / {back}')
         check('no script errors (weather)', not errs, '; '.join(errs)[:300])
+        await ctx.close()
+
+        # ---- the blob umbrella and the wet cursor (hc-weather-free asks hc-blobs for shelter) ----
+        async def wet_spot(page, tries=60):   # a point in falling rain, not behind a picture (the weather can't be seen there)
+            for n in range(tries):
+                if n and n % 8 == 0: await page.evaluate(f'window.scrollTo(0, {(n // 8 % 4) * 230})')
+                s = await page.evaluate('window.__hcWeather.wetSpot && window.__hcWeather.wetSpot()')
+                if s: return s
+                await page.wait_for_timeout(300)
+            return None
+        async def umbrella_over(page, s, secs=7):   # positions of the umbrella blob while it comes; True once it hovers just above s
+            path = []
+            for _ in range(int(secs * 10)):
+                u = await page.evaluate('window.hcBlobs.umbrella()'); path.append(u)
+                if u and abs(u[0] - s['x']) < 14 and -6 < s['y'] - (u[1] + u[2] / 2) < 40: return True, path
+                await page.wait_for_timeout(100)
+            return False, path
+        ctx = await b.new_context(viewport={'width': 1300, 'height': 900})
+        page = await ctx.new_page(); errs = []
+        page.on('pageerror', lambda e: errs.append(str(e)))
+        page.on('console', lambda m: m.type == 'error' and errs.append('console: ' + m.text))
+        await page.goto(base + '/short/Cheerios/?u=1'); await page.wait_for_timeout(1500)
+        s = await wet_spot(page)
+        # a wet cursor: moving about in the rain (never resting) for over a second
+        wet = 0
+        if s:
+            x = s['x']
+            for i in range(16):
+                x += 7 if i % 2 else -7
+                await page.mouse.move(x, s['y']); await page.wait_for_timeout(90)
+            wet = await page.evaluate('window.__hcWeather.wetCursor()')
+            for i in range(12):   # big moves shake the drops off, one at a time
+                await page.mouse.move(s['x'] + (60 if i % 2 else -60), s['y']); await page.wait_for_timeout(60)
+            await page.wait_for_timeout(300)
+        dry = await page.evaluate('window.__hcWeather.wetCursor()')
+        check('umbrella: a wet cursor in the rain (drops cling, then fall off as it moves)', bool(s) and wet >= 1 and dry == 0, f'spot {s}, {wet} drops, then {dry}')
+        await page.mouse.move(5, 890); await page.wait_for_timeout(2000)
+        s = await wet_spot(page)
+        ok, path = False, []
+        if s:
+            await page.mouse.move(s['x'], s['y'], steps=4)
+            ok, path = await umbrella_over(page, s)
+        got = [u for u in path if u]
+        jumps = max([abs(a[0] - c[0]) + abs(a[1] - c[1]) for a, c in zip(got, got[1:])] or [0])
+        await page.wait_for_timeout(600)
+        splashes = await page.evaluate('window.__hcWeather.splashes')
+        check('umbrella: a blob comes to hover just above a cursor resting in the rain, gliding (no jumps), and the rain splashes off it',
+              ok and got and got[-1][3] != 'made' and jumps < 90 and splashes > 0, f"spot {s}, umbrella {[round(v) if isinstance(v, float) else v for v in (got[-1] if got else [])]}, biggest step in 0.1 s {round(jumps)}px, {splashes} splashes")
+        # a link right where the umbrella is still works (the canvas and blobs take no clicks, nothing is prevented)
+        link = await page.evaluate("""([x, y]) => { const a = document.createElement('a'); a.href = '#umbrella-ok'; a.textContent = 'link';
+            a.style.cssText = 'position:fixed;left:' + (x - 20) + 'px;top:' + (y - 10) + 'px;width:40px;height:20px;z-index:5;display:block';
+            document.body.appendChild(a); window.__clicked = null; addEventListener('click', e => { window.__clicked = e.defaultPrevented; });
+            return document.elementFromPoint(x, y) === a; }""", [s['x'], s['y']]) if s else False
+        if s: await page.mouse.click(s['x'], s['y']); await page.wait_for_timeout(200)
+        r = await page.evaluate("[location.hash, window.__clicked, !!window.hcBlobs.umbrella()]")
+        check('umbrella: a link under the umbrella is on top and clicks through to its address', link and r[0] == '#umbrella-ok' and r[1] is False and r[2], str([link] + r))
+        far = await page.evaluate("""([x, y]) => { for (let ty = 120; ty < innerHeight - 40; ty += 30) for (let tx = 30; tx < innerWidth - 30; tx += 30)
+            if (Math.hypot(tx - x, ty - y) > 300 && !window.__hcWeather.isWet(tx, ty)) return [tx, ty]; return null; }""", [s['x'], s['y']]) if s else None
+        gone = None
+        if far:
+            await page.mouse.move(far[0], far[1], steps=3)
+            for _ in range(30):
+                await page.wait_for_timeout(100)
+                gone = await page.evaluate("[window.hcBlobs.umbrella(), window.__hcWeather.umbrella]")
+                if gone[0] is None: break
+        check('umbrella: moving the cursor out of the weather lets the blob go', bool(far) and gone and gone[0] is None and gone[1] == 'none', f'{far} {gone}')
+        # phone: a long press in the rain, released when the finger lifts
+        await page.click('button.hc-pause'); await page.wait_for_timeout(200)
+        await page.mouse.move(s['x'] if s else 600, s['y'] if s else 400); await page.wait_for_timeout(2000)
+        r = await page.evaluate("[window.hcBlobs.umbrella(), window.__hcWeather.umbrella, window.__hcWeather.wetCursor()]")
+        await page.click('button.hc-pause')
+        check('umbrella: none while "pause blobs" is on', s and r[0] is None and r[1] == 'none' and r[2] == 0, str(r))
+        check('no script errors (umbrella, desktop)', not errs, '; '.join(errs)[:300])
+        await ctx.close()
+
+        ctx = await b.new_context(viewport={'width': 402, 'height': 874}, is_mobile=True, has_touch=True)
+        page = await ctx.new_page(); errs = []
+        page.on('pageerror', lambda e: errs.append(str(e)))
+        page.on('console', lambda m: m.type == 'error' and errs.append('console: ' + m.text))
+        await page.goto(base + '/short/Cheerios/?u=2'); await page.wait_for_timeout(1500)
+        cdp = await ctx.new_cdp_session(page)
+        s = await wet_spot(page); ok = held = False; after = 'x'
+        if s:
+            await cdp.send('Input.dispatchTouchEvent', {'type': 'touchStart', 'touchPoints': [{'x': s['x'], 'y': s['y']}]})
+            ok, path = await umbrella_over(page, s)
+            await cdp.send('Input.dispatchTouchEvent', {'type': 'touchEnd', 'touchPoints': []})
+            await page.wait_for_timeout(300)
+            after = await page.evaluate('window.hcBlobs.umbrella()')
+        check('umbrella (phone): a long press in the rain brings a blob above the finger, lifting the finger lets it go', ok and after is None, f'spot {s}, then {after}')
+        check('no script errors (umbrella, phone)', not errs, '; '.join(errs)[:300])
+        await ctx.close()
+
+        ctx = await b.new_context(viewport={'width': 1300, 'height': 900}, reduced_motion='reduce')
+        page = await ctx.new_page(); errs = []
+        page.on('pageerror', lambda e: errs.append(str(e)))
+        await page.goto(base + '/short/Cheerios/?u=3'); await page.wait_for_timeout(1500)
+        s = await page.evaluate("""() => { for (let ty = 150; ty < innerHeight - 60; ty += 20) for (let tx = 40; tx < innerWidth - 40; tx += 20)
+            if (window.__hcWeather.isWet(tx, ty)) return { x: tx, y: ty }; return null; }""")
+        if s:
+            await page.mouse.move(s['x'], s['y']); await page.wait_for_timeout(500)
+            await page.mouse.move(s['x'] + 1, s['y']); await page.wait_for_timeout(2500)
+        r = await page.evaluate("[window.hcBlobs.umbrella(), window.__hcWeather.umbrella || 'none', window.__hcWeather.wetCursor()]")
+        check('umbrella: none with reduced motion (no umbrella, no wet cursor)', s and r[0] is None and r[1] == 'none' and r[2] == 0, f'{s} {r}')
+        check('no script errors (umbrella, reduced motion)', not errs, '; '.join(errs)[:300])
         await ctx.close()
 
         # ---- playthings: five cards over Cargo's fallback, the pond card in preview mode ----

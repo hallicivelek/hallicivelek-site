@@ -2,7 +2,7 @@
 
     python3 tools/build_weather.py --refresh          # fetch every project's first picture and write src/weather.txt
     python3 tools/build_weather.py --refresh --years  # the same, but also work out every year again (drops hand edits)
-    python3 tools/build_weather.py                    # src/hc-weather.html + src/weather.txt -> dist/hc-weather.html
+    python3 tools/build_weather.py                    # src/hc-weather-free.html (+ the retired hc-weather.html) + src/weather.txt -> dist/
 
 Cargo's image host sends no CORS header, so a page can't read a picture's colours. This tool reads them instead,
 once, and keeps a small palette per project address in src/weather.txt (in the spirit of src/facts.txt).
@@ -15,6 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 TABLE = ROOT / 'src' / 'weather.txt'
 PLACEHOLDER = '/*WEATHER*/{}'
+ADDONS = ['hc-weather-free.html', 'hc-weather.html']   # both get the table put in
 API = 'https://hallicivelek.com/_api/v0/site/hallicivelek/projects?type=project&offset={}&limit=70'
 UA = {'User-Agent': 'Mozilla/5.0 (compatible; site-build)'}
 HEAD = """# Project weather: one line per project, by project address (made by tools/build_weather.py --refresh).
@@ -46,12 +47,13 @@ def build():
     rows, errors = parse(TABLE.read_text()) if TABLE.exists() else ({}, [])
     if errors:
         sys.exit('src/weather.txt:\n  ' + '\n  '.join(errors))
-    src = (ROOT / 'src' / 'hc-weather.html').read_text()
-    if PLACEHOLDER not in src:
-        sys.exit('src/hc-weather.html: weather placeholder missing')
-    (ROOT / 'dist' / 'hc-weather.html').write_text(src.replace(PLACEHOLDER, json.dumps(rows, separators=(',', ':'))))
+    for name in ADDONS:   # hc-weather-free is the one loaded; the retired strip (hc-weather) is still built, not loaded
+        src = (ROOT / 'src' / name).read_text()
+        if PLACEHOLDER not in src:
+            sys.exit(f'src/{name}: weather placeholder missing')
+        (ROOT / 'dist' / name).write_text(src.replace(PLACEHOLDER, json.dumps(rows, separators=(',', ':'))))
     old = sum(1 for r in rows.values() if r[0] and r[0] < 2005)
-    print(f'dist/hc-weather.html: {len(rows)} projects in the colour table, {old} before 2005, {sum(1 for r in rows.values() if not r[0])} without a year')
+    print(f'dist/{" + dist/".join(ADDONS)}: {len(rows)} projects in the colour table, {old} before 2005, {sum(1 for r in rows.values() if not r[0])} without a year')
 
 
 # ---------------------------------------------------------------- refresh (needs the network and Playwright)
