@@ -6,7 +6,7 @@ The stand-in mimics what matters about hallicivelek.com on Cargo:
 - deliberately clashing global styles (.caption, h1, p, button) to prove the pond is fenced
 - NO viewport tag at first; a script near the end adds it, like Cargo does on phones
 It cannot test real Cargo, real Safari, or Cargo's limit on Custom HTML size."""
-import asyncio, functools, http.server, threading, tempfile, sys, re, zlib, struct
+import asyncio, functools, http.server, threading, tempfile, sys, re, zlib, struct, os
 from pathlib import Path
 from playwright.async_api import async_playwright
 
@@ -62,6 +62,7 @@ BLOCK_RESIZE = "(function(){ const add = window.addEventListener; window.addEven
 
 results = []
 PASTE = []
+SHOTS = os.environ.get('HC_SHOTS')   # a folder: also save screenshots of birth-a-blob after a release there
 def check(name, ok, detail=''):
     results.append(ok); print(('  PASS  ' if ok else '  FAIL  ') + name + (f'  ({detail})' if detail else ''))
 
@@ -394,21 +395,25 @@ async def main(base):
         check('no script errors (weather)', not errs, '; '.join(errs)[:300])
         await ctx.close()
 
-        # ---- playthings: four cards over Cargo's fallback, the pond card in preview mode ----
+        # ---- playthings: five cards over Cargo's fallback, the pond card in preview mode ----
         page = await b.new_page(viewport={'width': 1300, 'height': 900}); errs = []
         page.on('pageerror', lambda e: errs.append(str(e)))
         await page.goto(base + '/short/playthings/'); await page.wait_for_timeout(2500)
-        r = await page.evaluate("""() => ({ cards: [...document.querySelectorAll('#hc-pt a.hc-pt-card h2')].map(h => h.firstChild.textContent),
-          intro: (document.querySelector('#hc-pt .hc-pt-intro') || {}).textContent,
+        r = await page.evaluate("""async () => ({ cards: [...document.querySelectorAll('#hc-pt a.hc-pt-card h2')].map(h => h.firstChild.textContent),
+          pencil: await new Promise(ok => { const im = document.querySelector('#hc-pt .hc-pt-win image'); if (!im) return ok(0); const i = new Image(); i.onload = () => ok(i.naturalWidth); i.onerror = () => ok(0); i.src = im.getAttribute('href'); }), intro: (document.querySelector('#hc-pt .hc-pt-intro') || {}).textContent,
           fallbackHidden: [...document.querySelectorAll('[data-hc-pt-fallback]')].every(e => getComputedStyle(e).display === 'none'),
           pondSrc: (document.querySelector('#hc-pt iframe[src*="blob-pond"]') || {}).getAttribute ? document.querySelector('#hc-pt iframe[src*="blob-pond"]').getAttribute('src') : null,
           outsideNewTab: [...document.querySelectorAll('#hc-pt a.hc-pt-card')].filter(a => /^https?:/.test(a.getAttribute('href'))).every(a => a.target === '_blank') })""")
+        if SHOTS: await page.screenshot(path=os.path.join(SHOTS, 'playthings.png'))
+        if SHOTS:
+            ph = await b.new_page(viewport={'width': 390, 'height': 844}); await ph.goto(base + '/short/playthings/'); await ph.wait_for_timeout(2500)
+            await ph.screenshot(path=os.path.join(SHOTS, 'playthings-phone.png')); await ph.close()
         hid = await page.evaluate("[...document.querySelectorAll('.thumbnails, #hc-sort')].every(e => getComputedStyle(e).display === 'none')")
         check("playthings: Cargo's project grid is hidden", hid)
-        check('playthings: four cards in order, intro, Cargo fallback hidden', r['cards'] == ['Music Kontrapunkt Kontrol', 'Shakeskin', 'The Calculater', 'The blob-pond']
+        check('playthings: five cards in order, intro, Cargo fallback hidden, the pencil loaded', r['cards'] == ['Birth-a-blob', 'Music Kontrapunkt Kontrol', 'Shakeskin', 'The Calculater', 'The blob-pond'] and (r['pencil'] or 0) > 0
               and r['intro'] == "Things I've built and kept running (some since 2004)." and r['fallbackHidden'] and r['outsideNewTab'], str(r))
-        await page.hover('#hc-pt a.hc-pt-card >> nth=2'); await page.wait_for_timeout(400)
-        bg = await page.evaluate("getComputedStyle(document.querySelectorAll('#hc-pt a.hc-pt-card')[2]).backgroundColor")
+        await page.hover('#hc-pt a.hc-pt-card >> nth=3'); await page.wait_for_timeout(400)
+        bg = await page.evaluate("getComputedStyle(document.querySelectorAll('#hc-pt a.hc-pt-card')[3]).backgroundColor")
         check("playthings: hover is 20% white, not Cargo's yellow", bg == 'rgba(255, 255, 255, 0.2)', bg)
         f = next((fr for fr in page.frames if 'hc-preview' in fr.url), None)
         r = await f.evaluate("""() => ({ pond: !!document.getElementById('hc-pond'), preview: document.documentElement.classList.contains('hc-pond-preview'),
@@ -421,6 +426,42 @@ async def main(base):
         r = await page.evaluate("[document.documentElement.classList.contains('hc-pond-preview'), getComputedStyle(document.getElementById('hcp-wake')).display]")
         check('pond preview only inside another page: opened directly, the wake screen stays', r == [False, 'flex'] or (r[0] is False and r[1] != 'none'), str(r))
         check('no script errors (playthings)', not errs, '; '.join(errs)[:300])
+        await page.close()
+
+        # ---- birth a blob: draw a face, let it go, it joins the background blobs ----
+        page = await b.new_page(viewport={'width': 1300, 'height': 900}); errs = []
+        page.on('pageerror', lambda e: errs.append(str(e)))
+        await page.goto(base + '/short/birth-a-blob/'); await page.wait_for_timeout(1500)
+        r = await page.evaluate("""() => ({ title: (document.querySelector('#hc-bab h1') || {}).textContent,
+          back: (document.querySelector('#hc-bab a.hc-bab-back') || { getAttribute: () => null }).getAttribute('href'),
+          colours: document.querySelectorAll('#hc-bab .hc-bab-colours input').length,
+          pencil: (document.querySelector('#hc-bab .hc-bab-pencil img') || {}).naturalWidth,
+          h1Color: document.querySelector('#hc-bab h1') && getComputedStyle(document.querySelector('#hc-bab h1')).color,
+          fallbackHidden: [...document.querySelectorAll('[data-hc-bab-fallback]')].length === 1 && [...document.querySelectorAll('[data-hc-bab-fallback]')].every(e => getComputedStyle(e).display === 'none'),
+          gridHidden: [...document.querySelectorAll('.thumbnails, #hc-sort')].every(e => getComputedStyle(e).display === 'none') })""")
+        check('birth a blob: the maker is built (title, back to playthings, five colours, the pencil loaded, Cargo styles kept out)',
+              r['title'] == 'Birth-a-blob' and r['back'] == '/playthings' and r['colours'] == 5 and (r['pencil'] or 0) > 0 and r['h1Color'] == 'rgb(73, 46, 70)', str(r))
+        check("birth a blob: Cargo's content kept as a hidden fallback, the grid hidden", r['fallbackHidden'] and r['gridHidden'], str(r))
+        pr = await page.evaluate("(() => { const r = document.getElementById('hc-bab-paper').getBoundingClientRect(); return [r.left, r.top, r.width]; })()")
+        await page.mouse.move(pr[0] + pr[2] * 0.38, pr[1] + pr[2] * 0.42); await page.mouse.down()
+        await page.mouse.move(pr[0] + pr[2] * 0.62, pr[1] + pr[2] * 0.58, steps=12); await page.mouse.up()
+        r = await page.evaluate("[document.querySelector('#hc-bab .hc-bab-stage').classList.contains('hc-bab-holding'), [...document.querySelectorAll('#hc-bab-ink path')].map(p => (p.getAttribute('d').match(/Q/g) || []).length)]")
+        check('birth a blob: drawing with the mouse picks up the pencil and adds one stroke', r[0] and len(r[1]) == 1 and r[1][0] >= 5, str(r))
+        await page.evaluate("document.addEventListener('keydown', e => { if (e.key === 'Escape') window.__cargoEsc = (window.__cargoEsc || 0) + 1; })")   # stands in for Cargo's leave-on-Esc
+        await page.keyboard.press('Escape'); await page.wait_for_timeout(150)
+        await page.keyboard.press('Escape'); await page.wait_for_timeout(150)   # a second Esc, pencil already down, face still there
+        r = await page.evaluate("[!document.querySelector('#hc-bab .hc-bab-stage').classList.contains('hc-bab-holding'), window.__cargoEsc || 0, location.pathname]")
+        check('birth a blob: Esc puts the pencil down; Cargo never gets Esc while there is a face', r == [True, 0, '/short/birth-a-blob/'], str(r))
+        n0 = await page.evaluate("document.querySelectorAll('.hc-blobs .hc-blob').length")
+        await page.click('#hc-bab-go'); await page.wait_for_timeout(2500)
+        r = await page.evaluate("""() => { const all = document.querySelectorAll('.hc-blobs .hc-blob'), b = all[all.length - 1];
+          const g = b && b.querySelector('g[clip-path]');
+          return { n: all.length, ink: g ? g.querySelectorAll('path').length : 0, clip: !!(b && b.querySelector('clipPath path').getAttribute('d')),
+            gone: !document.getElementById('hc-bab-gone').hidden, focus: document.activeElement.id }; }""")
+        check('birth a blob: Let it go adds one blob to the background with the face inside it', r['n'] == n0 + 1 and r['ink'] == 1 and r['clip'], f'{n0} -> {r}')
+        check('birth a blob: then "Make another blob" is offered and focused', r['gone'] and r['focus'] == 'hc-bab-again', str(r))
+        if SHOTS: await page.screenshot(path=os.path.join(SHOTS, 'desktop.png'))
+        check('no script errors (birth a blob)', not errs, '; '.join(errs)[:300])
         await page.close()
 
         # ---- Cargo's own stylesheet arriving empty (Cargo's outage 2026-11-09) ----
@@ -461,6 +502,16 @@ async def main(base):
         p3 = await ctx.new_page(); await p3.goto(base + '/filter/artdirection/?hc-sort=hands'); await p3.wait_for_timeout(1500)
         r = await p3.evaluate(GRID_DUMP)
         check('phone: grid keeps Cargo\'s columns and is sorted', len(r['cols']) == 3 and r['cols'][0][0] == FIRST_BY_HANDS[0], str([c[:1] for c in r['cols']]))
+        p4 = await ctx.new_page(); p4.on('pageerror', lambda e: errs.append(str(e)))
+        await p4.goto(base + '/short/birth-a-blob/'); await p4.wait_for_timeout(1500)
+        pr = await p4.evaluate("(() => { const r = document.getElementById('hc-bab-paper').getBoundingClientRect(); return [r.left, r.top, r.width]; })()")
+        await p4.mouse.move(pr[0] + pr[2] * 0.35, pr[1] + pr[2] * 0.4); await p4.mouse.down()
+        await p4.mouse.move(pr[0] + pr[2] * 0.6, pr[1] + pr[2] * 0.6, steps=10); await p4.mouse.up()
+        n0 = await p4.evaluate("document.querySelectorAll('.hc-blobs .hc-blob').length")
+        await p4.tap('#hc-bab-go'); await p4.wait_for_timeout(2500)
+        r = await p4.evaluate("[document.documentElement.scrollWidth, innerWidth, document.querySelectorAll('.hc-blobs .hc-blob').length]")
+        check('phone: birth a blob fits the screen and lets its blob go', r[0] <= r[1] and r[2] == n0 + 1, f'page {r[0]}px wide on {r[1]}, blobs {n0} -> {r[2]}')
+        if SHOTS: await p4.screenshot(path=os.path.join(SHOTS, 'phone.png'))
         check('no script errors (phone)', not errs, '; '.join(errs)[:200])
         await b.close()
 
@@ -495,6 +546,8 @@ if __name__ == '__main__':
                         .replace('</div></div>\n<script>', '</div>' + GRID + '</div>\n<script>', 1)),
                     ('short/stylecheck-empty', PAGE.replace('ADDONS', tags).replace('</head>', '<link rel="stylesheet" href="/stylesheet?empty-once"></head>', 1)),
                     ('short/stylecheck-ok', PAGE.replace('ADDONS', tags).replace('</head>', '<link rel="stylesheet" href="/stylesheet?ok"></head>', 1)),
+                    ('short/birth-a-blob', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', '<p>Birth-a-blob: draw a face on a blob</p>')
+                        .replace('</div></div>\n<script>', '</div>' + GRID + '</div>\n<script>', 1)),
                     ('short/playthings', PAGE.replace('ADDONS', tags)
                         .replace('</style>', '  .project_content a:hover { background-color: rgb(255, 255, 0); color: rgb(0, 0, 0); }\n</style>', 1)
                         .replace('<p>PAGE CONTENT</p>', '<p>Music Kontrapunkt Kontrol, Shakeskin, The Calculater, the blob-pond</p>')

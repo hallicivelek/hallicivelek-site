@@ -1,5 +1,6 @@
 <!-- Playthings for hallicivelek.com: builds the page whose address contains "playthings".
-     Four big cards, each with a live preview of the project:
+     Five big cards, each with a preview of the project:
+       Birth-a-blob               a picture: a soft blue blob, a face scribbled on it, and Halli's pencil resting on the end of the line
        Music Kontrapunkt Kontrol  the real blog, shown small, gliding slowly down and back up
        Shakeskin                  Halli and friends' faces from the gallery, one at a time, softly fading into the next
                                   (shakeskin.com doesn't allow being shown inside another page)
@@ -49,15 +50,21 @@
   var INTRO = "Things I've built and kept running (some since 2004).";
   var FACES = ['ufd1236b1cbdd86', '3ffabdafe66c630', '42623ba9596b356', '7662eaad81b67246', 'ee05d41940906d', 'c49534a2653b6d53',
                '9384b19a7957c4e', '629bbdd38af4a7cf', '74f81e1515bb5625', 'e7ffdcebd88ec424', '4e494fd3add96bba', '9f1025e773392387'];
+  // pencil.png lives next to this script on GitHub Pages: dist/js/hc-playthings.js -> assets/portrait/
+  var here = document.currentScript && document.currentScript.src;
+  var PENCIL = (here ? new URL('../../assets/portrait/', here).href
+                     : 'https://hallicivelek.github.io/hallicivelek-site/assets/portrait/') + 'pencil.png';
   var THINGS = [
+    { title: 'Birth-a-blob', href: '/birth-a-blob', bg: '#241B28', show: 'pencil',
+      line: 'Draw a blob-face and set it free on the site.' },
     { title: 'Music Kontrapunkt Kontrol', href: 'https://kontrapunkt.hallicivelek.com/', bg: '#f3efe6', show: 'tall',
-      line: 'An Italo Disco blog, and a map of who produced what. Since 2004.' },
+      line: 'An Italo Disco blog and a producer map (of who made what). Since 2004.' },
     { title: 'Shakeskin', href: 'https://www.shakeskin.com/', bg: '#086eb2', show: 'faces',   // Shakeskin's own blue
       line: 'A gallery of shaken faces. Since 2004.' },
     { title: 'The Calculater', href: 'https://www.thecalculater.net/', bg: '#a77bf0', show: 'still',
       line: 'Input digits and get results. Later.' },
     { title: 'The blob-pond', href: '/the-blob-pond', frame: '/the-blob-pond?hc-preview', bg: '#241B28', show: 'still',
-      line: 'Blobs drift across the lines and play notes. Made for sound.' }
+      line: 'Blobs drift across the lines and play sweet notes. Made for sound!' }
   ];
 
   function el(tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text) e.textContent = text; return e; }
@@ -67,7 +74,22 @@
     var a = el('a', 'hc-pt-card'); a.href = t.href;
     if (outside) { a.target = '_blank'; a.rel = 'noopener'; }
     var win = el('div', 'hc-pt-win'); win.style.backgroundColor = t.bg;
-    if (t.show === 'faces') {
+    if (t.show === 'pencil') {
+      // 400 x 300 picture; Halli's face layer from birth-a-blob_face1.svg (500x500, its blob centre 249.8,251.26) at 0.5x; the pencil's tip (15,191 of 59x200) rests on top of the right eye
+      win.innerHTML = '<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" ' +
+        'style="position:absolute;left:0;top:0;width:100%;height:100%">' +
+        '<defs><radialGradient id="hc-pt-g" cx="190" cy="150" r="120" gradientUnits="userSpaceOnUse">' +
+          '<stop offset="0" stop-color="#2BA6CF" stop-opacity="1"/><stop offset=".45" stop-color="#2BA6CF" stop-opacity=".75"/>' +
+          '<stop offset="1" stop-color="#2BA6CF" stop-opacity="0"/></radialGradient></defs>' +
+        '<path fill="url(#hc-pt-g)" d="M185,38 C252,30 306,86 298,152 C292,218 248,270 186,265 C118,260 72,216 82,150 C90,92 122,44 185,38Z"/>' +
+        '<g transform="translate(190 152) scale(.5) translate(-249.8 -251.26)" fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="7.51">' +
+          '<ellipse cx="161.96" cy="189.68" rx="29.09" ry="36.55"/><ellipse cx="287.6" cy="179.49" rx="29.09" ry="36.55"/>' +
+          '<path d="M192.05,258.85s17.34,14.69,39.21,13.930c21.87-.75,46.28-20.01,46.28-20.01"/>' +
+          '<path d="M226.43,194.9c0,13.14-2.08,25.94-6.48,38.26-.38,1.06-1.54,2.96-.5,3.66,1.21.82,5.85.07,7.16-.13,4.76-.72,9.14-3.36,13.8-3.95"/>' +
+          '<path d="M223.92,96.34c-6.57,3.42-14.56,2.260-19.86-2.96-6.84-6.74-11.96-24.34-1.43-30.350,5.89-3.37,11.52.76,13.16,6.51.6,2.1-1.08,3.71-2.27,5.22-7.18,9.11-21.05,1.75-26.28-5.43-3.19-4.38-10.03-16.45-8.84-22.08" stroke-width="4.63"/>' +
+          '<path d="M381.69,157.59c0-3,3.75-6.9,5.62-9.03,18.84-21.63,49.32-7.22,50.75,19.77.97,18.350-17.09,44.12-37.11,29.37"/></g>' +
+        '<image href="' + PENCIL + '" width="59" height="200" transform="translate(209 96) rotate(14) scale(.75) translate(-15 -191)"/></svg>';
+    } else if (t.show === 'faces') {
       win.classList.add('hc-pt-faces');
       FACES.forEach(function (f, i) {
         var img = el('img'); img.src = 'https://www.shakeskin.com/photos/' + f + '.jpg'; img.alt = ''; img.loading = 'lazy';

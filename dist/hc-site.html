@@ -572,7 +572,7 @@
   // its lobe, then joined with a smooth closed curve (Catmull-Rom → cubic Bézier).
   function shape(b, time) { return pathFrom(outline(b, time)); }
   function outline(b, time) {
-    var N = 28, pts = [], w = CFG.wobble, pod = b.pod;
+    var N = 28, pts = [], w = CFG.wobble * (b.wob || 1), pod = b.pod;
     var podAng = pod.ang + time * pod.drift;
     var reach = 0.16 * Math.pow(Math.max(0, Math.sin(time * pod.sp + pod.ph)), 2);
     for (var j = 0; j < N; j++) {
@@ -1004,6 +1004,8 @@
       print(b); b.svx += 2.4; b.svy -= 2;
     } else if (b.kind === 'hungry') {
       eat(b);
+    } else if (b.kind === 'made') {
+      b.svx += 2.2; b.svy -= 1.6;                                   // a blob born on birth-a-blob: just a wobble
     }
   }, { passive: false });
 
@@ -1038,12 +1040,43 @@
     if (wasWide && W < 700) {        // started out thinking it was a desktop: trim to the phone count
       for (var i = blobs.length - 1; i >= 0 && blobs.length > CFG.countMobile; i--) {
         var b = blobs[i];
-        if (b.state !== 'float' || b.prey || b === babbling || b === printing || b === held) continue;
+        if (b.state !== 'float' || b.prey || b.kind === 'made' || b === babbling || b === printing || b === held) continue;
         b.el.parentNode.removeChild(b.el); blobs.splice(i, 1);
       }
     }
   }
   addEventListener('resize', fitToScreen);
+
+  /* ---------- stepping aside (hc-weather-free publishes where rain or snow is falling) ----------
+     window.hcBlobs.keepOut([{ x0, x1, y0, y1 }, ...]) in screen px, sent every frame; a list older than 0.3 s counts as
+     none. A floating blob in a column picks a side once (no flip-flopping) and moves out on a critically damped spring
+     (no jitter), stretching a little in the direction it moves and hopping a few px; it comes back when the column has
+     passed. The move is added to its real position, so clicks and the pond-style hit tests still find it. */
+  var keepOut = [], keepOutAt = -1e9, dodged = 0;
+  function sidestep(b, dt, now) {
+    var g = b.dg || (b.dg = { ox: 0, oy: 0, vx: 0, vy: 0, side: 0, free: 0, st: 0 });
+    var list = now - keepOutAt < 300 ? keepOut : [], r = radius(b) * 0.9, x = b.x - g.ox, y = viewY(b) - g.oy;
+    var target = 0, near = null, best = 0, CAP = Math.min(130, r * 1.1 + 50), K = 26, C = 2 * Math.sqrt(K);
+    for (var i = 0; i < list.length; i++) {
+      var s = list[i];
+      if (y + r < s.y0 - 6 || y - r > s.y1) continue;
+      var needL = (x + r) - (s.x0 - 26), needR = (s.x1 + 26) - (x - r);   // starts leaning a little before the drops arrive
+      if (needL <= 0 || needR <= 0) continue;
+      var o = Math.min(needL, needR); if (o > best) { best = o; near = { L: needL, R: needR }; }
+    }
+    if (near) {
+      if (!g.side) g.side = near.L < near.R ? -1 : 1;
+      var mine = g.side < 0 ? near.L : near.R, other = g.side < 0 ? near.R : near.L;
+      if (mine > CAP && other < mine - 30) { g.side = -g.side; mine = other; }
+      target = g.side * Math.min(mine, CAP); g.free = 0;
+    } else if ((g.free += dt) > 0.8) g.side = 0;
+    var hop = -Math.min(14, Math.abs(g.vx) * 0.09), ox = g.ox, oy = g.oy;
+    g.vx += ((target - g.ox) * K - g.vx * C) * dt; g.ox += g.vx * dt;
+    g.vy += ((hop - g.oy) * K - g.vy * C) * dt; g.oy += g.vy * dt;
+    b.x += g.ox - ox; b.y += g.oy - oy;
+    g.st = Math.min(0.1, Math.abs(g.vx) / 900);
+    if (Math.abs(g.ox) > dodged) dodged = Math.abs(g.ox);
+  }
 
   /* ---------- animation loop ---------- */
   var last = performance.now(), t = 0;
@@ -1078,7 +1111,15 @@
       b.svx += ((b.tx - b.sx) * 170 - b.svx * 9) * dt; b.sx += b.svx * dt;
       b.svy += ((b.ty - b.sy) * 170 - b.svy * 9) * dt; b.sy += b.svy * dt;
 
-      if (b.state === 'float' && !paused) {                       // paused: no drifting, dodging or gathering
+      if (b.k !== undefined && b.k !== 1) {                      // a newborn blob shrinking to its size among the others
+        b.k += (1 - b.k) * Math.min(1, dt * 1.6);
+        if (Math.abs(b.k - 1) < 0.003) b.k = 1;
+      }
+      if (b.goTo && b.state === 'float') {                        // paused or reduced motion: it glides to a free spot and rests
+        var gk = Math.min(1, dt * 1.6);
+        b.x += (b.goTo[0] - b.x) * gk; b.y += (b.goTo[1] + scrollY * dep(b) - b.y) * gk;
+        if (Math.hypot(b.goTo[0] - b.x, b.goTo[1] + scrollY * dep(b) - b.y) < 0.5) b.goTo = null;
+      } else if (b.state === 'float' && !paused) {                // paused: no drifting, dodging or gathering
         if (b.kind === 'shy' && ptr) {
           var dx = b.x - ptr.x, dy = viewY(b) - ptr.y, dist = Math.sqrt(dx * dx + dy * dy) || 1, reach = radius(b) + 70;
           if (dist < reach) {
@@ -1097,8 +1138,10 @@
         }
         b.ox *= Math.exp(-3 * dt); b.oy *= Math.exp(-3 * dt);
         var pace = drift * (b.prey ? 0.5 : 1) * (curious ? 0.4 : 1);   // a full belly slows you down
+        if (b.k > 1) pace *= 1 + 5 * (b.k - 1);                   // a newborn sets off quickly, then settles into the drift
         b.x += (b.vx * pace + b.ox) * dt;
         b.y += (b.vy * pace + b.oy) * dt;
+        sidestep(b, dt, now);
         b.rot += b.vr * drift * dt;
         var m = radius(b) + 10;
         if (b.x < -m) b.x = W + m; else if (b.x > W + m) b.x = -m;
@@ -1134,13 +1177,49 @@
       }
 
       if (b.face && !paused) lookAround(b, dt);                    // paused: the eyes rest too
-      b.path.setAttribute('d', shape(b, t));
+      var d = shape(b, t), k = b.k || 1, st = b.dg && b.state === 'float' ? b.dg.st : 0;   // st: stretch while stepping aside
+      b.path.setAttribute('d', d);
+      if (b.clip) b.clip.setAttribute('d', d);                    // a drawn face stays inside the blob
       b.el.style.transform = 'translate3d(' + (b.x - b.S / 2) + 'px,' + (viewY(b) - b.S / 2) + 'px,0) scale(' +
-        b.sx + ',' + b.sy + ') rotate(' + b.rot + 'deg)';
+        (b.sx * k * (1 + st)) + ',' + (b.sy * k * (1 - st * 0.8)) + ') rotate(' + b.rot + 'deg)';
     }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
+
+  /* ---------- newborn blobs (from hc-birth-a-blob) ----------
+     window.hcBlobs.adopt({ color, d (px), waves, pod, wob, ink (SVG markup in the -60..60 box), at: [x, y, k], goTo: [x, y] })
+     adds a blob to this layer. It lives as long as the page does (Cargo changes pages without reloading).
+     Also: paused(), spots() ([x, y, d] of each floating blob on screen), keepOut(list) and dodged() (see "stepping aside"). */
+  var born = 0;
+  window.hcBlobs = {
+    paused: function () { return paused; },
+    adopt: function (o) {
+      var S = o.d * 4 / 3, id = 'hc-born' + (born++), el = document.createElementNS(NS, 'svg');
+      el.setAttribute('class', 'hc-blob'); el.setAttribute('viewBox', '-60 -60 120 120');
+      el.setAttribute('width', S); el.setAttribute('height', S);
+      el.style.overflow = 'visible'; el.style.opacity = CFG.opacity;
+      el.innerHTML = '<defs><radialGradient id="' + id + '" cx="0" cy="0" r="60" gradientUnits="userSpaceOnUse">' +
+        '<stop offset="0" stop-color="' + o.color + '"/><stop offset="0.45" stop-color="' + o.color + '" stop-opacity="0.75"/>' +
+        '<stop offset="1" stop-color="' + o.color + '" stop-opacity="0"/></radialGradient>' +
+        '<clipPath id="' + id + 'c"><path/></clipPath></defs><path fill="url(#' + id + ')"/>' +
+        '<g clip-path="url(#' + id + 'c)" fill="none" stroke="#111" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.1">' + (o.ink || '') + '</g>';
+      layer.appendChild(el);
+      var depth = reduce ? 0 : CFG.depth[0] + (CFG.depth[1] - CFG.depth[0]) * Math.min(1, (o.d - CFG.minSize) / (CFG.maxSize - CFG.minSize));
+      var b = { el: el, path: el.querySelector('path[fill]'), clip: el.querySelector('clipPath path'), S: S, kind: 'made', color: o.color,
+        d: o.d, depth: depth, x: o.at[0], y: o.at[1] + scrollY * (paused ? 0 : depth), vx: 0, vy: 0, ox: 0, oy: 0,
+        sx: 1, sy: 1, svx: 0, svy: 0, tx: 1, ty: 1, grow: 1, rot: 0, vr: 0, fall: 0, state: 'float', wait: 0,
+        waves: o.waves, pod: o.pod, wob: o.wob || 1, k: reduce ? 1 : o.at[2], personal: rand(0, 90), circle: rand(0.5, 1) };
+      if (reduce || paused) b.goTo = o.goTo;
+      else { var a = rand(-2.2, -0.9), sp = rand(13, 20); b.vx = Math.cos(a) * sp; b.vy = Math.sin(a) * sp; }
+      if (reduce) { b.x = o.goTo[0]; b.y = o.goTo[1] + scrollY * dep(b); b.goTo = null; }
+      blobs.push(b);
+      return b;
+    },
+    keepOut: function (list) { keepOut = list || []; keepOutAt = performance.now(); },
+    dodged: function () { return Math.round(dodged); },   // the furthest any blob has stepped aside (px), for the tests
+    spots: function () { return blobs.filter(function (b) { return b.state === 'float'; }).map(function (b) { return [b.x, viewY(b), b.d]; }); }
+  };
 })();
 </script>
 

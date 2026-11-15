@@ -62,6 +62,13 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   scaled-down iframe, gliding), Shakeskin (12 of Halli's friends' faces from shakeskin.com, one at a time with a shake;
   shakeskin.com won't be framed), The Calculater (still iframe), the blob-pond (`/the-blob-pond?hc-preview`). Hover is
   20% white (overrides Cargo's yellow `.project_content a:hover`); Halli ruled out tilting. Reduced motion: no glide/shake.
+- `src/hc-birth-a-blob.html` — **Birth-a-blob** (page address contains `birth-a-blob`; ported from
+  `mockups/blob-maker`): a big blank blob and Halli's pencil (mouse, finger with the hc-eyes offset, or arrow keys /
+  Space / Esc after picking it up from the keyboard), five colours, "Let it go" hands it to the background blobs via
+  `window.hcBlobs.adopt(...)` (end of hc-blobs: also `paused()` and `spots()`), where it drifts as kind `made` for the
+  rest of the visit (a tap gives it a wobble). Hides Cargo's content (fallback), grid and sort line; ids/classes `hc-bab-`,
+  CSS under `#hc-bab`. Esc is kept from Cargo while the pencil is held or a face is drawn. Not saved anywhere.
+  Loaded by hc-pond.js (no paste).
 - **Pond preview mode:** `?hc-preview` *inside an iframe* (pond_loader_template) adds `html.hc-pond-preview`: no Cargo
   header, no wake screen, no tray or caption, so audio never starts. Opened directly, `?hc-preview` does nothing.
 - `src/hc-retro.html` — **1999 mode** (see below).
