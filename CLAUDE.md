@@ -266,12 +266,14 @@ header.css, remove "Other projects" from about me.
 The redesign looks fine on his iPhone and speed is fine. Wanton Boys Club GIF stays out for now.
 
 ## Where we left off (2026-11-04)
-- **2026-11-16:** the palette piano (`src/hc-palette-piano.html`, `src/palettes.json`, `tools/build_palettes.py`) and its
-  way back in hc-project; `palette-piano` added to hc-nav-active's PAGES and hc-retro's grid check. 120/120 tests pass.
-  Built, **not committed or pushed**; not yet seen on the live site or a real iPhone, and the sound has only been
-  checked in headless Chromium (audio running, notes scheduled), not listened to on the site. Its playthings card (sixth, between Music Kontrapunkt Kontrol and
-  Shakeskin) was added the same day: 121/121 tests pass, desktop and phone screenshots checked, not yet on the live site. The back/forward-cache return is in the code
-  but headless Chromium reloaded the page in the test, so only the reload path is tested.
+- **2026-11-16:** the palette piano (`src/hc-palette-piano.html`, `src/palettes.json`, `tools/build_palettes.py`), its
+  way back in hc-project and its playthings card (sixth, between Music Kontrapunkt Kontrol and Shakeskin) are
+  **committed, pushed and live** (build `2026-11-16 03:52`; 121/121 tests). Checked on the live site in the desktop
+  browser pane: page builds with 94 strips, a title link leads to the project, "← palette piano" shows there, and
+  coming back scrolls to the strip (Cargo scrolls to the top late on the live site, so the scroll is repeated for
+  2.5 s until the visitor scrolls, taps or types; the stand-in test did not catch this). Halli approved the sound in
+  the mockup. Not checked: a real iPhone, the sound on the live site by ear, the back/forward-cache return (headless
+  Chromium reloaded instead).
 - **2026-11-15:** hc-weather-free (free clouds behind the blobs) replaces the hc-weather strip in the later-add-on list;
   95/95 tests pass. Built, **not committed or pushed**; not yet checked on the live site or a real iPhone.
 - **Waiting on Halli:** a new `?hc-debug` screenshot from his iPhone (hallicivelek.com/info-contact?hc-debug, scrolled
