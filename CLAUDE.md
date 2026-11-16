@@ -73,9 +73,11 @@ The build was verified to reproduce the installed files byte-for-byte when this 
 - `src/hc-palette-piano.html` — **Proper palette piano player** (page address contains `palette-piano`, a Cargo page
   Halli made 2026-11-16; ported from `mockups/palette-piano`, sound approved by Halli): every project as a white key
   painted with its own colours, in Halli's order, tilted like the pinboard prints. Pressing a strip plays its colours
-  (instrument, notes, order, pace, trill, held note all from the colours and address; always D major pentatonic; all
-  sounds made in the browser). The sound code and colour-to-music mapping are the mockup's, **unchanged** (copied line
-  for line; `window.PalettePiano` is its checking hook, as used by the mockup's `check_sound.py`). Title tag only on
+  (instrument, notes, order, pace, trill, held note all from the colours and address; always D hirajoshi (D E F A Bb); all
+  sounds made in the browser). Sound: six analog-synth voices (Kraftwerk, Numan, Boards of Canada, acid, Hopkins,
+  Italo; Kraftwerk, acid and Italo in strict time). Since 2026-11-16 the sound code and colour-to-music mapping are
+  `mockups/palette-piano/synth.html`'s, **unchanged** (copied line for line; the earlier piano/pluck sound was the
+  mockup's `index.html`; `window.PalettePiano` is the checking hook, as used by `check_synth.py`). Title tag only on
   hover / focus / after a press, linking to `/<project>`. Keyboard: one Tab stop, arrows / Home / End move, Enter or
   Space plays, Tab reaches the title link. Reduced motion: strips don't move or grow. "Turn the sound off" is fixed
   **bottom left** (the pause button and "back to 2026" have the bottom right; lifted above the Netscape bar, styled in

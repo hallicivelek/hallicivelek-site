@@ -8,7 +8,7 @@
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------- colour to music ---------- */
-  // Every note comes from one set, D major pentatonic (D E F# A B), so any strips sound fine together, in any order, overlapping.
+  // Every note comes from one set, D hirajoshi (D E F A Bb), so any strips sound fine together, in any order, overlapping.
   // Each strip takes its own character from its colours and its name: instrument, register, which notes, their order, the pace
   // and rhythm, whether a soft held note sits underneath, and now and then a trill. The same every visit.
   function hash(s) { var h = 7; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; }
@@ -24,15 +24,45 @@
   function pick(r, a) { return a[Math.floor(r() * a.length)]; }
 
   // notes are counted in "degrees" of the scale, five to an octave; degree 0 is a low D
-  var PENT = [0, 2, 4, 7, 9];
+  var PENT = [0, 2, 3, 7, 8];   // hirajoshi on D: D E F A Bb
   function degMidi(d) { return 26 + 12 * Math.floor(d / 5) + PENT[((d % 5) + 5) % 5]; }
-  var SETS = { full: [0, 1, 2, 3, 4], open: [0, 1, 3, 4], ring: [0, 2, 3] };     // all five; no F#; only D F# A
+  var SETS = { full: [0, 1, 2, 3, 4], open: [0, 1, 3, 4], ring: [0, 2, 3] };     // all five; no F; only D F A
   function allowed(d, set) { return set.indexOf(((d % 5) + 5) % 5) >= 0; }
   function snap(d, set) { for (var k = 0; k < 5; k++) { if (allowed(d - k, set)) return d - k; if (allowed(d + k, set)) return d + k; } return d; }
   function stepFrom(d, dir, set) { do { d += dir; } while (!allowed(d, set)); return d; }
   function degRange(lo, hi) { var a = 0; while (degMidi(a) < lo) a++; var b = a; while (degMidi(b + 1) <= hi) b++; return [a, b]; }
-  // each instrument's comfortable range (midi notes) and its natural pace (ms added to the gap between notes)
-  var INSTR = { pluck: [45, 76, -25], ep: [47, 81, 5], felt: [43, 79, 25], wood: [55, 86, -40], glass: [62, 91, 60], tine: [57, 86, -10], flute: [62, 88, 70] };
+  // each synth's comfortable range (midi notes) and its natural pace (ms added to the gap between notes)
+  var INSTR = { kraft: [50, 81, -25], numan: [43, 74, 35], boc: [48, 79, 40], acid: [38, 62, -40], hopkins: [57, 88, 55], italo: [50, 81, -30] };
+  // the machines play in strict time on a grid of half the strip's pace; the others keep a loose, human timing
+  var STRICT = { kraft: 1, acid: 1, italo: 1 };
+  // the held note underneath, in each synth's own manner
+  var HELD = { kraft: 'vocoder', numan: 'strings', boc: 'tape', acid: 'ambient', hopkins: 'pump', italo: 'octbass' };
+
+  // which synth suits a strip: each one scores the colours, a little of the name's hash breaks near-ties
+  function voiceFor(cols, url) {
+    var tot = 0, grey = 0, C = 0, L = 0, M = 0, dark = 0, light = 0, warm = 0, ws = 0, x = 0, y = 0, nsat = 0;
+    cols.forEach(function (c) { tot += c.share; });
+    cols.forEach(function (c) {
+      var s = c.share / tot; C += c.c * s; L += c.l * s; M = Math.max(M, c.c);
+      if (c.grey) grey += s; if (c.l < 0.3) dark += s; if (c.l > 0.75) light += s;
+      if (!c.grey) { nsat++; warm += Math.cos((c.h - 35) * Math.PI / 180) * s; ws += s; x += Math.cos(c.h * Math.PI / 180) * s; y += Math.sin(c.h * Math.PI / 180) * s; }
+    });
+    warm = ws ? warm / ws : 0; var spread = ws ? 1 - Math.sqrt(x * x + y * y) / ws : 0;
+    var sc = {
+      kraft: grey * grey * (1 - Math.min(1, M / 0.6)) + 0.25 * grey,                                               // greys, black and white
+      numan: 1.2 * dark + Math.max(0, 0.6 - L) * 2.2,                                                              // dark and heavy
+      boc: (1 - grey) * 0.3 + Math.max(0, 0.22 - Math.abs(C - 0.17)) * 2 + (warm > 0.2 ? 0.2 : 0) + (L > 0.6 && L < 0.88 ? 0.15 : 0) - 0.6 * dark,   // faded, pastel
+      hopkins: light * (1 - Math.min(1, C * 3)) * 0.8 + (grey > 0.5 ? 0.3 * Math.min(1, M / 0.5) : 0),           // pale, airy, a touch of colour
+      acid: C * M * 2.2 - 0.7 * spread + 0.12,                                                                     // bright, loud, one strong hue
+      italo: C * 1.2 + spread * 0.9 * Math.min(1, C * 3) + 0.07 * nsat - 0.3                                       // saturated, many hues
+    };
+    var h = hash(url), best = null;
+    ['kraft', 'numan', 'boc', 'hopkins', 'acid', 'italo'].forEach(function (k, i) {
+      sc[k] += ((h >>> (3 * i)) % 97) / 97 * 0.18;
+      if (best === null || sc[k] > sc[best]) best = k;
+    });
+    return best;
+  }
 
   function arrange(cols, order) {
     var s = cols.slice(), n = s.length, o = [], a, b;
@@ -55,10 +85,8 @@
       if (!c.grey) { warm += Math.cos((c.h - 35) * Math.PI / 180) * c.share; wsum += c.share; } });
     grey /= tot; avgC /= tot; avgL /= tot; warm = wsum ? warm / wsum : 0;
 
-    // instrument: greyish strips lean to felt piano, wood and glass; warm colourful ones to strings and tines; cool ones to flute and glass
-    var fam = grey > 0.7 ? ['felt', 'wood', 'glass', 'pluck', 'ep', 'flute'] : avgC > 0.28 && warm > 0.2 ? ['pluck', 'tine', 'ep', 'wood', 'felt']
-            : avgC > 0.28 ? ['flute', 'glass', 'ep', 'tine', 'pluck'] : ['ep', 'felt', 'flute', 'pluck', 'tine', 'wood'];
-    var voice = pick(r, fam), info = INSTR[voice], rg = degRange(info[0], info[1]);
+    // synth: chosen from the colours (see voiceFor); r() is still drawn once so every later choice comes out as before
+    r(); var voice = voiceFor(cols, p.url), info = INSTR[voice], rg = degRange(info[0], info[1]), strict = !!STRICT[voice];
     var setName = pick(r, ['full', 'full', 'full', 'open', 'open', 'ring']), set = SETS[setName];
 
     // notes: lightness sets the height finely (so greys and whites land on different notes), hue and colourfulness nudge it
@@ -83,9 +111,12 @@
     var gap = 205 + 110 * grey - 120 * avgC + (avgL < 0.35 ? 45 : 0) + info[2] + (r() * 100 - 50);
     gap = Math.round(Math.max(130, Math.min(420, gap)));
     var rhythms = ['even', 'even', 'swing', 'speeding up', 'slowing down', 'by size', 'held last', 'pairs'];
-    if (voice !== 'flute') rhythms.push('strum');
+    if (voice !== 'numan') rhythms.push('strum');
     var rhythm = pick(r, rhythms);
     var tStep = Math.round(60 + r() * 28), tN = 9 + 2 * Math.floor(r() * 4), up = r() < 0.65 ? 1 : -1;   // 11 to 16 notes a second, ending on the main note
+    // strict time: every note lands on a grid of half the pace, and a trill (a ratchet, for the acid line) on a quarter or an eighth of it
+    var unit = gap / 2;
+    if (strict) tStep = [unit, unit / 2, unit / 4].reduce(function (b, s) { return Math.abs(s - 72) < Math.abs(b - 72) ? s : b; });
 
     var items = seq.map(function (c) { return { c: c }; });
     if (trill === 'accent') items.forEach(function (it) { if (it.c === acc) it.trill = { b: stepFrom(acc.deg, up, SETS.full), band2: acc.i }; });
@@ -114,20 +145,24 @@
       var vel = 0.5 + 0.45 * Math.sqrt(it.c.share) + 0.15 * it.c.c;
       if (rhythm === 'speeding up') vel *= 0.85 + 0.25 * x;
       if (rhythm === 'slowing down') vel *= 1.08 - 0.25 * x;
+      var step = strict ? Math.max(1, Math.round(m * 2)) * unit : gap * m;
       var e = { at: Math.round(at), midi: degMidi(it.c.deg), vel: +Math.min(1, vel).toFixed(3), band: it.c.i,
-                len: last ? (rhythm === 'held last' || rhythm === 'strum' ? 2.2 : 1) : +(gap * m * 1.15 / 1000).toFixed(2) };
-      if (it.trill) { e.trill = { midi2: degMidi(it.trill.b), step: tStep, n: tN, band2: it.trill.band2 }; at += tStep * tN + gap * 0.6; }
-      else at += gap * m;
+                len: last ? (rhythm === 'held last' || rhythm === 'strum' ? 2.2 : 1) : +(step * 1.15 / 1000).toFixed(2) };
+      if (it.trill) { e.trill = { midi2: degMidi(it.trill.b), step: tStep, n: tN, band2: it.trill.band2 };
+        at += strict ? Math.ceil((tStep * tN + gap * 0.6) / unit - 0.01) * unit : tStep * tN + gap * 0.6; }
+      else at += step;
       events.push(e);
     });
 
-    // a soft held note underneath, more often for grey and dark strips: D, or A when the strip starts on A or E
+    // a soft held note underneath, more often for grey and dark strips: D, or A when the strip starts on A or E; low or middle as before
     var drone = null;
     if (r() < 0.2 + 0.3 * grey + (avgL < 0.4 ? 0.2 : 0)) {
       var low = (events[0].midi - 2) % 12, onA = low === 7 || low === 2;     // A or E
-      drone = warm > 0.1 || avgL < 0.4 ? { voice: 'reed', midi: onA ? 45 : 38 } : { voice: 'pad', midi: onA ? 57 : 50 };
+      drone = { voice: HELD[voice], midi: warm > 0.1 || avgL < 0.4 ? (onA ? 45 : 38) : (onA ? 57 : 50) };
     }
-    return { voice: voice, notes: setName, order: order, rhythm: rhythm, gap: gap, spread: spread, trill: trill, drone: drone, events: events, total: Math.round(at) };
+    return { voice: voice, strict: strict, unit: unit, notes: setName, order: order, rhythm: rhythm, gap: gap, spread: spread, trill: trill, drone: drone,
+             saw: (hash(p.url) >>> 7) % 3 !== 0, eighth: (gap < 170 ? 2 : 1) * gap / 1000, beat: Math.max(0.55, Math.min(0.95, gap * 3 / 1000)),
+             events: events, total: Math.round(at) };
   }
 
   /* ---------- the page ---------- */
@@ -146,17 +181,28 @@
   quiet.type = 'button'; quiet.className = 'hc-pp-quiet'; quiet.id = 'hc-pp-quiet'; quiet.setAttribute('aria-pressed', 'false');
   quiet.textContent = 'Turn the sound off';
 
-  /* ---------- sound: instruments built from scratch, no samples ---------- */
-  var ctx = null, master, verbSend, delaySend, NOISE, KS = {}, volume = 0.7, muted = false, timers = [], holding = [], lastNote = 0;
+  /* ---------- sound: analog-style synths built from scratch, no samples ---------- */
+  // Saw and pulse oscillators, two or three a hair apart and drifting a little differently on every note, through resonant filters
+  // whose cutoff moves with each note; a soft saturation over everything. Every source stops (and lets go of its wiring) when its note ends.
+  var ctx = null, master, verbSend, delaySend, hallSend, NOISE, PW = {}, CURVES = {}, volume = 0.7, muted = false, timers = [], holding = [], lastNote = 0, SRC = null;
   function mtof(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+  // a reverb's impulse: noise fading out; dark = the tail loses its highs as it goes, like a big soft room
+  function impulse(secs, shape, dark) {
+    var len = Math.floor(ctx.sampleRate * secs), buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (var c = 0; c < 2; c++) { var d = buf.getChannelData(c), lp = 0;
+      for (var i = 0; i < len; i++) { var x = i / len, a = dark ? 0.85 - 0.75 * x : 1; lp += a * (Math.random() * 2 - 1 - lp); d[i] = lp * Math.pow(1 - x, shape); } }
+    return buf;
+  }
   function setup(ac) {
-    ctx = ac; KS = {};
+    ctx = ac; PW = {}; CURVES = {};
     master = ctx.createGain(); master.gain.value = muted ? 0 : volume;
+    var warmth = ctx.createWaveShaper(); warmth.curve = soft(1.3); warmth.oversample = '2x';     // gentle tape-ish saturation over everything
     var comp = ctx.createDynamicsCompressor(); comp.threshold.value = -20; comp.ratio.value = 3;
-    master.connect(comp); comp.connect(ctx.destination);
-    var verb = ctx.createConvolver(), len = Math.floor(ctx.sampleRate * 3.8), buf = ctx.createBuffer(2, len, ctx.sampleRate);
-    for (var c = 0; c < 2; c++) { var data = buf.getChannelData(c); for (var i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6); }
-    verb.buffer = buf; verbSend = ctx.createGain(); verbSend.gain.value = 0.55; verbSend.connect(verb); verb.connect(master);
+    master.connect(warmth); warmth.connect(comp); comp.connect(ctx.destination);
+    var verb = ctx.createConvolver(); verb.buffer = impulse(3.2, 2.6, false);
+    verbSend = ctx.createGain(); verbSend.gain.value = 0.5; verbSend.connect(verb); verb.connect(master);
+    var hall = ctx.createConvolver(); hall.buffer = impulse(6, 1.7, true);                       // the long, shimmering hall (Jon Hopkins)
+    hallSend = ctx.createGain(); hallSend.gain.value = 0.55; hallSend.connect(hall); hall.connect(master);
     var delay = ctx.createDelay(1.5), fb = ctx.createGain(), tone = ctx.createBiquadFilter();
     delay.delayTime.value = 0.46; fb.gain.value = 0.3; tone.type = 'lowpass'; tone.frequency.value = 1800;
     delaySend = ctx.createGain(); delaySend.gain.value = 0.3;
@@ -166,190 +212,277 @@
   }
   function initAudio() { var AC = window.AudioContext || window.webkitAudioContext; if (AC) setup(new AC()); }
 
-  function osc(type, f, t0, t1, dest, cents) { var o = ctx.createOscillator(); o.type = type; o.frequency.value = f; if (cents) o.detune.value = cents;
-    o.connect(dest); o.start(t0); o.stop(t1); return o; }
+  // soft saturation: slope 1 for quiet signals, rounding off towards 1/k
+  function soft(k) { if (CURVES[k]) return CURVES[k]; var n = 2048, c = new Float32Array(n);
+    for (var i = 0; i < n; i++) { var x = i / (n - 1) * 2 - 1; c[i] = Math.tanh(k * x) / k; } return (CURVES[k] = c); }
+  function shaper(k, dest) { var w = ctx.createWaveShaper(); w.curve = soft(k); if (dest) w.connect(dest); return w; }
+  // a band-limited pulse wave of width w (0.5 = square)
+  function pulse(w) {
+    if (PW[w]) return PW[w];
+    var n = 128, re = new Float32Array(n), im = new Float32Array(n);
+    for (var k = 1; k < n; k++) { re[k] = Math.sin(2 * Math.PI * k * w) / (Math.PI * k); im[k] = (1 - Math.cos(2 * Math.PI * k * w)) / (Math.PI * k); }
+    return (PW[w] = ctx.createPeriodicWave(re, im));
+  }
+  function track(s, t1) { s._end = t1; s.onended = function () { try { s.disconnect(); } catch (e) {} }; if (SRC) SRC.push(s); return s; }
+  function osc(type, f, t0, t1, dest, cents) { var o = ctx.createOscillator();
+    if (typeof type === 'string') o.type = type; else o.setPeriodicWave(type);
+    o.frequency.value = f; if (cents) o.detune.value = cents; if (dest) o.connect(dest); o.start(t0); o.stop(t1); return track(o, t1); }
   function env(t, peak, atk, dec) {
-    var g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t);
+    var g = ctx.createGain(); g.gain.value = 0.0001; g.gain.setValueAtTime(0.0001, t);
     g.gain.linearRampToValueAtTime(peak, t + atk); g.gain.exponentialRampToValueAtTime(0.0001, t + atk + dec);
     return g;
   }
   function filt(type, f, q, dest) { var b = ctx.createBiquadFilter(); b.type = type; b.frequency.value = f; if (q != null) b.Q.value = q; if (dest) b.connect(dest); return b; }
   function amp(v, dest) { var g = ctx.createGain(); g.gain.value = v; g.connect(dest); return g; }
-  function noise(t, dur, dest) { var s = ctx.createBufferSource(); s.buffer = NOISE; s.loop = true; s.connect(dest); s.start(t, Math.random() * 1.5); s.stop(t + dur); return s; }
-
-  // a plucked string (Karplus-Strong): a burst of noise going round a loop one period long, softened a little on every pass.
-  // A softer burst (quieter note) starts darker.
-  function ks(f, v, dur) {
-    var sr = ctx.sampleRate, key = f.toFixed(1) + '|' + Math.round(v * 4) + '|' + dur.toFixed(2);
-    if (KS[key]) return KS[key];
-    var N = Math.max(2, Math.round(sr / f - 0.5)), len = Math.floor(sr * dur), b = ctx.createBuffer(1, len, sr), d = b.getChannelData(0);
-    var a = 0.12 + 0.75 * v, lp = 0, m = 0, mx = 0, i;
-    for (i = 0; i < N; i++) { lp += a * (Math.random() * 2 - 1 - lp); d[i] = lp; m += lp; }
-    m /= N; for (i = 0; i < N; i++) { d[i] -= m; mx = Math.max(mx, Math.abs(d[i])); }
-    for (i = 0; i < N; i++) d[i] /= mx || 1;
-    var rho = Math.pow(0.001, 1 / (f * dur));
-    for (i = N; i < len; i++) d[i] = rho * 0.5 * (d[i - N] + (i > N ? d[i - N - 1] : 0));
-    if (Object.keys(KS).length > 160) KS = {};
-    return (KS[key] = b);
+  function noise(t, dur, dest) { var s = ctx.createBufferSource(); s.buffer = NOISE; s.loop = true; s.connect(dest); s.start(t, Math.random() * 1.5); s.stop(t + dur); return track(s, t + dur); }
+  function drift(c, a) { return (c || 0) + (Math.random() * 2 - 1) * a; }        // analog oscillators never sit exactly where they were set
+  // a gate: up in atk, settling to sus × peak, held until off, then let go
+  function vca(t, peak, atk, sus, decTau, off, relTau, dest) {
+    var g = ctx.createGain(); g.gain.value = 0; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + atk);
+    g.gain.setTargetAtTime(peak * sus, t + atk, decTau); g.gain.setTargetAtTime(0, Math.max(t + atk, off), relTau);
+    if (dest) g.connect(dest); return g;
+  }
+  function sweep(p, t, from, to, tau) { p.setValueAtTime(from, t); p.setTargetAtTime(to, t + 0.002, tau); }
+  // pitch wobble in cents (vibrato, tape wow and flutter), optionally fading in after `wait`
+  function wobble(rate, cents, t, t1, oscs, wait, fade) {
+    var l = osc('sine', rate, t, t1), g = ctx.createGain(); l.connect(g);
+    if (wait) { g.gain.setValueAtTime(0, t); g.gain.setValueAtTime(0, t + wait); g.gain.linearRampToValueAtTime(cents, t + wait + fade); } else g.gain.value = cents;
+    oscs.forEach(function (o) { g.connect(o.detune); });
+  }
+  function glide(oscs, ratios, t, from, f, tau) { oscs.forEach(function (o, i) { o.frequency.setValueAtTime(from * ratios[i], t); o.frequency.setTargetAtTime(f * ratios[i], t, tau); }); }
+  // pulse-width modulation, the string machine way: a saw minus a slightly later copy of itself is a pulse; moving the delay moves the width
+  function pwm(f, t, t1, dest, rate, cents) {
+    var s = osc('sawtooth', f, t, t1, dest, cents), d = ctx.createDelay(0.05); d.delayTime.value = 0.5 / f;
+    s.connect(d); d.connect(amp(-1, dest));
+    var l = osc('sine', rate, t, t1); l.connect(amp(0.3 / f, d.delayTime));
+    return s;
+  }
+  // a held note's level: a slow rise, held for len, a long let-go
+  function swell(t, peak, rise, len, relTau, dest) {
+    var g = ctx.createGain(); g.gain.value = 0; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + rise);
+    g.gain.setValueAtTime(peak, Math.max(t + rise, t + len)); g.gain.setTargetAtTime(0, Math.max(t + rise, t + len), relTau);
+    if (dest) g.connect(dest); return g;
   }
 
-  // Each voice: (start time, frequency, output, {vel, len, short, trill}) → [reverb send, echo send].
-  // vel changes brightness as well as loudness; short is for the quick notes of a trill.
+  // Each voice: (start time, frequency, output, options) → [reverb send, echo send, long hall send].
+  // Options: vel (brightness as well as loudness), len, short (a quick trill note), from (the previous note, for glides),
+  // accent, slide, stab, trill (a legato trill), saw, unit / eighth / beat (the strip's grid, in seconds).
   var VOICES = {
-    // nylon-ish plucked string
-    pluck: function (t, f, out, o) {
-      var v = o.vel, dur = o.short ? 0.4 : Math.min(3.4, 0.9 + 1.4 * Math.pow(330 / f, 0.4)), N = Math.max(2, Math.round(ctx.sampleRate / f - 0.5));
-      var src = ctx.createBufferSource(); src.buffer = ks(f, v, dur); src.playbackRate.value = f * (N + 0.5) / ctx.sampleRate;
-      var lp = filt('lowpass', 700 + 4200 * v * v, 0.5, out), body = filt('peaking', 210, 1.1, lp); body.gain.value = 3;
-      var g = ctx.createGain(); g.gain.setValueAtTime(0.25, t); g.gain.setValueAtTime(0.25, t + dur - 0.06); g.gain.linearRampToValueAtTime(0, t + dur); g.connect(body);
-      src.connect(g); src.start(t); src.stop(t + dur + 0.02);
-      return [0.5, 0.28];
+    // Kraftwerk: dry, exact pulse-wave blips with a snappy filter, a square an octave down for weight
+    kraft: function (t, f, out, o) {
+      var v = o.vel, on = o.short ? o.len * 0.5 : Math.min(0.3, Math.max(0.07, (o.len || 0.3) * 0.5)), end = t + on + 0.08;
+      var g = vca(t, 0.065, 0.002, 0.7, 0.05, t + on, 0.008, out);
+      var lp = filt('lowpass', 1000, 4 + 4 * v, g);
+      sweep(lp.frequency, t, Math.min(14000, f * 4 + 4000 * v), f * 1.8 + 350, 0.04);
+      osc(pulse(0.25), f, t, end, lp, drift(0, 1.5));
+      osc(pulse(0.5), f / 2, t, end, amp(0.45, lp), drift(0, 1.5));
+      return [0.06, 0.04, 0];
     },
-    // soft electric piano (Rhodes-style FM, from the blob-pond): a little bell-like brightness that mellows as it rings, a slightly detuned twin
-    ep: function (t, f, out, o) {
-      var v = o.vel, dec = o.short ? 0.35 : 3.4, end = t + dec + 0.2;
-      var car = ctx.createOscillator(); car.frequency.value = f;
-      var mod = ctx.createOscillator(); mod.frequency.value = f;
-      var mg = ctx.createGain(); mg.gain.setValueAtTime(f * (0.4 + 1.3 * v), t); mg.gain.exponentialRampToValueAtTime(f * 0.03, t + Math.min(dec, 1.3));
-      mod.connect(mg); mg.connect(car.frequency);
-      var soft = filt('lowpass', 1300 + 2200 * v, 0.4, out);
-      var g = env(t, 0.1, 0.005, dec); g.connect(soft); car.connect(g);
-      var g2 = env(t, 0.03, 0.008, dec * 0.8); g2.connect(soft); osc('sine', f, t, end, g2, 6);
-      var tg = env(t, 0.012 * v, 0.002, 0.16); tg.connect(soft); osc('sine', f * 7, t, t + 0.22, tg);   // the tine's tick
-      car.start(t); mod.start(t); car.stop(end); mod.stop(end);
-      return [0.6, 0.25];
+    // Kraftwerk's held note: a buzzy vocoder-like drone, saw and narrow pulse through a few fixed vowel formants
+    vocoder: function (t, f, out, o) {
+      var len = o.len || 2, end = t + len + 2.6; while (f < 140) f *= 2;
+      var g = swell(t, 1, 0.5, len, 0.4, out), pre = shaper(1.5), src = amp(0.5, pre);
+      osc('sawtooth', f, t, end, src, drift(-4, 2)); osc(pulse(0.18), f, t, end, amp(0.6, src), drift(5, 2));
+      [[650, 0.36], [1080, 0.26], [2300, 0.17], [3200, 0.11]].forEach(function (p) { pre.connect(filt('bandpass', p[0], 9, amp(p[1], g))); });
+      pre.connect(filt('lowpass', 450, 0.7, amp(0.07, g)));
+      return [0.25, 0.1, 0];
     },
-    // felt piano: slightly stretched overtones that fade fastest at the top, two strings a hair apart, a soft hammer thud
-    felt: function (t, f, out, o) {
-      var v = o.vel, dec = o.short ? 0.35 : Math.max(1, Math.min(4, 2.6 * Math.pow(260 / f, 0.35))), end = t + dec + 0.1;
-      var lp = filt('lowpass', 700 + 2600 * v, 0.5, out), sum = amp(1, lp);
-      for (var n = 1; n <= 6; n++) {
-        var fn = f * n * Math.sqrt(1 + 0.00035 * n * n); if (fn > 9000) break;
-        var a = Math.pow(n, -1.5) * (n === 1 ? 1 : Math.pow(v, 0.25 * n)) * 0.08;
-        var g = env(t, a, 0.008 + 0.006 * (1 - v), dec / (1 + 0.7 * (n - 1))); g.connect(sum); osc('sine', fn, t, end, g, n <= 2 ? -1.5 : 0);
-        if (n <= 2) { var g2 = env(t, a * 0.7, 0.01, dec * 1.1 / n); g2.connect(sum); osc('sine', fn, t, end, g2, 1.8); }
-      }
-      var th = env(t, 0.06 * v, 0.002, 0.05); th.connect(sum); noise(t, 0.08, filt('bandpass', Math.min(1800, f * 2), 0.9, th));
-      return [0.55, 0.2];
-    },
-    // breathy flute: a round tone with air tuned to the note, a little chiff at the start and a slow vibrato; trills legato
-    flute: function (t, f, out, o) {
-      var v = o.vel, tr = o.trill, len = tr ? tr.n * tr.step / 1000 + 0.1 : Math.max(0.22, o.len || 0.5), rel = o.short ? 0.06 : 0.3, end = t + len + rel * 2 + 0.1;
-      var a = ctx.createGain(); a.gain.setValueAtTime(0.0001, t); a.gain.linearRampToValueAtTime(0.06, t + 0.07);
-      a.gain.setValueAtTime(0.06, t + len); a.gain.setTargetAtTime(0.0001, t + len, rel / 3);
-      var lp = filt('lowpass', 1500 + 2500 * v, 0.3, out); a.connect(lp);
-      var s1 = ctx.createOscillator(); s1.frequency.value = f; s1.connect(a);
-      var s2 = ctx.createOscillator(); s2.type = 'triangle'; s2.frequency.value = f; s2.connect(amp(0.15 + 0.2 * v, a));
-      var bp = filt('bandpass', f, 9); bp.connect(amp(2.2, a)); noise(t, end - t, bp);                          // breath tuned to the note
-      noise(t, end - t, filt('highpass', 3000, 0.5, amp(0.05, a)));                                              // air
-      var ch = env(t, 0.025 * v, 0.004, 0.06); ch.connect(lp); noise(t, 0.08, filt('bandpass', Math.min(5000, f * 3), 2, ch));   // chiff
-      var vib = ctx.createOscillator(), vg = ctx.createGain(); vib.frequency.value = 4.6 + Math.random() * 0.6;
-      vg.gain.setValueAtTime(0, t); vg.gain.linearRampToValueAtTime(f * 0.005, t + 0.45); vib.connect(vg); vg.connect(s1.frequency); vg.connect(s2.frequency);
+    // Gary Numan: a fat lead of detuned saws and a sub-octave saw, saturated, through a two-stage low-pass; vibrato fades in; glides between notes
+    numan: function (t, f, out, o) {
+      var v = o.vel, tr = o.trill, len = tr ? tr.n * tr.step / 1000 + 0.06 : Math.max(0.16, o.len || 0.4), rel = o.short && !tr ? 0.05 : 0.3, end = t + len + rel * 5;
+      var g = vca(t, 0.12, 0.012, 0.8, 0.3, t + len, rel / 2, out);
+      var lp2 = filt('lowpass', 1000, 0.6, g), lp1 = filt('lowpass', 1000, 1.6, lp2), mix = amp(0.4, shaper(1.8, lp1));
+      var top = Math.min(9000, f * 6 + 2400 * v), sus = Math.min(6000, f * 3 + 600 * v);
+      [lp1, lp2].forEach(function (b) { b.frequency.setValueAtTime(f * 1.5 + 200, t); b.frequency.linearRampToValueAtTime(top, t + 0.06);
+        b.frequency.setTargetAtTime(sus, t + 0.06, 0.3); b.frequency.setTargetAtTime(f + 250, t + len, rel); });
+      var os = [osc('sawtooth', f, t, end, mix, drift(-8, 3)), osc('sawtooth', f, t, end, mix, drift(7, 3)), osc('sawtooth', f / 2, t, end, amp(0.6, mix), drift(0, 3))], rs = [1, 1, 0.5];
+      if (o.from && !o.short) glide(os, rs, t, o.from, f, 0.03);
+      if (!o.short || tr) wobble(5.2, 11, t, end, os, 0.35, 0.8);
       if (tr) for (var q = 1; q < tr.n; q++) { var fq = q % 2 ? tr.f2 : f, tq = t + q * tr.step / 1000;
-        [s1.frequency, s2.frequency, bp.frequency].forEach(function (pp) { pp.setTargetAtTime(fq, tq, 0.006); }); }
-      [s1, s2, vib].forEach(function (x) { x.start(t); x.stop(end); });
-      return [0.6, 0.3];
+        os.forEach(function (x, i) { x.frequency.setTargetAtTime(fq * rs[i], tq, 0.012); }); }
+      return [0.4, 0.22, 0];
     },
-    // struck glass: inharmonic partials (a free bar's 1 : 2.76 : 5.4 : 8.9), the low ones beating slowly, a tiny click
-    glass: function (t, f, out, o) {
-      var v = o.vel, k = o.short ? 0.18 : 1, lp = filt('lowpass', 2500 + 4000 * v, 0.3, out);
-      [[1, 1, 3.4], [2.756, 0.4 * v, 1.6], [5.404, 0.18 * v * v, 0.7], [8.933, 0.07 * v * v, 0.3]].forEach(function (p, i) {
-        var fp = f * p[0]; if (fp > 12000) return;
-        var g = env(t, 0.06 * p[1], 0.002, Math.max(0.12, p[2] * k)); g.connect(lp); osc('sine', fp, t, t + p[2] * k + 0.1, g);
-        if (i < 2) { var g2 = env(t, 0.03 * p[1], 0.002, Math.max(0.12, p[2] * k)); g2.connect(lp); osc('sine', fp + 0.8, t, t + p[2] * k + 0.1, g2); }
-      });
-      var c = env(t, 0.012 * v, 0.001, 0.02); c.connect(lp); noise(t, 0.04, filt('highpass', 2500, 0.7, c));
-      return [0.7, 0.3];
+    // Numan's held note: a string machine, pulse-width-modulated saws and an octave, through an ensemble chorus
+    strings: function (t, f, out, o) {
+      var len = o.len || 2, end = t + len + 3.6; if (f < 100) f *= 2;
+      var g = swell(t, 0.045, 1.1, len, 0.6, out), lp = filt('lowpass', 2200, 0.5);
+      pwm(f, t, end, lp, 0.7, drift(-5, 2)); pwm(f * 2, t, end, amp(0.6, lp), 0.53, drift(6, 2)); osc('sawtooth', f * 2, t, end, amp(0.3, lp), drift(9, 3));
+      lp.connect(amp(0.6, g));
+      [[0.011, 0.53], [0.017, 0.81]].forEach(function (c) { var dl = ctx.createDelay(0.05); dl.delayTime.value = c[0]; lp.connect(dl); dl.connect(amp(0.5, g));
+        osc('sine', c[1], t, end).connect(amp(0.004, dl.delayTime)); });
+      return [0.5, 0.15, 0.1];
     },
-    // wooden bars over a tube: tuned overtones (1 : 4 : 10), a soft mallet knock and a short hollow ring
-    wood: function (t, f, out, o) {
-      var v = o.vel, d = (o.short ? 0.3 : 1) * Math.min(1.4, 0.75 * Math.pow(330 / f, 0.5)), lp = filt('lowpass', 1800 + 3000 * v, 0.4, out);
-      [[1, 1, 1], [3.99, 0.22 * v, 0.28], [10.1, 0.05 * v, 0.08]].forEach(function (p) {
-        var fp = f * p[0]; if (fp > 12000) return;
-        var g = env(t, 0.15 * p[1], 0.002, d * p[2]); g.connect(lp); osc('sine', fp, t, t + d * p[2] + 0.05, g);
-      });
-      noise(t, 0.03, filt('bandpass', f, 40, amp(1.1 * v, lp)));                                                         // the tube
-      var m = env(t, 0.04 * v, 0.001, 0.008); m.connect(lp); noise(t, 0.02, filt('lowpass', 1500 + 2000 * v, 0.5, m));   // the mallet
-      return [0.45, 0.25];
+    // Boards of Canada: a warm, slightly out-of-tune soft lead, low-passed, with slow tape wow and flutter, and a little hiss
+    boc: function (t, f, out, o) {
+      var v = o.vel, d = o.short ? 0.22 : Math.max(0.6, Math.min(1.9, (o.len || 0.5) * 1.2 + 0.5)), end = t + d + 1.3, off = drift(0, 7);
+      var g = vca(t, 0.052, 0.03, 0.42, 0.35, t + d, 0.3, out), lp = filt('lowpass', 800, 0.9, g);
+      lp.frequency.setValueAtTime(400 + 500 * v, t); lp.frequency.linearRampToValueAtTime(Math.min(4000, f * 2.5 + 1100 * v), t + 0.08);
+      lp.frequency.setTargetAtTime(Math.min(1500, f * 1.5 + 350), t + 0.08, 0.6);
+      var os = [osc('sawtooth', f, t, end, amp(0.45, lp), off - 6), osc('triangle', f, t, end, lp, off + 5)];
+      if (!o.short) {
+        wobble(0.45 + Math.random() * 0.25, 4.5, t, end, os); wobble(6.5 + Math.random(), 1.5, t, end, os);
+        noise(t, d + 1, filt('highpass', 4500, 0.5, vca(t, 0.0035, 0.05, 1, 1, t + d, 0.3, out)));
+      }
+      return [0.55, 0.32, 0.15];
     },
-    // kalimba tine: a sine that settles from a hair sharp, the tine's high overtone (≈5.9×), a wooden box
-    tine: function (t, f, out, o) {
-      var v = o.vel, d = o.short ? 0.3 : Math.min(2.6, 1.3 * Math.pow(440 / f, 0.3));
-      var lp = filt('lowpass', 2200 + 3500 * v, 0.4, out), body = filt('peaking', 420, 1.5, lp); body.gain.value = 4;
-      var g = env(t, 0.13, 0.003, d); g.connect(body);
-      var o1 = osc('sine', f, t, t + d + 0.1, g); o1.frequency.setValueAtTime(f * 1.006, t); o1.frequency.exponentialRampToValueAtTime(f, t + 0.05);
-      var g2 = env(t, 0.03 * v, 0.001, 0.12); g2.connect(body); osc('sine', f * 5.93, t, t + 0.2, g2);
-      var g3 = env(t, 0.012, 0.004, d * 0.5); g3.connect(body); osc('sine', f * 2, t, t + d * 0.5 + 0.1, g3);
-      var c = env(t, 0.03 * v, 0.001, 0.006); c.connect(body); noise(t, 0.02, filt('bandpass', 3000, 1, c));
-      return [0.5, 0.3];
-    },
-    // the held notes underneath. pad: round tones with a slight chorus, a filter that blooms and closes, slow breathing
-    pad: function (t, f, out, o) {
-      var len = o.len || 2, end = t + len + 4.2;
-      var lp = filt('lowpass', 350, 0.3, out);
-      lp.frequency.setValueAtTime(350, t); lp.frequency.linearRampToValueAtTime(1300, t + 1.6); lp.frequency.linearRampToValueAtTime(500, t + len + 4);
-      var g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.07, t + 1.6);
-      g.gain.setValueAtTime(0.07, t + len); g.gain.exponentialRampToValueAtTime(0.0001, t + len + 4); g.connect(lp);
-      var lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.25; lg.gain.value = 0.014; lfo.connect(lg); lg.connect(g.gain); lfo.start(t); lfo.stop(end);
-      [[f, 1, 'sine'], [f * 2, 0.25, 'sine'], [f * 1.5, 0.3, 'triangle']].forEach(function (p) {
-        [-5, 5].forEach(function (cents) { osc(p[2], p[0], t, end, amp(p[1] * 0.5, g), cents); });
-      });
-      return [0.9, 0.12];
-    },
-    // reed: a shruti-box drone, detuned reeds through a low, slowly breathing filter
-    reed: function (t, f, out, o) {
+    // BoC's held note: a detuned saw pad, warm and low, on the same wobbly tape
+    tape: function (t, f, out, o) {
       var len = o.len || 2, end = t + len + 3.2;
-      var lp = filt('lowpass', 520, 0.6, out);
-      var lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.19; lg.gain.value = 140; lfo.connect(lg); lg.connect(lp.frequency); lfo.start(t); lfo.stop(end);
-      var g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.026, t + 1.2);
-      g.gain.setValueAtTime(0.026, t + len); g.gain.exponentialRampToValueAtTime(0.0001, t + len + 3); g.connect(lp);
-      [[f, -6, 1], [f, 6, 1], [f * 2, 3, 0.35], [f * 1.5, -2, 0.25]].forEach(function (p) { osc('sawtooth', p[0], t, end, amp(p[2] * 0.5, g), p[1]); });
-      return [0.8, 0.1];
+      var g = swell(t, 0.1, 1.4, len, 0.5, out), lp = filt('lowpass', 700, 0.7, g);
+      var os = [[f, -11, 0.5, 'sawtooth'], [f, 9, 0.5, 'sawtooth'], [f * 2, 3, 0.3, 'triangle'], [f * 1.5, -4, 0.15, 'triangle']]
+        .map(function (p) { return osc(p[3], p[0], t, end, amp(p[2], lp), drift(p[1], 4)); });
+      wobble(0.38, 9, t, end, os); wobble(5.8, 1.5, t, end, os);
+      noise(t, len + 2, filt('highpass', 4500, 0.5, amp(0.0015, g)));
+      return [0.7, 0.15, 0.2];
+    },
+    // Aphex Twin: a 303-style acid line, one saw or square into a very resonant low-pass whose envelope snaps shut; accents bite harder,
+    // soft notes slide in from the last one; a trill becomes a quick ratchet with the filter opening and closing across it
+    acid: function (t, f, out, o) {
+      var v = o.vel, acc = o.accent && !o.short, sl = o.slide && o.from && !o.short,
+        on = o.short ? o.len * 0.45 : Math.min(0.3, Math.max(0.07, (o.len || 0.25) * 0.55)) + (sl ? 0.03 : 0), end = t + on + 0.12;
+      var g = vca(t, acc ? 0.12 : 0.1, 0.003, 0.85, 0.15, t + on, 0.012, out);
+      var lp2 = filt('lowpass', 5000, 0.5, shaper(1.6, g)), lp = filt('lowpass', 1000, acc ? 15 : 11, lp2);
+      var base = Math.min(1100, f * 1.4 + 170), peak = sl ? base * 1.6 : Math.min(7000, base + (o.short ? 400 + 1600 * (o.sweep || 0) : acc ? 2600 : 1500) * (0.6 + 0.4 * v));
+      sweep(lp.frequency, t, peak, base, acc ? 0.06 : 0.11);
+      var s = osc(o.saw ? 'sawtooth' : pulse(0.5), f, t, end, amp(0.6, lp), drift(0, 2));
+      if (sl) glide([s], [1], t, o.from, f, 0.022);
+      return [0.14, 0.2, 0];
+    },
+    // Aphex's held note: a dark, slowly breathing ambient pad (Selected Ambient Works), sines and a soft octave
+    ambient: function (t, f, out, o) {
+      var len = o.len || 2, end = t + len + 4; if (f < 100) f *= 2;
+      var g = swell(t, 0.06, 1.8, len, 0.8, out), lp = filt('lowpass', 500, 0.8, g);
+      lp.frequency.setValueAtTime(500, t); lp.frequency.linearRampToValueAtTime(1400, t + 2); lp.frequency.linearRampToValueAtTime(600, t + len + 3);
+      var os = [[f, -6, 'sine', 0.5], [f, 6, 'sine', 0.5], [f * 2, -3, 'triangle', 0.2], [f * 3, 4, 'sine', 0.06]]
+        .map(function (p) { return osc(p[2], p[0], t, end, amp(p[3], lp), drift(p[1], 3)); });
+      wobble(0.17, 4, t, end, os);
+      return [0.85, 0.12, 0.3];
+    },
+    // Jon Hopkins: a soft felt-and-glass tone, a slow swell of warm saws underneath, an octave shimmer that goes only into the long hall
+    hopkins: function (t, f, out, o) {
+      var v = o.vel, d = o.short ? 0.35 : Math.max(1.4, Math.min(3.6, 2.8 * Math.pow(330 / f, 0.3))), end = t + d + 0.2;
+      var lp = filt('lowpass', Math.min(9000, 1300 + 2600 * v), 0.4, out);
+      var g = env(t, 0.085, 0.006 + 0.01 * (1 - v), d); g.connect(lp); osc('sine', f, t, end, g, drift(-2, 1));
+      var g2 = env(t, 0.03, 0.008, d * 0.9); g2.connect(lp); osc('triangle', f, t, end, g2, drift(3, 1));
+      var g3 = env(t, 0.022 * v, 0.004, d * 0.4); g3.connect(lp); osc('sine', f * 2, t, t + d * 0.4 + 0.1, g3);
+      if (f * 4 < 9000) { var g4 = env(t, 0.008 * v * v, 0.002, 0.5); g4.connect(lp); osc('sine', f * 4.02, t, t + 0.6, g4); }   // glassy
+      var th = env(t, 0.05 * v, 0.002, 0.05); th.connect(lp); noise(t, 0.08, filt('lowpass', 900, 0.7, th));                     // felt
+      if (!o.short) {
+        var sw = ctx.createGain(); sw.gain.value = 0; sw.gain.setValueAtTime(0, t); sw.gain.linearRampToValueAtTime(0.016, t + 0.9); sw.gain.linearRampToValueAtTime(0, t + d + 0.8);
+        sw.connect(filt('lowpass', Math.min(1200, f * 2), 0.6, out));
+        osc('sawtooth', f, t, t + d + 0.85, sw, drift(-7, 2)); osc('sawtooth', f, t, t + d + 0.85, sw, drift(7, 2));
+        var sh = ctx.createGain(); sh.gain.value = 0; sh.gain.setValueAtTime(0, t); sh.gain.linearRampToValueAtTime(0.02, t + 0.6); sh.gain.exponentialRampToValueAtTime(0.0001, t + d + 1.6); sh.connect(hallSend);
+        osc('sine', f * 2, t, t + d + 1.7, sh, 3); if (f * 4 < 7000) osc('sine', f * 4, t, t + d + 1.7, amp(0.5, sh), -3);
+      }
+      return [0.15, 0.08, 0.9];
+    },
+    // Hopkins's held note: a warm pad that pumps slowly, ducking on every beat and swelling back
+    pump: function (t, f, out, o) {
+      var len = o.len || 2, end = t + len + 3.6, beat = o.beat || 0.6; if (f < 100) f *= 2;
+      var pump = ctx.createGain(); pump.connect(out); pump.gain.value = 1;
+      for (var b = t + 0.4; b < end; b += beat) { pump.gain.setTargetAtTime(0.25, b, 0.012); pump.gain.setTargetAtTime(1, b + 0.06, beat / 3.5); }
+      var g = swell(t, 0.055, 1.6, len, 0.7, pump), lp = filt('lowpass', 600, 0.6, g);
+      lp.frequency.setValueAtTime(600, t); lp.frequency.linearRampToValueAtTime(1600, t + len);
+      [[f, -7, 'sawtooth', 0.4], [f, 7, 'sawtooth', 0.4], [f * 2, 2, 'triangle', 0.25], [f / 2, 0, 'sine', 0.4]]
+        .forEach(function (p) { osc(p[2], p[0], t, end, amp(p[3], lp), drift(p[1], 3)); });
+      return [0.3, 0.05, 0.7];
+    },
+    // Italo disco: a plucky arpeggio note with a dotted-eighth echo; first and strong notes add a bright, brassy poly stab
+    italo: function (t, f, out, o) {
+      var v = o.vel, e = o.eighth || 0.25;
+      function pluck(t0, lvl, br) {
+        var g = vca(t0, lvl, 0.002, 0.3, 0.08, t0 + 0.14, 0.04, out), lp = filt('lowpass', 1000, 4.5, g);
+        sweep(lp.frequency, t0, Math.min(12000, (f * 6 + 3500 * v) * br), f * 1.4 + 250, 0.05);
+        osc(pulse(0.3), f, t0, t0 + 0.4, lp, drift(-5, 2)); osc('sawtooth', f, t0, t0 + 0.4, amp(0.7, lp), drift(6, 2));
+      }
+      pluck(t, 0.1, 1);
+      if (!o.short) { pluck(t + 1.5 * e, 0.032, 0.6); pluck(t + 3 * e, 0.012, 0.4); }
+      if (o.stab && !o.short) {
+        var pc = o.midi % 12, st = pc === 4 || pc === 5 ? 5 : 7;   // a fifth above, or a fourth above E and F, so the chord stays in the scale
+        var sg = vca(t, 0.03, 0.012, 0.7, 0.1, t + 0.2, 0.06, out), sl = filt('lowpass', 500, 1.8, sg);
+        sl.frequency.setValueAtTime(500, t); sl.frequency.linearRampToValueAtTime(Math.min(9000, 2800 + 2200 * v), t + 0.035); sl.frequency.setTargetAtTime(1300, t + 0.035, 0.12);
+        [1, Math.pow(2, st / 12), 2].forEach(function (k) { [-8, 8].forEach(function (c) { osc('sawtooth', f * k, t, t + 0.65, amp(0.33, sl), drift(c, 3)); }); });
+      }
+      return [0.2, 0.08, 0];
+    },
+    // Italo's held note: the octave-jumping bass, low and high on every eighth, each one plucked through a resonant filter
+    octbass: function (t, f, out, o) {
+      var len = o.len || 2, e = o.eighth || 0.25, end = t + len + 0.4, low = f >= 100 ? f / 2 : f;
+      var g = ctx.createGain(); g.gain.value = 0; g.connect(out);
+      var lp = filt('lowpass', 400, 6, g), mix = amp(0.5, shaper(1.5, lp));
+      var os = [osc('sawtooth', low, t, end, mix, drift(-4, 2)), osc(pulse(0.5), low, t, end, amp(0.6, mix), drift(5, 2))];
+      for (var k = 0, tk = t; tk < t + len; k++, tk = t + k * e) {
+        var fk = k % 2 ? low * 2 : low;
+        os.forEach(function (x) { x.frequency.setValueAtTime(fk, tk); });
+        lp.frequency.setValueAtTime(Math.min(3000, fk * 8 + 700), tk); lp.frequency.setTargetAtTime(fk * 2 + 120, tk + 0.002, 0.05);
+        g.gain.setValueAtTime(0, tk); g.gain.linearRampToValueAtTime(0.07, tk + 0.004); g.gain.setTargetAtTime(0.035, tk + 0.004, 0.06); g.gain.setTargetAtTime(0, tk + e * 0.7, 0.012);
+      }
+      return [0.05, 0.03, 0];
     }
   };
-  // returns the note's own gain, so a held note can be faded out early
+  // returns the note's own gain (carrying its sources), so a held note can be faded and stopped early
   function play(voice, midi, pan, vel, o) {
     if (!ctx || muted) return null;
-    o = o || {}; o.vel = vel;
-    var t = o.t != null ? o.t : ctx.currentTime + 0.01, out = ctx.createGain(), node = out;
+    o = o || {}; o.vel = vel; o.midi = midi; if (o.fromMidi != null) o.from = mtof(o.fromMidi);
+    // start on a whole sample, and every envelope's gain sits at zero before its note (a gain left at its default of 1 lets a
+    // source starting a hair early through at full level: an audible click)
+    var t = Math.ceil((o.t != null ? o.t : ctx.currentTime + 0.01) * ctx.sampleRate) / ctx.sampleRate, out = ctx.createGain(), node = out;
     out.gain.value = 0.35 + 0.65 * vel;
     if (ctx.createStereoPanner) { var pn = ctx.createStereoPanner(); pn.pan.value = pan; out.connect(pn); node = pn; }
-    var sends = VOICES[voice](t, mtof(midi), out, o);
+    SRC = []; var sends = VOICES[voice](t, mtof(midi), out, o); out._srcs = SRC; SRC = null;
     node.connect(master);
-    var v = ctx.createGain(); v.gain.value = sends[0]; node.connect(v); v.connect(verbSend);
-    var e = ctx.createGain(); e.gain.value = sends[1]; node.connect(e); e.connect(delaySend);
+    if (sends[0]) node.connect(amp(sends[0], verbSend));
+    if (sends[1]) node.connect(amp(sends[1], delaySend));
+    if (sends[2]) node.connect(amp(sends[2], hallSend));
     return out;
   }
 
   /* ---------- pressing a key ---------- */
   // A strip's plan, spelled out note by note; a trill becomes its quick notes. still = reduced motion (a trill lights its band once, steadily).
   function expand(pl, still) {
-    var out = [];
-    pl.events.forEach(function (e) {
-      if (!e.trill) { out.push({ at: e.at, midi: e.midi, vel: e.vel, len: e.len, band: e.band, lit: 420 }); return; }
-      var T = e.trill, legato = pl.voice === 'flute', same = T.band2 === e.band;
+    var out = [], prev = null;
+    pl.events.forEach(function (e, j) {
+      var strong = e.vel > 0.82;
+      if (!e.trill) {
+        out.push({ at: e.at, midi: e.midi, vel: e.vel, len: e.len, band: e.band, lit: 420, from: prev, accent: strong,
+          slide: pl.voice === 'acid' && j > 0 && e.vel < 0.66, stab: pl.voice === 'italo' && (j === 0 || strong) });
+        prev = e.midi; return;
+      }
+      var T = e.trill, legato = pl.voice === 'numan', same = T.band2 === e.band;
       for (var q = 0; q < T.n; q++) {
         var hi = q % 2 === 1, last = q === T.n - 1, sw = Math.sin(Math.PI * (q + 0.5) / T.n);
         out.push({ at: e.at + q * T.step, midi: hi ? T.midi2 : e.midi, vel: e.vel * (legato ? 0.8 : last ? 0.8 : 0.5 + 0.3 * sw),
-          len: last ? 0.9 : T.step / 1000, short: !last, band: hi ? T.band2 : e.band, quick: true,
+          len: last ? 0.9 : T.step / 1000, short: !last, band: hi ? T.band2 : e.band, quick: true, sweep: sw, from: prev,
           lit: still ? (q === 0 ? T.n * T.step + 300 : 0) : last ? 420 : same ? (hi ? 0 : T.step * 1.6) : T.step * 0.95,
           silent: legato && q > 0, legato: legato && q === 0 ? { f2: mtof(T.midi2), step: T.step, n: T.n } : null });
+        prev = hi ? T.midi2 : e.midi;
       }
     });
     return out;
   }
+  function noteOpts(pl, it) {
+    return { len: it.len, short: it.short, trill: it.legato, fromMidi: it.from, accent: it.accent, slide: it.slide, stab: it.stab,
+             sweep: it.sweep, saw: pl.saw, eighth: pl.eighth };
+  }
+  function heldOpts(pl) { return { len: pl.total / 1000 + 0.6, eighth: pl.eighth, beat: pl.beat }; }
   function light(s, ms) {
     if (!s || !ms) return;
     var until = Date.now() + ms; s._until = until; s.classList.add('lit');
     setTimeout(function () { if (s._until === until) s.classList.remove('lit'); }, ms);
   }
-  // A new press replaces the notes still waiting from the last one (trills too), fades out any held note,
+  // A new press replaces the notes still waiting from the last one (trills too), fades out and stops any held note,
   // and never starts sooner than a moment after the last note that sounded, so quick presses can't pile up.
   function stopWaiting() {
     timers.forEach(clearTimeout); timers = [];
-    if (ctx) holding.forEach(function (g) { var t = ctx.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.setTargetAtTime(0, t, 0.15); });
+    if (ctx) holding.forEach(function (g) {
+      var t = ctx.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.setTargetAtTime(0, t, 0.15);
+      (g._srcs || []).forEach(function (s) { if (s._end > t + 1.2) { try { s.stop(t + 1.2); s._end = t + 1.2; } catch (e) {} } });
+    });
     holding = [];
   }
+  // Notes are handed to the audio clock a moment ahead of time, so the machines (Kraftwerk, acid, Italo) keep exact time;
+  // the others get a touch of human unevenness on purpose. The bands light when each note sounds.
+  var AHEAD = 60, LAG = 50;
   function press(k) {
     if (!ctx) initAudio();
     if (ctx && ctx.state === 'suspended') ctx.resume();
@@ -357,45 +490,60 @@
     keys.forEach(function (o) { o.li.classList.toggle('on', o === k); });
     var r = k.b.getBoundingClientRect(), pan = Math.max(-0.6, Math.min(0.6, ((r.left + r.width / 2) / innerWidth) * 1.2 - 0.6));
     k.b.classList.add('down'); setTimeout(function () { k.b.classList.remove('down'); }, 160);
-    var pl = k.plan, spans = k.b.children, start = Math.max(0, lastNote + 120 - Date.now());
-    if (pl.drone) timers.push(setTimeout(function () { var h = play(pl.drone.voice, pl.drone.midi, pan, 0.8, { len: pl.total / 1000 + 0.6 }); if (h) holding.push(h); }, start));
+    var pl = k.plan, spans = k.b.children, start = Math.max(0, lastNote + 120 - Date.now()), t0 = null, pressed = performance.now();
+    function when(ms) {         // the audio clock's time for a moment `ms` after the press (fixed once the clock is running)
+      if (t0 === null && ctx && ctx.state === 'running') t0 = ctx.currentTime - (performance.now() - pressed) / 1000 + LAG / 1000;
+      return t0 === null ? ctx.currentTime + 0.01 : Math.max(ctx.currentTime + 0.005, t0 + ms / 1000);
+    }
+    if (pl.drone) timers.push(setTimeout(function () {
+      if (!ctx) return; var o = heldOpts(pl); o.t = when(start); var h = play(pl.drone.voice, pl.drone.midi, pan, 0.8, o); if (h) holding.push(h); }, Math.max(0, start - AHEAD)));
     expand(pl, reduce).forEach(function (it) {
-      var jitter = (Math.random() - 0.5) * (it.quick ? 6 : 18);                 // a touch of human unevenness
+      var at = start + it.at + (pl.strict ? 0 : (Math.random() - 0.5) * (it.quick ? 6 : 18));
       timers.push(setTimeout(function () {
-        lastNote = Date.now();
-        if (!it.silent) {
-          var h = play(pl.voice, it.midi, pan, Math.min(1, it.vel * (0.92 + Math.random() * 0.16)), { len: it.len, short: it.short, trill: it.legato });
+        if (!it.silent && ctx) {
+          var o = noteOpts(pl, it); o.t = when(at);
+          var h = play(pl.voice, it.midi, pan, Math.min(1, it.vel * (pl.strict ? 0.97 + Math.random() * 0.06 : 0.92 + Math.random() * 0.16)), o);
           if (h && it.legato) holding.push(h);
         }
-        light(spans[it.band], it.lit);
-      }, Math.max(0, start + it.at + jitter)));
+      }, Math.max(0, at - AHEAD)));
+      timers.push(setTimeout(function () { lastNote = Date.now(); light(spans[it.band], it.lit); }, Math.max(0, at + LAG)));
     });
   }
 
   // for checking: every strip's plan, and a strip (or several, pressed in quick succession and never cut short) rendered silently
+  function offline(secs, fn) {
+    var keep = [ctx, master, verbSend, delaySend, hallSend, NOISE, PW, CURVES, muted];
+    muted = false; setup(new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, Math.ceil(44100 * secs), 44100)); var oc = ctx;
+    try { fn(); } finally { ctx = keep[0]; master = keep[1]; verbSend = keep[2]; delaySend = keep[3]; hallSend = keep[4]; NOISE = keep[5]; PW = keep[6]; CURVES = keep[7]; muted = keep[8]; }
+    return oc.startRendering();
+  }
+  function stats(buf, upto) {
+    var pk = 0, ss = 0, n = 0;
+    for (var c = 0; c < buf.numberOfChannels; c++) { var d = buf.getChannelData(c), m = Math.min(d.length, upto || d.length);
+      for (var i = 0; i < m; i++) { var x = Math.abs(d[i]); if (x > pk) pk = x; ss += x * x; n++; } }
+    return { peak: pk, rms: Math.sqrt(ss / n) };
+  }
   window.PalettePiano = {
     plans: function () { return keys.map(function (k) { return k.plan; }); },
+    expand: function (i) { return expand(keys[i].plan, false); },
     render: function (list, every, secs) {
-      var OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext, keep = [ctx, master, verbSend, delaySend, NOISE, KS, muted];
-      muted = false; setup(new OAC(2, Math.ceil(44100 * secs), 44100)); var oc = ctx;
-      list.forEach(function (idx, m) {
-        var pl = keys[idx].plan, t0 = 0.05 + m * every, pan = (m % 3 - 1) * 0.4;
-        if (pl.drone) play(pl.drone.voice, pl.drone.midi, pan, 0.8, { t: t0, len: pl.total / 1000 + 0.6 });
-        expand(pl, false).forEach(function (it) { if (!it.silent) play(pl.voice, it.midi, pan, it.vel, { t: t0 + it.at / 1000, len: it.len, short: it.short, trill: it.legato }); });
-      });
-      ctx = keep[0]; master = keep[1]; verbSend = keep[2]; delaySend = keep[3]; NOISE = keep[4]; KS = keep[5]; muted = keep[6];
-      return oc.startRendering().then(function (buf) {
-        var pk = 0, ss = 0, n = 0;
-        for (var c = 0; c < buf.numberOfChannels; c++) { var d = buf.getChannelData(c); for (var i = 0; i < d.length; i++) { var x = Math.abs(d[i]); if (x > pk) pk = x; ss += x * x; n++; } }
-        return { peak: pk, rms: Math.sqrt(ss / n) };
-      });
+      return offline(secs, function () {
+        list.forEach(function (idx, m) {
+          var pl = keys[idx].plan, t0 = 0.05 + m * every, pan = (m % 3 - 1) * 0.4;
+          if (pl.drone) { var ho = heldOpts(pl); ho.t = t0; play(pl.drone.voice, pl.drone.midi, pan, 0.8, ho); }
+          expand(pl, false).forEach(function (it) { if (!it.silent) { var o = noteOpts(pl, it); o.t = t0 + it.at / 1000; play(pl.voice, it.midi, pan, it.vel, o); } });
+        });
+      }).then(function (buf) { return stats(buf); });
     },
-    note: function (voice, midi, vel) {   // one note alone, to compare loudness between instruments
-      var keep = [ctx, master, verbSend, delaySend, NOISE, KS, muted];
-      muted = false; setup(new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, 44100 * 3, 44100)); var oc = ctx;
-      play(voice, midi, 0, vel, { t: 0.02, len: 1 });
-      ctx = keep[0]; master = keep[1]; verbSend = keep[2]; delaySend = keep[3]; NOISE = keep[4]; KS = keep[5]; muted = keep[6];
-      return oc.startRendering().then(function (buf) { var d = buf.getChannelData(0), pk = 0, ss = 0; for (var i = 0; i < 44100; i++) { pk = Math.max(pk, Math.abs(d[i])); ss += d[i] * d[i]; } return { peak: pk, rms: Math.sqrt(ss / 44100) }; });
+    note: function (voice, midi, vel) {   // one note alone, to compare loudness between voices
+      return offline(3, function () { play(voice, midi, 0, vel, { t: 0.02, len: 1 }); }).then(function (buf) { return stats(buf, 44100); });
+    },
+    // one note (or held note) rendered with options; dry = without the reverbs and echo. Resolves to the AudioBuffer, for analysis.
+    buffer: function (voice, midi, vel, opts, secs, dry) {
+      return offline(secs || 3, function () {
+        if (dry) { verbSend.gain.value = 0; delaySend.gain.value = 0; hallSend.gain.value = 0; }
+        var o = Object.assign({ t: 0.02, len: 1 }, opts || {}); play(voice, midi, 0, vel, o);
+      });
     }
   };
 
@@ -517,4 +665,4 @@
     returned: function () { return returned; }
   };
 })();
-window.__hcBuild = "2026-11-16 03:52";
+window.__hcBuild = "2026-11-16 04:40";
