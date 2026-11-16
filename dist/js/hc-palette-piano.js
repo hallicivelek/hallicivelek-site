@@ -426,7 +426,12 @@
       var r = k.li.getBoundingClientRect();
       if (r.top < 64 || r.bottom > innerHeight - 70) k.li.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
     }
-    requestAnimationFrame(show); setTimeout(show, 350);   // and again, in case Cargo scrolled to the top after showing the page
+    // and again a few times: on the live site Cargo scrolls to the top well after showing the page (seen 2026-11-16).
+    // The visitor's own scrolling, touch or keys end it, so the page never fights them.
+    var timers = [350, 800, 1500, 2500].map(function (ms) { return setTimeout(show, ms); });
+    function mine() { timers.forEach(clearTimeout); ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(function (n) { removeEventListener(n, mine, true); }); }
+    ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(function (n) { addEventListener(n, mine, { capture: true, passive: true }); });
+    requestAnimationFrame(show);
   }
 
   /* ---------- building ---------- */
@@ -512,4 +517,4 @@
     returned: function () { return returned; }
   };
 })();
-window.__hcBuild = "2026-11-16 03:47";
+window.__hcBuild = "2026-11-16 03:52";
