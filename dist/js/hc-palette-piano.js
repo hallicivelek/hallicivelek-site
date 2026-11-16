@@ -156,7 +156,7 @@
 
     // a soft held note underneath, more often for grey and dark strips: D, or A when the strip starts on A or E; low or middle as before
     var drone = null;
-    if (r() < 0.2 + 0.3 * grey + (avgL < 0.4 ? 0.2 : 0)) {
+    if (r() < 0.2 + 0.3 * grey + (avgL < 0.4 ? 0.2 : 0) && voice !== 'kraft') {   // no held note under the Kraftwerk strips: Halli found the vocoder drone thin (2026-11-16)
       var low = (events[0].midi - 2) % 12, onA = low === 7 || low === 2;     // A or E
       drone = { voice: HELD[voice], midi: warm > 0.1 || avgL < 0.4 ? (onA ? 45 : 38) : (onA ? 57 : 50) };
     }
@@ -665,4 +665,4 @@
     returned: function () { return returned; }
   };
 })();
-window.__hcBuild = "2026-11-16 04:40";
+window.__hcBuild = "2026-11-16 04:45";
