@@ -1,0 +1,607 @@
+<!-- Proper palette piano player for hallicivelek.com: builds the page whose address contains "palette-piano".
+     Every project as a strip of its own colours (baked from its Cargo thumbnail into src/palettes.json by
+     tools/build_palettes.py, put in at build time like the weather table), in Halli's order. Pressing a strip plays its
+     colours: instrument, notes, order, pace, trill and held note all come from the colours and the address, so a strip
+     sounds the same every visit, and every note is in D major pentatonic. All sounds are made in the browser, no samples.
+     The project's title opens under a strip on hover, focus, or after a press ("the work stands on its own"); it links to
+     the project on this site. Keyboard: the piano is one Tab stop, the arrow keys / Home / End move along it, Enter or
+     Space plays, Tab goes on to that strip's title link. Reduced motion: the strips don't move or grow, a trill lights once.
+     "Turn the sound off" sits bottom left (the blobs' pause button and 1999 mode's "back to 2026" have the bottom right).
+     The way back: following a title saves the strip in sessionStorage ("hc-from-piano"); hc-project then shows
+     "← palette piano" instead of "← things I've made", and coming back here scrolls to that strip and opens its title,
+     silently (also after the browser's back button and the back/forward cache).
+     Ported from mockups/palette-piano (2026-11-16); the sound code and the colour-to-music mapping are the approved
+     mockup's, unchanged. Whatever Halli puts on the Cargo page stays as the hidden fallback; Cargo's grid and the sort
+     line are hidden here. -->
+<style>
+  html.hc-pp-on .thumbnails, html.hc-pp-on #hc-sort { display: none !important; }
+  #hc-pp { box-sizing: border-box; width: min(1180px, 92vw); position: relative; left: 50%; transform: translateX(-50%);
+    text-align: left; font-family: pacaembu, sans-serif; color: #492E46; letter-spacing: .02em; line-height: 1.5;
+    padding: 44px 0 120px; }
+  #hc-pp *, #hc-pp *::before, #hc-pp *::after { box-sizing: border-box; }
+  #hc-pp a { color: inherit; }
+  #hc-pp .hc-pp-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; padding: 0; }
+  #hc-pp a.hc-pp-back { display: inline-block; font-size: 18px; text-decoration: none; margin-bottom: 18px; background: none !important; color: inherit !important; }
+  #hc-pp a.hc-pp-back:hover { text-decoration: underline; }
+  #hc-pp h1 { font-family: inherit; font-size: 44px; line-height: 1.1; margin: 0 0 14px; font-weight: bold; letter-spacing: 0; color: inherit; text-transform: none; }
+  #hc-pp p.hc-pp-lede { font-size: 21px; line-height: 1.45; margin: 0 0 40px; max-width: 34em; color: inherit; }
+
+  /* the keys: each project a strip of its own colours, painted in bands on a white key, tilted a little like the prints on the pinboard */
+  #hc-pp ul.hc-pp-keys { display: grid; grid-template-columns: repeat(var(--cols), 1fr); --cols: 24; gap: 34px 8px; padding: 0; margin: 0; list-style: none; }
+  #hc-pp li.hc-pp-k { position: relative; margin: 0; padding: 0; list-style: none; line-height: 1.5; transform: translateY(var(--dy)) rotate(var(--tilt)); }
+  #hc-pp li.hc-pp-k::before, #hc-pp li.hc-pp-k::marker { content: none; }
+  #hc-pp button.hc-pp-key { display: flex; flex-direction: column; width: 100%; min-width: 0; height: 214px; padding: 4px 4px 5px; border: 0; margin: 0;
+    background: #fff; border-radius: 3px 3px 14px 14px; cursor: pointer; font: inherit; letter-spacing: 0; text-transform: none; color: inherit;
+    box-shadow: 0 1px 1px rgba(73, 46, 70, .12), 0 6px 14px -6px rgba(73, 46, 70, .35);
+    transition: transform .12s ease, box-shadow .12s ease; -webkit-tap-highlight-color: transparent; }
+  /* each band overlaps the one above with a slightly uneven top edge, like paint or cut paper */
+  #hc-pp .hc-pp-key span { display: block; flex: var(--share) 1 0; min-height: 9px; margin-top: -4px; clip-path: var(--edge);
+    transition: transform .6s ease, filter .6s ease; }
+  #hc-pp .hc-pp-key span:first-child { margin-top: 0; clip-path: none; border-radius: 1px 1px 0 0; }
+  #hc-pp .hc-pp-key span:last-child { border-radius: 0 0 11px 11px; }
+  #hc-pp .hc-pp-key span.lit { transform: scaleX(1.22); filter: brightness(1.08) saturate(1.25); transition: transform .08s ease-out, filter .08s; }
+  #hc-pp button.hc-pp-key:hover { background: #fff; box-shadow: 0 1px 1px rgba(73, 46, 70, .12), 0 10px 18px -6px rgba(73, 46, 70, .4); }
+  #hc-pp button.hc-pp-key.down { transform: translateY(5px); box-shadow: 0 1px 1px rgba(73, 46, 70, .15), 0 2px 5px -2px rgba(73, 46, 70, .35); }
+  #hc-pp button.hc-pp-key:focus { outline: none; }
+  #hc-pp button.hc-pp-key:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }
+
+  /* the title only shows on hover, focus, or after a press: the work stands on its own */
+  #hc-pp a.hc-pp-tag { position: absolute; left: 50%; top: calc(100% + 10px); z-index: 2; width: max-content; max-width: 210px;
+    transform: translateX(-50%) rotate(calc(var(--tilt) * -1.4)); padding: 7px 12px 8px; background: #fff !important; color: inherit !important;
+    border-radius: 3px; font-size: 14px; line-height: 1.3; text-decoration: none; text-align: center;
+    box-shadow: 0 6px 14px -6px rgba(73, 46, 70, .4); opacity: 0; pointer-events: none; transition: opacity .15s; }
+  #hc-pp li.hc-pp-k[data-edge="l"] a.hc-pp-tag { left: 0; transform: rotate(calc(var(--tilt) * -1.4)); text-align: left; }
+  #hc-pp li.hc-pp-k[data-edge="r"] a.hc-pp-tag { left: auto; right: 0; transform: rotate(calc(var(--tilt) * -1.4)); text-align: right; }
+  #hc-pp .hc-pp-tag b { display: block; font-weight: bold; }
+  #hc-pp .hc-pp-tag i { font-style: normal; color: rgba(73, 46, 70, .66); text-decoration: underline; text-underline-offset: 3px; }
+  #hc-pp .hc-pp-tag:hover i { color: #492E46; }
+  #hc-pp a.hc-pp-tag:focus { outline: none; }
+  #hc-pp a.hc-pp-tag:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 2px; }
+  #hc-pp li.hc-pp-k:hover a.hc-pp-tag, #hc-pp li.hc-pp-k:focus-within a.hc-pp-tag, #hc-pp li.hc-pp-k.on a.hc-pp-tag { opacity: 1; pointer-events: auto; }
+  #hc-pp li.hc-pp-k:hover, #hc-pp li.hc-pp-k:focus-within, #hc-pp li.hc-pp-k.on { z-index: 3; }
+  #hc-pp ul.hc-pp-keys:has(li.hc-pp-k:hover) li.hc-pp-k.on:not(:hover):not(:focus-within) a.hc-pp-tag { opacity: 0; pointer-events: none; }
+  #hc-pp li.hc-pp-k { scroll-margin: 96px 0 140px; }   /* clear of Cargo's fixed header and the buttons at the bottom */
+  @media (max-width: 1000px) { #hc-pp ul.hc-pp-keys { --cols: 14; } }
+
+  /* sound on/off: bottom left, the blobs' pause button (and 1999 mode's way back) keep the bottom right */
+  button.hc-pp-quiet { display: none; position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 1001;
+    min-height: 44px; margin: 0; padding: 0 18px; border: 0; border-radius: 999px; background: #492E46; color: #F3DCDF;
+    font-family: pacaembu, sans-serif; font-size: 15px; font-weight: normal; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;
+    box-shadow: 0 6px 16px -6px rgba(73, 46, 70, .5); }
+  html.hc-pp-on button.hc-pp-quiet { display: inline-flex; align-items: center; }
+  button.hc-pp-quiet[aria-pressed="true"] { background: #fff; color: #492E46; }
+  button.hc-pp-quiet:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }
+  html.hc-ns button.hc-pp-quiet { bottom: 40px; background: #c0c0c0 !important; color: #000 !important; border: 2px solid !important;
+    border-color: #fff #404040 #404040 #fff !important; border-radius: 0; box-shadow: none !important; font-family: Arial, Helvetica, sans-serif !important; }
+  html.hc-gc button.hc-pp-quiet { background: #ff00ff !important; color: #ffff00 !important; border: 3px outset #ff99ff !important; box-shadow: none !important; }
+
+  @media (max-width: 760px) {
+    #hc-pp { padding: 22px 0 110px; }
+    #hc-pp a.hc-pp-back { margin-bottom: 10px; font-size: 17px; }
+    #hc-pp h1 { font-size: 34px; margin-bottom: 8px; }
+    #hc-pp p.hc-pp-lede { font-size: 18px; margin-bottom: 30px; }
+  }
+  @media (max-width: 600px) {
+    #hc-pp ul.hc-pp-keys { --cols: 7; gap: 28px 7px; }
+    #hc-pp button.hc-pp-key { height: 150px; padding: 3px 3px 4px; }
+    #hc-pp a.hc-pp-tag { max-width: 170px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #hc-pp button.hc-pp-key, #hc-pp .hc-pp-key span, #hc-pp a.hc-pp-tag { transition: none !important; }
+    #hc-pp button.hc-pp-key.down, #hc-pp .hc-pp-key span.lit { transform: none; }
+  }
+</style>
+<script>
+(function () {
+  if (window.__hcPalettePiano) return;
+  window.__hcPalettePiano = true;
+  var PAGE = /palette-piano/i;
+  var PALETTES = [{"title":"Þroskahjálp - the art calendar","url":"Troskahjalp-the-art-calendar","colours":[["#fefdfd",0.659],["#d1b171",0.087],["#ce8d58",0.136],["#e1d9cd",0.062],["#99795b",0.056]]},{"title":"Retro Stefson - Retro Stefson","url":"Retro-Stefson-Retro-Stefson","colours":[["#8b2e21",0.301],["#3d4e54",0.209],["#537279",0.17],["#f0f4f3",0.168],["#89c0bd",0.152]]},{"title":"Cheerios","url":"Cheerios","colours":[["#fad612",0.356],["#fffffe",0.354],["#f2e292",0.14],["#d2bd43",0.09],["#ccc3ac",0.06]]},{"title":"FM Belfast - how to make friends","url":"FM-Belfast-how-to-make-friends","colours":[["#eae7d4",0.462],["#6c72a8",0.22],["#f5a76d",0.132],["#5554a6",0.104],["#b66d95",0.082]]},{"title":"The Mouse Wrestler","url":"The-Mouse-Wrestler","colours":[["#1b272c",0.669],["#fdfdfd",0.209],["#d9e0e4",0.043],["#5c8099",0.04],["#33444d",0.039]]},{"title":"Retro Stefson - Kimbabwe","url":"Retro-Stefson-Kimbabwe","colours":[["#4192af",0.348],["#f9f9f8",0.212],["#1d596d",0.173],["#44737d",0.148],["#9bb8c3",0.119]]},{"title":"Sesar A - Gerðuþaðsjálfur (Doityourself)","url":"Sesar-A-Gerdutadsjalfur-Doityourself","colours":[["#fefefd",0.899],["#bfb7b8",0.062],["#e3e1df",0.026],["#a29a99",0.013]]},{"title":"Rímnamín","url":"Rimnamin","colours":[["#daedf6",0.492],["#82c5e4",0.378],["#f7d34f",0.07],["#e29947",0.035],["#af2c20",0.025]]},{"title":"Apparat Organ Quartet - Romantika","url":"Apparat-Organ-Quartet-Romantika","colours":[["#fefefe",0.632],["#b5d4db",0.176],["#89aab0",0.082],["#f6dc31",0.059],["#6e7673",0.051]]},{"title":"Millilending","url":"Millilending","colours":[["#fefefe",0.555],["#d5d4e0",0.286],["#b7b9c4",0.091],["#6c7172",0.051],["#7277ba",0.017]]},{"title":"Herbergi í öðrum heimi","url":"Herbergi-i-odrum-heimi","colours":[["#f4f3f1",0.354],["#a9503e",0.319],["#d9d8d5",0.118],["#b5aba8",0.108],["#222330",0.101]]},{"title":"Blue walker","url":"Blue-walker","colours":[["#ffffff",0.819],["#21c7e6",0.101],["#c2eef6",0.043],["#70d9ed",0.036]]},{"title":"Retro Stefson visual identity","url":"Retro-Stefson-visual-identity","colours":[["#000000",1]]},{"title":"Sesar A - Stormurinn á eftir logninu","url":"Sesar-A-Stormurinn-a-eftir-logninu","colours":[["#d64c1d",0.373],["#fbfafa",0.243],["#c3b8b3",0.136],["#b48f88",0.126],["#505a59",0.123]]},{"title":"Fastland soccer uniform","url":"Fastland-soccer-uniform","colours":[["#fdfdfc",0.714],["#f8ed12",0.142],["#09adec",0.062],["#e42093",0.051],["#d2c7d6",0.03]]},{"title":"Smite The World","url":"Smite-The-World","colours":[["#fdfdfd",0.736],["#dcdcdc",0.106],["#b9b9b9",0.071],["#949494",0.05],["#6d6d6d",0.037]]},{"title":"Liggikrútt","url":"Liggikrutt","colours":[["#ffffff",0.901],["#dce0e7",0.061],["#bcc4d1",0.031],["#93a0b6",0.006]]},{"title":"Fluffyhead","url":"Fluffyhead","colours":[["#91d8f7",0.597],["#fcfeff",0.227],["#2aaae1",0.093],["#cdedfa",0.056],["#62c2eb",0.026]]},{"title":"Retro Stefson - Montaña","url":"Retro-Stefson-Montana","colours":[["#080f12",0.382],["#7099b4",0.185],["#4e7799",0.18],["#282d31",0.156],["#b15649",0.097]]},{"title":"Halli lettering","url":"Halli-lettering","colours":[["#f4cb48",0.853],["#dcd3a1",0.063],["#dda452",0.052],["#e3ebd5",0.017],["#e3b7c2",0.015]]},{"title":"Pungstöppuslayer","url":"Pungstoppuslayer","colours":[["#ffffff",0.809],["#d4d8dc",0.171],["#b1b9c2",0.02]]},{"title":"Retro Stefson - Qween","url":"Retro-Stefson-Qween","colours":[["#fefefe",0.32],["#252322",0.383],["#4a4745",0.117],["#635f5d",0.1],["#7b7675",0.079]]},{"title":"Uppskriftabók - skáldverk","url":"Uppskriftabok-skaldverk","colours":[["#f4f0ee",0.831],["#15100d",0.107],["#d0cbc6",0.028],["#b0a9a2",0.02],["#5b5550",0.013]]},{"title":"Fran Lebowitz","url":"Fran-Lebowitz","colours":[["#dca21e",0.614],["#144463",0.204],["#249bdf",0.065],["#fdfdfc",0.059],["#9c873d",0.058]]},{"title":"Blómakona","url":"Blomakona","colours":[["#f6b3f5",0.674],["#9ec3c1",0.134],["#beb2e6",0.124],["#f3def7",0.052],["#6298e5",0.017]]},{"title":"Magse - Maximum Weights vol. 1","url":"Magse-Maximum-Weights-vol-1","colours":[["#f5f2ef",0.312],["#088990",0.222],["#d9b9a2",0.211],["#4641a4",0.151],["#9e80a5",0.104]]},{"title":"Adventure Girl","url":"Adventure-Girl","colours":[["#fefefe",0.821],["#ced4d2",0.077],["#a3a99b",0.048],["#41a1d9",0.029],["#d4ac43",0.025]]},{"title":"Joker Classique","url":"Joker-Classique","colours":[["#f4da71",0.785],["#33a831",0.075],["#b9b76b",0.056],["#9d4eab",0.053],["#dfe0d0",0.031]]},{"title":"Cat family","url":"Cat-family","colours":[["#f2f1ee",0.922],["#c7ced6",0.061],["#8b9fc0",0.011],["#7289b2",0.007]]},{"title":"hairtower","url":"hairtower","colours":[["#ffffff",0.805],["#4d95e5",0.07],["#d4e2ec",0.064],["#a7c8e5",0.041],["#75abe2",0.02]]},{"title":"Sitjikall","url":"Sitjikall","colours":[["#ffffff",0.865],["#e2e5ea",0.068],["#c6cdd8",0.059],["#9faabd",0.008]]},{"title":"Bluefluffy","url":"Bluefluffy","colours":[["#2aaee7",0.51],["#010101",0.372],["#111523",0.044],["#2a7fab",0.04],["#1a475e",0.033]]},{"title":"Skokkikona","url":"Skokkikona","colours":[["#fefefe",0.762],["#c4d66c",0.136],["#c6d2d0",0.039],["#adbcbb",0.037],["#b2c186",0.026]]},{"title":"Krjúpandi blómakona","url":"Krjupandi-blomakona","colours":[["#fefefe",0.749],["#cbd5de",0.16],["#aab2c7",0.067],["#8395b6",0.024]]},{"title":"Tyrole and the crew","url":"Tyrole-and-the-crew","colours":[["#f5f7f8",0.368],["#bdd6df",0.209],["#43acdd",0.16],["#aaaea3",0.132],["#051118",0.132]]},{"title":"Boyband","url":"Boyband","colours":[["#f7ffff",0.89],["#d4e9f4",0.038],["#b3d4ea",0.042],["#67b3df",0.024],["#267abf",0.007]]},{"title":"Main Girl","url":"Main-Girl-1","colours":[["#ffffff",0.738],["#469cc0",0.122],["#529d19",0.051],["#65b51e",0.048],["#3c778b",0.041]]},{"title":"Adopt this cat","url":"Adopt-this-cat","colours":[["#fefefe",0.63],["#ede1c6",0.14],["#e9c690",0.13],["#eba05c",0.063],["#bad3b5",0.037]]},{"title":"Blue sinker","url":"Blue-sinker","colours":[["#ecf4f5",0.287],["#050708",0.273],["#b5d8de",0.179],["#182326",0.176],["#3dc7e0",0.085]]},{"title":"Icelandsmites","url":"Icelandsmites","colours":[["#fdfdfd",0.662],["#dddddd",0.108],["#b9b9b9",0.094],["#979797",0.081],["#757575",0.054]]},{"title":"Nothing/Ekkert","url":"Nothing-Ekkert","colours":[["#fefefe",0.767],["#dfdfdf",0.138],["#bfbfbf",0.071],["#9e9e9e",0.015],["#868686",0.008]]},{"title":"Grapewaves","url":"Grapewaves","colours":[["#fdfdfd",0.615],["#e1e1e1",0.125],["#c3c3c3",0.102],["#a6a6a6",0.087],["#888888",0.071]]},{"title":"The Future Selfie","url":"The-Future-Selfie","colours":[["#fdfdfd",0.684],["#dedede",0.203],["#c0c0c0",0.063],["#989898",0.028],["#505050",0.021]]},{"title":"Pumpkinator","url":"Pumpkinator","colours":[["#fffefb",0.52],["#fc9f06",0.253],["#f98001",0.145],["#ef4e01",0.042],["#fdcd71",0.039]]},{"title":"Beardgrumphead","url":"Beardgrumphead","colours":[["#fefffe",0.532],["#fac7b6",0.38],["#fa9a7a",0.032],["#ace3f5",0.023],["#7ad3f0",0.033]]},{"title":"Things","url":"Things","colours":[["#2daae4",0.958],["#64c0ea",0.042]]},{"title":"Blue lady 1","url":"Blue-lady-1","colours":[["#ffffff",0.774],["#27c8e7",0.155],["#8fe2f1",0.071]]},{"title":"Selfie","url":"Selfie-1","colours":[["#e8d4a6",0.661],["#69ab9b",0.271],["#668697",0.024],["#3d0f75",0.023],["#5f5f8d",0.021]]},{"title":"Fartrunner","url":"Fartrunner","colours":[["#fefefe",0.717],["#eadce4",0.116],["#30517a",0.074],["#ebb4c5",0.061],["#e18aa4",0.031]]},{"title":"Presidential Election","url":"Presidential-Election","colours":[["#fefefe",0.717],["#d6d6d6",0.196],["#b6b6b6",0.078],["#939393",0.01]]},{"title":"Pedro Pilatus album artwork","url":"Pedro-Pilatus-album-artwork","colours":[["#46abc6",0.62],["#fdfdfd",0.235],["#f9dc16",0.074],["#866140",0.048],["#b5d5dd",0.023]]},{"title":"Beardmen","url":"Beardmen","colours":[["#ffffff",0.524],["#1a75bb",0.255],["#26a8df",0.183],["#bfe1f1",0.02],["#97cce7",0.019]]},{"title":"Toasterman On The Move!","url":"Toasterman-On-The-Move","colours":[["#ffffff",0.882],["#ecddea",0.11],["#d9b9d6",0.008]]},{"title":"Swimbert","url":"Swimbert-1","colours":[["#ffffff",0.758],["#4da6be",0.108],["#478ba2",0.077],["#dee0e0",0.031],["#b9c2c5",0.026]]},{"title":"Strollin' Into The Club Like","url":"Strollin-Into-The-Club-Like","colours":[["#ffffff",0.884],["#dce4f7",0.057],["#b8c8f1",0.035],["#6488e5",0.014],["#8da8eb",0.009]]},{"title":"Charles","url":"Charles-1","colours":[["#d0dea7",0.735],["#d3b28e",0.137],["#3f6b8c",0.051],["#b5916b",0.042],["#976331",0.034]]},{"title":"Greek","url":"Greek","colours":[["#ffffff",0.788],["#1475a9",0.082],["#69bdd5",0.046],["#bbb4dc",0.045],["#79a0c8",0.039]]},{"title":"Halli with a helmet on","url":"Halli-with-a-helmet-on","colours":[["#dbe7ee",0.661],["#6099ab",0.243],["#8bdbfe",0.079],["#7ac1de",0.018]]},{"title":"some finger drawings","url":"some-finger-drawings","colours":[["#d1342d",0.728],["#fefdfc",0.216],["#f5dddb",0.027],["#e59490",0.015],["#e8b3af",0.014]]},{"title":"Healthy Problems","url":"Healthy-Problems-1","colours":[["#fefefe",0.583],["#2861a0",0.315],["#c8d5e2",0.028],["#789abf",0.049],["#abbfd5",0.026]]},{"title":"Firehair","url":"Firehair-1","colours":[["#f0ab9f",0.787],["#cb9a9a",0.079],["#9de0ee",0.064],["#a48692",0.04],["#92c1d4",0.031]]},{"title":"Apparat Organ Quartet","url":"Apparat-Organ-Quartet","colours":[["#ffffff",0.912],["#121212",0.05],["#dddddd",0.018],["#353535",0.012],["#777777",0.008]]},{"title":"I LOuVrE U","url":"I-LOuVrE-U","colours":[["#853103",0.353],["#fefefe",0.246],["#924161",0.324],["#b57392",0.044],["#d2a3b7",0.033]]},{"title":"Man With Horns aka Horny Hombre","url":"Man-With-Horns-aka-Horny-Hombre","colours":[["#abd8fd",0.747],["#3b679c",0.161],["#7ab2d7",0.047],["#d6f0f9",0.024],["#5895c1",0.021]]},{"title":"The Lyrebird","url":"The-Lyrebird","colours":[["#97ac18",0.713],["#c1d23c",0.16],["#e8abe7",0.057],["#cc9e9f",0.041],["#000000",0.03]]},{"title":"Purrrtay","url":"Purrrtay","colours":[["#ffffff",0.699],["#f59a35",0.147],["#b76a4b",0.093],["#cfa392",0.031],["#dfc4bb",0.03]]},{"title":"sharkknife","url":"sharkknife","colours":[["#50dcff",0.665],["#ffffff",0.277],["#49b7d2",0.021],["#2c6e7d",0.02],["#468fa0",0.017]]},{"title":"Automysophobia","url":"Automysophobia","colours":[["#fcfdfd",0.454],["#60c4f1",0.222],["#576687",0.223],["#cae3ef",0.068],["#a3b3c1",0.033]]},{"title":"Phuture Joga","url":"Phuture-Joga","colours":[["#ffffff",0.618],["#ecb4f8",0.224],["#a194cf",0.086],["#bea8dd",0.044],["#d3d7e6",0.029]]},{"title":"DesignMarch","url":"DesignMarch","colours":[["#fefefe",0.737],["#d3e9f3",0.145],["#c5c7c9",0.08],["#9fa0a1",0.038]]},{"title":"Krónan","url":"Kronan","colours":[["#fefefe",0.648],["#d22b31",0.168],["#b01925",0.072],["#cccccd",0.059],["#b2917d",0.053]]},{"title":"Unicef Christmas Card","url":"Unicef-Christmas-Card","colours":[["#22779c",0.29],["#fefefd",0.281],["#6199b5",0.199],["#03587b",0.196],["#ce942a",0.034]]},{"title":"Í barnastærðum","url":"I-barnastardum","colours":[["#cfcdcd",0.681],["#4090a9",0.128],["#a3a6a5",0.179],["#e9d625",0.011]]},{"title":"Breakbeat","url":"Breakbeat","colours":[["#90a580",0.459],["#f9faf8",0.235],["#abcbd0",0.181],["#a1483b",0.07],["#7a7b60",0.055]]},{"title":"Snake shelf","url":"Snake-shelf","colours":[["#fefefe",0.672],["#4e982b",0.133],["#93c9d5",0.076],["#70ab50",0.06],["#c4dfdc",0.06]]},{"title":"Santa & Ogre","url":"Santa-Ogre","colours":[["#58bee6",0.325],["#dfeff5",0.303],["#a0d6eb",0.204],["#e4b5ad",0.117],["#b63739",0.051]]},{"title":"6 train head","url":"6-train-head","colours":[["#825232",0.255],["#449cbd",0.271],["#67b207",0.215],["#956947",0.211],["#5e9318",0.048]]},{"title":"Ornament Boy","url":"Ornament-Boy","colours":[["#fefefd",0.292],["#c3955e",0.258],["#ac754b",0.225],["#88d2df",0.123],["#eccf7c",0.102]]},{"title":"Rejected Tortilla Lord","url":"Rejected-Tortilla-Lord","colours":[["#ffffff",0.607],["#e9d977",0.148],["#9cbe18",0.104],["#62411c",0.097],["#7e6635",0.044]]},{"title":"The Flash Game","url":"The-Flash-Game","colours":[["#faf0c3",0.288],["#e59e91",0.243],["#265f7b",0.219],["#609a04",0.206],["#7584a6",0.044]]},{"title":"Morkinskinka","url":"Morkinskinka","colours":[["#42a0d2",0.52],["#916536",0.17],["#dba246",0.115],["#34799c",0.102],["#b57f33",0.093]]},{"title":"Idea for a fireworks company: Fuse","url":"Idea-for-a-fireworks-company-Fuse","colours":[["#ffffff",0.925],["#dcdcdc",0.022],["#8d8d8d",0.021],["#b9b9b9",0.017],["#333333",0.015]]},{"title":"Italo Disco - Opal","url":"Italo-Disco-Opal","colours":[["#f8fafb",0.385],["#4ab3f2",0.338],["#f5461e",0.113],["#a88974",0.091],["#a3d7f6",0.073]]},{"title":"A Mix of Oddities and Rarities","url":"A-Mix-of-Oddities-and-Rarities","colours":[["#fdfdfb",0.428],["#f6c53e",0.297],["#f97849",0.182],["#f6a25e",0.055],["#f7d5b7",0.038]]},{"title":"Hotplay from Europe - Minimix","url":"Hotplay-from-Europe-Minimix","colours":[["#090808",0.882],["#222830",0.044],["#2b3b4d",0.034],["#484a4c",0.027],["#315b89",0.013]]},{"title":"Italo mix 2007","url":"Italo-mix-2007","colours":[["#684d31",0.37],["#58a9bc",0.184],["#886542",0.172],["#6fc3c5",0.138],["#463726",0.136]]},{"title":"Italo Rider mix","url":"Italo-Rider-mix","colours":[["#cb8041",0.3],["#e39a57",0.265],["#b7662d",0.217],["#bd2811",0.124],["#523b2c",0.094]]},{"title":"Hey","url":"Hey","colours":[["#ccd4c4",0.802],["#b7b5a8",0.101],["#9e9a95",0.071],["#7b7173",0.02],["#564850",0.007]]},{"title":"Idea: Shoelaces","url":"Idea-Shoelaces","colours":[["#ffffff",0.925],["#dcdcdc",0.022],["#8d8d8d",0.021],["#b9b9b9",0.017],["#333333",0.015]]},{"title":"Idea: Remembering Measure Tape","url":"Idea-Remembering-Measure-Tape","colours":[["#ffffff",0.925],["#dcdcdc",0.022],["#8d8d8d",0.021],["#b9b9b9",0.017],["#333333",0.015]]},{"title":"Best GIF I've ever made (2006)","url":"Best-GIF-I-ve-ever-made-2006","colours":[["#fdfefe",0.694],["#dfe1df",0.12],["#bacdd6",0.068],["#cfc09c",0.068],["#b5a170",0.049]]},{"title":"The Office Chair","url":"The-Office-Chair","colours":[["#98918b",0.66],["#010202",0.118],["#0e0e0f",0.087],["#6f6863",0.082],["#2a2829",0.053]]},{"title":"Fletcher","url":"Fletcher","colours":[["#fefefe",0.598],["#bce2eb",0.337],["#f5cfcc",0.042],["#7cc1cb",0.012],["#63abb3",0.011]]},{"title":"Duckrador","url":"Duckrador","colours":[["#121212",0.864],["#fce6b9",0.09],["#eeb132",0.017],["#2c2927",0.015],["#c69535",0.014]]}];   // src/palettes.json, put in by tools/build_palettes.py
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- colour to music ---------- */
+  // Every note comes from one set, D major pentatonic (D E F# A B), so any strips sound fine together, in any order, overlapping.
+  // Each strip takes its own character from its colours and its name: instrument, register, which notes, their order, the pace
+  // and rhythm, whether a soft held note sits underneath, and now and then a trill. The same every visit.
+  function hash(s) { var h = 7; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; }
+  function hsl(hex) {
+    var r = parseInt(hex.substr(1, 2), 16) / 255, g = parseInt(hex.substr(3, 2), 16) / 255, b = parseInt(hex.substr(5, 2), 16) / 255;
+    var mx = Math.max(r, g, b), mn = Math.min(r, g, b), c = mx - mn, h = 0;
+    if (c) h = mx === r ? ((g - b) / c + 6) % 6 : mx === g ? (b - r) / c + 2 : (r - g) / c + 4;
+    return { h: h * 60, c: c, l: (mx + mn) / 2 };
+  }
+  function rgbDist(a, b) { var d = 0; for (var i = 1; i < 7; i += 2) { var x = parseInt(a.substr(i, 2), 16) - parseInt(b.substr(i, 2), 16); d += x * x; } return Math.sqrt(d) / 441.7; }
+  function rng(seed) { return function () { seed = (seed + 0x6D2B79F5) >>> 0; var t = seed; t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  function pick(r, a) { return a[Math.floor(r() * a.length)]; }
+
+  // notes are counted in "degrees" of the scale, five to an octave; degree 0 is a low D
+  var PENT = [0, 2, 4, 7, 9];
+  function degMidi(d) { return 26 + 12 * Math.floor(d / 5) + PENT[((d % 5) + 5) % 5]; }
+  var SETS = { full: [0, 1, 2, 3, 4], open: [0, 1, 3, 4], ring: [0, 2, 3] };     // all five; no F#; only D F# A
+  function allowed(d, set) { return set.indexOf(((d % 5) + 5) % 5) >= 0; }
+  function snap(d, set) { for (var k = 0; k < 5; k++) { if (allowed(d - k, set)) return d - k; if (allowed(d + k, set)) return d + k; } return d; }
+  function stepFrom(d, dir, set) { do { d += dir; } while (!allowed(d, set)); return d; }
+  function degRange(lo, hi) { var a = 0; while (degMidi(a) < lo) a++; var b = a; while (degMidi(b + 1) <= hi) b++; return [a, b]; }
+  // each instrument's comfortable range (midi notes) and its natural pace (ms added to the gap between notes)
+  var INSTR = { pluck: [45, 76, -25], ep: [47, 81, 5], felt: [43, 79, 25], wood: [55, 86, -40], glass: [62, 91, 60], tine: [57, 86, -10], flute: [62, 88, 70] };
+
+  function arrange(cols, order) {
+    var s = cols.slice(), n = s.length, o = [], a, b;
+    function ends() { o = []; for (a = 0, b = n - 1; a <= b; a++, b--) { o.push(s[a]); if (a !== b) o.push(s[b]); } return o; }
+    if (order === 'up') s.reverse();
+    else if (order === 'outside-in') s = ends();
+    else if (order === 'by hue') s.sort(function (x, y) { return (x.grey - y.grey) || (x.grey ? y.l - x.l : x.h - y.h); });
+    else if (order === 'rising') s.sort(function (x, y) { return x.deg - y.deg || x.l - y.l; });
+    else if (order === 'falling') s.sort(function (x, y) { return y.deg - x.deg || y.l - x.l; });
+    else if (order === 'biggest first') s.sort(function (x, y) { return y.share - x.share; });
+    else if (order === 'zigzag') { s.sort(function (x, y) { return x.deg - y.deg; }); s = ends(); }
+    return s;
+  }
+
+  function planFor(p) {
+    var r = rng(hash(p.url) ^ 0x5bd1e995);
+    var cols = p.colours.map(function (c, i) { var k = hsl(c[0]); return { i: i, hex: c[0], share: c[1], h: k.h, c: k.c, l: k.l, grey: k.c < 0.12 }; });
+    var n = cols.length, tot = 0, grey = 0, avgC = 0, avgL = 0, warm = 0, wsum = 0;
+    cols.forEach(function (c) { tot += c.share; if (c.grey) grey += c.share; avgC += c.c * c.share; avgL += c.l * c.share;
+      if (!c.grey) { warm += Math.cos((c.h - 35) * Math.PI / 180) * c.share; wsum += c.share; } });
+    grey /= tot; avgC /= tot; avgL /= tot; warm = wsum ? warm / wsum : 0;
+
+    // instrument: greyish strips lean to felt piano, wood and glass; warm colourful ones to strings and tines; cool ones to flute and glass
+    var fam = grey > 0.7 ? ['felt', 'wood', 'glass', 'pluck', 'ep', 'flute'] : avgC > 0.28 && warm > 0.2 ? ['pluck', 'tine', 'ep', 'wood', 'felt']
+            : avgC > 0.28 ? ['flute', 'glass', 'ep', 'tine', 'pluck'] : ['ep', 'felt', 'flute', 'pluck', 'tine', 'wood'];
+    var voice = pick(r, fam), info = INSTR[voice], rg = degRange(info[0], info[1]);
+    var setName = pick(r, ['full', 'full', 'full', 'open', 'open', 'ring']), set = SETS[setName];
+
+    // notes: lightness sets the height finely (so greys and whites land on different notes), hue and colourfulness nudge it
+    var spread = pick(r, [0.55, 0.8, 1, 1.3]), mean = 0;
+    cols.forEach(function (c) { var hw = c.grey ? 0 : Math.min(1, c.c * 2.2); c.pos = c.l * 11 + hw * c.h / 72 + c.c * 1.5; mean += c.pos * c.share / tot; });
+    var centre = (rg[0] + rg[1]) / 2 + (avgL - 0.55) * 5 + (r() * 4 - 2);
+    cols.forEach(function (c) {
+      var d = snap(Math.round(centre + (c.pos - mean) * spread), set);
+      while (d < rg[0]) d += 5; while (d > rg[1]) d -= 5;
+      c.deg = d;
+    });
+
+    var order = pick(r, ['down', 'down', 'up', 'outside-in', 'by hue', 'rising', 'falling', 'biggest first', 'zigzag']);
+    var seq = arrange(cols, order);
+
+    // a trill, for a minority: two very close colours side by side trill together at the end, or a small bright accent trills in place
+    var trill = null, pair = null, tr = r();
+    for (var i = 1; i < n && !pair; i++) if (rgbDist(cols[i - 1].hex, cols[i].hex) < 0.1 && cols[i].l < 0.9 && cols[i - 1].l < 0.9) pair = [cols[i - 1], cols[i]];
+    var acc = cols.filter(function (c) { return c.share < 0.08 && c.c > 0.3; }).sort(function (x, y) { return y.c - x.c; })[0];
+    if (pair && tr < 0.55) trill = 'pair'; else if (acc && tr < 0.3) trill = 'accent';
+
+    var gap = 205 + 110 * grey - 120 * avgC + (avgL < 0.35 ? 45 : 0) + info[2] + (r() * 100 - 50);
+    gap = Math.round(Math.max(130, Math.min(420, gap)));
+    var rhythms = ['even', 'even', 'swing', 'speeding up', 'slowing down', 'by size', 'held last', 'pairs'];
+    if (voice !== 'flute') rhythms.push('strum');
+    var rhythm = pick(r, rhythms);
+    var tStep = Math.round(60 + r() * 28), tN = 9 + 2 * Math.floor(r() * 4), up = r() < 0.65 ? 1 : -1;   // 11 to 16 notes a second, ending on the main note
+
+    var items = seq.map(function (c) { return { c: c }; });
+    if (trill === 'accent') items.forEach(function (it) { if (it.c === acc) it.trill = { b: stepFrom(acc.deg, up, SETS.full), band2: acc.i }; });
+    if (trill === 'pair') {
+      items = items.filter(function (it) { return it.c !== pair[0] && it.c !== pair[1]; });
+      var a = pair[0], b = pair[1], bd = Math.abs(b.deg - a.deg) === 1 ? b.deg : stepFrom(a.deg, b.deg === a.deg ? up : b.deg > a.deg ? 1 : -1, SETS.full);
+      items.push({ c: a, trill: { b: bd, band2: b.i } });
+    }
+    for (var j = 1; j < items.length; j++) {           // two different colours in a row get two different notes
+      var x0 = items[j - 1].c, x1 = items[j].c;
+      if (items[j].trill || x1.deg !== x0.deg || x1.hex === x0.hex) continue;
+      var dir = x1.l >= x0.l ? 1 : -1, d = stepFrom(x1.deg, dir, set);
+      x1.deg = d < rg[0] || d > rg[1] ? stepFrom(x1.deg, -dir, set) : d;
+    }
+
+    var m2 = items.length, at = 0, events = [];
+    items.forEach(function (it, j) {
+      var x = m2 > 1 ? j / (m2 - 1) : 0, m = 1, last = j === m2 - 1;
+      if (rhythm === 'swing') m = j % 2 ? 0.62 : 1.38;
+      else if (rhythm === 'speeding up') m = 1.5 - 0.9 * x;
+      else if (rhythm === 'slowing down') m = 0.65 + 0.9 * x;
+      else if (rhythm === 'by size') m = 0.55 + 1.6 * Math.sqrt(it.c.share);
+      else if (rhythm === 'pairs') m = j % 2 ? 1.45 : 0.55;
+      else if (rhythm === 'strum') m = 0.38;
+      else if (rhythm === 'held last' && j === m2 - 2) m = 1.7;
+      var vel = 0.5 + 0.45 * Math.sqrt(it.c.share) + 0.15 * it.c.c;
+      if (rhythm === 'speeding up') vel *= 0.85 + 0.25 * x;
+      if (rhythm === 'slowing down') vel *= 1.08 - 0.25 * x;
+      var e = { at: Math.round(at), midi: degMidi(it.c.deg), vel: +Math.min(1, vel).toFixed(3), band: it.c.i,
+                len: last ? (rhythm === 'held last' || rhythm === 'strum' ? 2.2 : 1) : +(gap * m * 1.15 / 1000).toFixed(2) };
+      if (it.trill) { e.trill = { midi2: degMidi(it.trill.b), step: tStep, n: tN, band2: it.trill.band2 }; at += tStep * tN + gap * 0.6; }
+      else at += gap * m;
+      events.push(e);
+    });
+
+    // a soft held note underneath, more often for grey and dark strips: D, or A when the strip starts on A or E
+    var drone = null;
+    if (r() < 0.2 + 0.3 * grey + (avgL < 0.4 ? 0.2 : 0)) {
+      var low = (events[0].midi - 2) % 12, onA = low === 7 || low === 2;     // A or E
+      drone = warm > 0.1 || avgL < 0.4 ? { voice: 'reed', midi: onA ? 45 : 38 } : { voice: 'pad', midi: onA ? 57 : 50 };
+    }
+    return { voice: voice, notes: setName, order: order, rhythm: rhythm, gap: gap, spread: spread, trill: trill, drone: drone, events: events, total: Math.round(at) };
+  }
+
+  /* ---------- the page ---------- */
+  var HTML =
+    '<a class="hc-pp-back" href="/playthings">← playthings</a>' +
+    '<h1>Proper palette piano player</h1>' +
+    '<p class="hc-pp-lede">Every project as a strip of its own colors, for you to click\'n play.</p>' +
+    '<p class="hc-pp-sr" id="hc-pp-keyhelp">Use the arrow keys to move between projects. Enter or Space plays the colours, and Tab goes to the link for that project.</p>' +
+    '<ul class="hc-pp-keys" id="hc-pp-keys" aria-label="Palette piano, one key for each project" aria-describedby="hc-pp-keyhelp"></ul>';
+  var PLANS = {};   // every strip's plan, worked out once (the same every visit)
+  var root = null, list = null, keys = [], cur = 0;
+  function live() { return !!root && root.isConnected; }
+
+  // the sound switch lives on <body> (a fixed element inside the page's moved box would move with it); shown only here
+  var quiet = document.createElement('button');
+  quiet.type = 'button'; quiet.className = 'hc-pp-quiet'; quiet.id = 'hc-pp-quiet'; quiet.setAttribute('aria-pressed', 'false');
+  quiet.textContent = 'Turn the sound off';
+
+  /* ---------- sound: instruments built from scratch, no samples ---------- */
+  var ctx = null, master, verbSend, delaySend, NOISE, KS = {}, volume = 0.7, muted = false, timers = [], holding = [], lastNote = 0;
+  function mtof(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+  function setup(ac) {
+    ctx = ac; KS = {};
+    master = ctx.createGain(); master.gain.value = muted ? 0 : volume;
+    var comp = ctx.createDynamicsCompressor(); comp.threshold.value = -20; comp.ratio.value = 3;
+    master.connect(comp); comp.connect(ctx.destination);
+    var verb = ctx.createConvolver(), len = Math.floor(ctx.sampleRate * 3.8), buf = ctx.createBuffer(2, len, ctx.sampleRate);
+    for (var c = 0; c < 2; c++) { var data = buf.getChannelData(c); for (var i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2.6); }
+    verb.buffer = buf; verbSend = ctx.createGain(); verbSend.gain.value = 0.55; verbSend.connect(verb); verb.connect(master);
+    var delay = ctx.createDelay(1.5), fb = ctx.createGain(), tone = ctx.createBiquadFilter();
+    delay.delayTime.value = 0.46; fb.gain.value = 0.3; tone.type = 'lowpass'; tone.frequency.value = 1800;
+    delaySend = ctx.createGain(); delaySend.gain.value = 0.3;
+    delaySend.connect(delay); delay.connect(tone); tone.connect(fb); fb.connect(delay); tone.connect(master);
+    NOISE = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
+    var nd = NOISE.getChannelData(0); for (var k = 0; k < nd.length; k++) nd[k] = Math.random() * 2 - 1;
+  }
+  function initAudio() { var AC = window.AudioContext || window.webkitAudioContext; if (AC) setup(new AC()); }
+
+  function osc(type, f, t0, t1, dest, cents) { var o = ctx.createOscillator(); o.type = type; o.frequency.value = f; if (cents) o.detune.value = cents;
+    o.connect(dest); o.start(t0); o.stop(t1); return o; }
+  function env(t, peak, atk, dec) {
+    var g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(peak, t + atk); g.gain.exponentialRampToValueAtTime(0.0001, t + atk + dec);
+    return g;
+  }
+  function filt(type, f, q, dest) { var b = ctx.createBiquadFilter(); b.type = type; b.frequency.value = f; if (q != null) b.Q.value = q; if (dest) b.connect(dest); return b; }
+  function amp(v, dest) { var g = ctx.createGain(); g.gain.value = v; g.connect(dest); return g; }
+  function noise(t, dur, dest) { var s = ctx.createBufferSource(); s.buffer = NOISE; s.loop = true; s.connect(dest); s.start(t, Math.random() * 1.5); s.stop(t + dur); return s; }
+
+  // a plucked string (Karplus-Strong): a burst of noise going round a loop one period long, softened a little on every pass.
+  // A softer burst (quieter note) starts darker.
+  function ks(f, v, dur) {
+    var sr = ctx.sampleRate, key = f.toFixed(1) + '|' + Math.round(v * 4) + '|' + dur.toFixed(2);
+    if (KS[key]) return KS[key];
+    var N = Math.max(2, Math.round(sr / f - 0.5)), len = Math.floor(sr * dur), b = ctx.createBuffer(1, len, sr), d = b.getChannelData(0);
+    var a = 0.12 + 0.75 * v, lp = 0, m = 0, mx = 0, i;
+    for (i = 0; i < N; i++) { lp += a * (Math.random() * 2 - 1 - lp); d[i] = lp; m += lp; }
+    m /= N; for (i = 0; i < N; i++) { d[i] -= m; mx = Math.max(mx, Math.abs(d[i])); }
+    for (i = 0; i < N; i++) d[i] /= mx || 1;
+    var rho = Math.pow(0.001, 1 / (f * dur));
+    for (i = N; i < len; i++) d[i] = rho * 0.5 * (d[i - N] + (i > N ? d[i - N - 1] : 0));
+    if (Object.keys(KS).length > 160) KS = {};
+    return (KS[key] = b);
+  }
+
+  // Each voice: (start time, frequency, output, {vel, len, short, trill}) → [reverb send, echo send].
+  // vel changes brightness as well as loudness; short is for the quick notes of a trill.
+  var VOICES = {
+    // nylon-ish plucked string
+    pluck: function (t, f, out, o) {
+      var v = o.vel, dur = o.short ? 0.4 : Math.min(3.4, 0.9 + 1.4 * Math.pow(330 / f, 0.4)), N = Math.max(2, Math.round(ctx.sampleRate / f - 0.5));
+      var src = ctx.createBufferSource(); src.buffer = ks(f, v, dur); src.playbackRate.value = f * (N + 0.5) / ctx.sampleRate;
+      var lp = filt('lowpass', 700 + 4200 * v * v, 0.5, out), body = filt('peaking', 210, 1.1, lp); body.gain.value = 3;
+      var g = ctx.createGain(); g.gain.setValueAtTime(0.25, t); g.gain.setValueAtTime(0.25, t + dur - 0.06); g.gain.linearRampToValueAtTime(0, t + dur); g.connect(body);
+      src.connect(g); src.start(t); src.stop(t + dur + 0.02);
+      return [0.5, 0.28];
+    },
+    // soft electric piano (Rhodes-style FM, from the blob-pond): a little bell-like brightness that mellows as it rings, a slightly detuned twin
+    ep: function (t, f, out, o) {
+      var v = o.vel, dec = o.short ? 0.35 : 3.4, end = t + dec + 0.2;
+      var car = ctx.createOscillator(); car.frequency.value = f;
+      var mod = ctx.createOscillator(); mod.frequency.value = f;
+      var mg = ctx.createGain(); mg.gain.setValueAtTime(f * (0.4 + 1.3 * v), t); mg.gain.exponentialRampToValueAtTime(f * 0.03, t + Math.min(dec, 1.3));
+      mod.connect(mg); mg.connect(car.frequency);
+      var soft = filt('lowpass', 1300 + 2200 * v, 0.4, out);
+      var g = env(t, 0.1, 0.005, dec); g.connect(soft); car.connect(g);
+      var g2 = env(t, 0.03, 0.008, dec * 0.8); g2.connect(soft); osc('sine', f, t, end, g2, 6);
+      var tg = env(t, 0.012 * v, 0.002, 0.16); tg.connect(soft); osc('sine', f * 7, t, t + 0.22, tg);   // the tine's tick
+      car.start(t); mod.start(t); car.stop(end); mod.stop(end);
+      return [0.6, 0.25];
+    },
+    // felt piano: slightly stretched overtones that fade fastest at the top, two strings a hair apart, a soft hammer thud
+    felt: function (t, f, out, o) {
+      var v = o.vel, dec = o.short ? 0.35 : Math.max(1, Math.min(4, 2.6 * Math.pow(260 / f, 0.35))), end = t + dec + 0.1;
+      var lp = filt('lowpass', 700 + 2600 * v, 0.5, out), sum = amp(1, lp);
+      for (var n = 1; n <= 6; n++) {
+        var fn = f * n * Math.sqrt(1 + 0.00035 * n * n); if (fn > 9000) break;
+        var a = Math.pow(n, -1.5) * (n === 1 ? 1 : Math.pow(v, 0.25 * n)) * 0.08;
+        var g = env(t, a, 0.008 + 0.006 * (1 - v), dec / (1 + 0.7 * (n - 1))); g.connect(sum); osc('sine', fn, t, end, g, n <= 2 ? -1.5 : 0);
+        if (n <= 2) { var g2 = env(t, a * 0.7, 0.01, dec * 1.1 / n); g2.connect(sum); osc('sine', fn, t, end, g2, 1.8); }
+      }
+      var th = env(t, 0.06 * v, 0.002, 0.05); th.connect(sum); noise(t, 0.08, filt('bandpass', Math.min(1800, f * 2), 0.9, th));
+      return [0.55, 0.2];
+    },
+    // breathy flute: a round tone with air tuned to the note, a little chiff at the start and a slow vibrato; trills legato
+    flute: function (t, f, out, o) {
+      var v = o.vel, tr = o.trill, len = tr ? tr.n * tr.step / 1000 + 0.1 : Math.max(0.22, o.len || 0.5), rel = o.short ? 0.06 : 0.3, end = t + len + rel * 2 + 0.1;
+      var a = ctx.createGain(); a.gain.setValueAtTime(0.0001, t); a.gain.linearRampToValueAtTime(0.06, t + 0.07);
+      a.gain.setValueAtTime(0.06, t + len); a.gain.setTargetAtTime(0.0001, t + len, rel / 3);
+      var lp = filt('lowpass', 1500 + 2500 * v, 0.3, out); a.connect(lp);
+      var s1 = ctx.createOscillator(); s1.frequency.value = f; s1.connect(a);
+      var s2 = ctx.createOscillator(); s2.type = 'triangle'; s2.frequency.value = f; s2.connect(amp(0.15 + 0.2 * v, a));
+      var bp = filt('bandpass', f, 9); bp.connect(amp(2.2, a)); noise(t, end - t, bp);                          // breath tuned to the note
+      noise(t, end - t, filt('highpass', 3000, 0.5, amp(0.05, a)));                                              // air
+      var ch = env(t, 0.025 * v, 0.004, 0.06); ch.connect(lp); noise(t, 0.08, filt('bandpass', Math.min(5000, f * 3), 2, ch));   // chiff
+      var vib = ctx.createOscillator(), vg = ctx.createGain(); vib.frequency.value = 4.6 + Math.random() * 0.6;
+      vg.gain.setValueAtTime(0, t); vg.gain.linearRampToValueAtTime(f * 0.005, t + 0.45); vib.connect(vg); vg.connect(s1.frequency); vg.connect(s2.frequency);
+      if (tr) for (var q = 1; q < tr.n; q++) { var fq = q % 2 ? tr.f2 : f, tq = t + q * tr.step / 1000;
+        [s1.frequency, s2.frequency, bp.frequency].forEach(function (pp) { pp.setTargetAtTime(fq, tq, 0.006); }); }
+      [s1, s2, vib].forEach(function (x) { x.start(t); x.stop(end); });
+      return [0.6, 0.3];
+    },
+    // struck glass: inharmonic partials (a free bar's 1 : 2.76 : 5.4 : 8.9), the low ones beating slowly, a tiny click
+    glass: function (t, f, out, o) {
+      var v = o.vel, k = o.short ? 0.18 : 1, lp = filt('lowpass', 2500 + 4000 * v, 0.3, out);
+      [[1, 1, 3.4], [2.756, 0.4 * v, 1.6], [5.404, 0.18 * v * v, 0.7], [8.933, 0.07 * v * v, 0.3]].forEach(function (p, i) {
+        var fp = f * p[0]; if (fp > 12000) return;
+        var g = env(t, 0.06 * p[1], 0.002, Math.max(0.12, p[2] * k)); g.connect(lp); osc('sine', fp, t, t + p[2] * k + 0.1, g);
+        if (i < 2) { var g2 = env(t, 0.03 * p[1], 0.002, Math.max(0.12, p[2] * k)); g2.connect(lp); osc('sine', fp + 0.8, t, t + p[2] * k + 0.1, g2); }
+      });
+      var c = env(t, 0.012 * v, 0.001, 0.02); c.connect(lp); noise(t, 0.04, filt('highpass', 2500, 0.7, c));
+      return [0.7, 0.3];
+    },
+    // wooden bars over a tube: tuned overtones (1 : 4 : 10), a soft mallet knock and a short hollow ring
+    wood: function (t, f, out, o) {
+      var v = o.vel, d = (o.short ? 0.3 : 1) * Math.min(1.4, 0.75 * Math.pow(330 / f, 0.5)), lp = filt('lowpass', 1800 + 3000 * v, 0.4, out);
+      [[1, 1, 1], [3.99, 0.22 * v, 0.28], [10.1, 0.05 * v, 0.08]].forEach(function (p) {
+        var fp = f * p[0]; if (fp > 12000) return;
+        var g = env(t, 0.15 * p[1], 0.002, d * p[2]); g.connect(lp); osc('sine', fp, t, t + d * p[2] + 0.05, g);
+      });
+      noise(t, 0.03, filt('bandpass', f, 40, amp(1.1 * v, lp)));                                                         // the tube
+      var m = env(t, 0.04 * v, 0.001, 0.008); m.connect(lp); noise(t, 0.02, filt('lowpass', 1500 + 2000 * v, 0.5, m));   // the mallet
+      return [0.45, 0.25];
+    },
+    // kalimba tine: a sine that settles from a hair sharp, the tine's high overtone (≈5.9×), a wooden box
+    tine: function (t, f, out, o) {
+      var v = o.vel, d = o.short ? 0.3 : Math.min(2.6, 1.3 * Math.pow(440 / f, 0.3));
+      var lp = filt('lowpass', 2200 + 3500 * v, 0.4, out), body = filt('peaking', 420, 1.5, lp); body.gain.value = 4;
+      var g = env(t, 0.13, 0.003, d); g.connect(body);
+      var o1 = osc('sine', f, t, t + d + 0.1, g); o1.frequency.setValueAtTime(f * 1.006, t); o1.frequency.exponentialRampToValueAtTime(f, t + 0.05);
+      var g2 = env(t, 0.03 * v, 0.001, 0.12); g2.connect(body); osc('sine', f * 5.93, t, t + 0.2, g2);
+      var g3 = env(t, 0.012, 0.004, d * 0.5); g3.connect(body); osc('sine', f * 2, t, t + d * 0.5 + 0.1, g3);
+      var c = env(t, 0.03 * v, 0.001, 0.006); c.connect(body); noise(t, 0.02, filt('bandpass', 3000, 1, c));
+      return [0.5, 0.3];
+    },
+    // the held notes underneath. pad: round tones with a slight chorus, a filter that blooms and closes, slow breathing
+    pad: function (t, f, out, o) {
+      var len = o.len || 2, end = t + len + 4.2;
+      var lp = filt('lowpass', 350, 0.3, out);
+      lp.frequency.setValueAtTime(350, t); lp.frequency.linearRampToValueAtTime(1300, t + 1.6); lp.frequency.linearRampToValueAtTime(500, t + len + 4);
+      var g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.07, t + 1.6);
+      g.gain.setValueAtTime(0.07, t + len); g.gain.exponentialRampToValueAtTime(0.0001, t + len + 4); g.connect(lp);
+      var lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.25; lg.gain.value = 0.014; lfo.connect(lg); lg.connect(g.gain); lfo.start(t); lfo.stop(end);
+      [[f, 1, 'sine'], [f * 2, 0.25, 'sine'], [f * 1.5, 0.3, 'triangle']].forEach(function (p) {
+        [-5, 5].forEach(function (cents) { osc(p[2], p[0], t, end, amp(p[1] * 0.5, g), cents); });
+      });
+      return [0.9, 0.12];
+    },
+    // reed: a shruti-box drone, detuned reeds through a low, slowly breathing filter
+    reed: function (t, f, out, o) {
+      var len = o.len || 2, end = t + len + 3.2;
+      var lp = filt('lowpass', 520, 0.6, out);
+      var lfo = ctx.createOscillator(), lg = ctx.createGain(); lfo.frequency.value = 0.19; lg.gain.value = 140; lfo.connect(lg); lg.connect(lp.frequency); lfo.start(t); lfo.stop(end);
+      var g = ctx.createGain(); g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.026, t + 1.2);
+      g.gain.setValueAtTime(0.026, t + len); g.gain.exponentialRampToValueAtTime(0.0001, t + len + 3); g.connect(lp);
+      [[f, -6, 1], [f, 6, 1], [f * 2, 3, 0.35], [f * 1.5, -2, 0.25]].forEach(function (p) { osc('sawtooth', p[0], t, end, amp(p[2] * 0.5, g), p[1]); });
+      return [0.8, 0.1];
+    }
+  };
+  // returns the note's own gain, so a held note can be faded out early
+  function play(voice, midi, pan, vel, o) {
+    if (!ctx || muted) return null;
+    o = o || {}; o.vel = vel;
+    var t = o.t != null ? o.t : ctx.currentTime + 0.01, out = ctx.createGain(), node = out;
+    out.gain.value = 0.35 + 0.65 * vel;
+    if (ctx.createStereoPanner) { var pn = ctx.createStereoPanner(); pn.pan.value = pan; out.connect(pn); node = pn; }
+    var sends = VOICES[voice](t, mtof(midi), out, o);
+    node.connect(master);
+    var v = ctx.createGain(); v.gain.value = sends[0]; node.connect(v); v.connect(verbSend);
+    var e = ctx.createGain(); e.gain.value = sends[1]; node.connect(e); e.connect(delaySend);
+    return out;
+  }
+
+  /* ---------- pressing a key ---------- */
+  // A strip's plan, spelled out note by note; a trill becomes its quick notes. still = reduced motion (a trill lights its band once, steadily).
+  function expand(pl, still) {
+    var out = [];
+    pl.events.forEach(function (e) {
+      if (!e.trill) { out.push({ at: e.at, midi: e.midi, vel: e.vel, len: e.len, band: e.band, lit: 420 }); return; }
+      var T = e.trill, legato = pl.voice === 'flute', same = T.band2 === e.band;
+      for (var q = 0; q < T.n; q++) {
+        var hi = q % 2 === 1, last = q === T.n - 1, sw = Math.sin(Math.PI * (q + 0.5) / T.n);
+        out.push({ at: e.at + q * T.step, midi: hi ? T.midi2 : e.midi, vel: e.vel * (legato ? 0.8 : last ? 0.8 : 0.5 + 0.3 * sw),
+          len: last ? 0.9 : T.step / 1000, short: !last, band: hi ? T.band2 : e.band, quick: true,
+          lit: still ? (q === 0 ? T.n * T.step + 300 : 0) : last ? 420 : same ? (hi ? 0 : T.step * 1.6) : T.step * 0.95,
+          silent: legato && q > 0, legato: legato && q === 0 ? { f2: mtof(T.midi2), step: T.step, n: T.n } : null });
+      }
+    });
+    return out;
+  }
+  function light(s, ms) {
+    if (!s || !ms) return;
+    var until = Date.now() + ms; s._until = until; s.classList.add('lit');
+    setTimeout(function () { if (s._until === until) s.classList.remove('lit'); }, ms);
+  }
+  // A new press replaces the notes still waiting from the last one (trills too), fades out any held note,
+  // and never starts sooner than a moment after the last note that sounded, so quick presses can't pile up.
+  function stopWaiting() {
+    timers.forEach(clearTimeout); timers = [];
+    if (ctx) holding.forEach(function (g) { var t = ctx.currentTime; g.gain.cancelScheduledValues(t); g.gain.setValueAtTime(g.gain.value, t); g.gain.setTargetAtTime(0, t, 0.15); });
+    holding = [];
+  }
+  function press(k) {
+    if (!ctx) initAudio();
+    if (ctx && ctx.state === 'suspended') ctx.resume();
+    stopWaiting();
+    keys.forEach(function (o) { o.li.classList.toggle('on', o === k); });
+    var r = k.b.getBoundingClientRect(), pan = Math.max(-0.6, Math.min(0.6, ((r.left + r.width / 2) / innerWidth) * 1.2 - 0.6));
+    k.b.classList.add('down'); setTimeout(function () { k.b.classList.remove('down'); }, 160);
+    var pl = k.plan, spans = k.b.children, start = Math.max(0, lastNote + 120 - Date.now());
+    if (pl.drone) timers.push(setTimeout(function () { var h = play(pl.drone.voice, pl.drone.midi, pan, 0.8, { len: pl.total / 1000 + 0.6 }); if (h) holding.push(h); }, start));
+    expand(pl, reduce).forEach(function (it) {
+      var jitter = (Math.random() - 0.5) * (it.quick ? 6 : 18);                 // a touch of human unevenness
+      timers.push(setTimeout(function () {
+        lastNote = Date.now();
+        if (!it.silent) {
+          var h = play(pl.voice, it.midi, pan, Math.min(1, it.vel * (0.92 + Math.random() * 0.16)), { len: it.len, short: it.short, trill: it.legato });
+          if (h && it.legato) holding.push(h);
+        }
+        light(spans[it.band], it.lit);
+      }, Math.max(0, start + it.at + jitter)));
+    });
+  }
+
+  // for checking: every strip's plan, and a strip (or several, pressed in quick succession and never cut short) rendered silently
+  window.PalettePiano = {
+    plans: function () { return keys.map(function (k) { return k.plan; }); },
+    render: function (list, every, secs) {
+      var OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext, keep = [ctx, master, verbSend, delaySend, NOISE, KS, muted];
+      muted = false; setup(new OAC(2, Math.ceil(44100 * secs), 44100)); var oc = ctx;
+      list.forEach(function (idx, m) {
+        var pl = keys[idx].plan, t0 = 0.05 + m * every, pan = (m % 3 - 1) * 0.4;
+        if (pl.drone) play(pl.drone.voice, pl.drone.midi, pan, 0.8, { t: t0, len: pl.total / 1000 + 0.6 });
+        expand(pl, false).forEach(function (it) { if (!it.silent) play(pl.voice, it.midi, pan, it.vel, { t: t0 + it.at / 1000, len: it.len, short: it.short, trill: it.legato }); });
+      });
+      ctx = keep[0]; master = keep[1]; verbSend = keep[2]; delaySend = keep[3]; NOISE = keep[4]; KS = keep[5]; muted = keep[6];
+      return oc.startRendering().then(function (buf) {
+        var pk = 0, ss = 0, n = 0;
+        for (var c = 0; c < buf.numberOfChannels; c++) { var d = buf.getChannelData(c); for (var i = 0; i < d.length; i++) { var x = Math.abs(d[i]); if (x > pk) pk = x; ss += x * x; n++; } }
+        return { peak: pk, rms: Math.sqrt(ss / n) };
+      });
+    },
+    note: function (voice, midi, vel) {   // one note alone, to compare loudness between instruments
+      var keep = [ctx, master, verbSend, delaySend, NOISE, KS, muted];
+      muted = false; setup(new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, 44100 * 3, 44100)); var oc = ctx;
+      play(voice, midi, 0, vel, { t: 0.02, len: 1 });
+      ctx = keep[0]; master = keep[1]; verbSend = keep[2]; delaySend = keep[3]; NOISE = keep[4]; KS = keep[5]; muted = keep[6];
+      return oc.startRendering().then(function (buf) { var d = buf.getChannelData(0), pk = 0, ss = 0; for (var i = 0; i < 44100; i++) { pk = Math.max(pk, Math.abs(d[i])); ss += d[i] * d[i]; } return { peak: pk, rms: Math.sqrt(ss / 44100) }; });
+    }
+  };
+
+  quiet.addEventListener('click', function () {
+    muted = !muted;
+    quiet.setAttribute('aria-pressed', String(muted));
+    quiet.textContent = muted ? 'Turn the sound on' : 'Turn the sound off';
+    if (muted) stopWaiting();
+    if (ctx) { var t = ctx.currentTime; master.gain.cancelScheduledValues(t); master.gain.setValueAtTime(master.gain.value, t);
+      master.gain.linearRampToValueAtTime(muted ? 0 : volume, t + 0.3); }
+  });
+
+  /* ---------- the way back (shared with hc-project through sessionStorage) ---------- */
+  var KEY = 'hc-from-piano', MAXAGE = 2 * 60 * 60 * 1000, returned = null;
+  function remember(p) { try { sessionStorage.setItem(KEY, JSON.stringify({ slug: p.url, t: Date.now() })); } catch (e) {} }
+  function take() { try { var v = sessionStorage.getItem(KEY); sessionStorage.removeItem(KEY); return v; } catch (e) { return null; } }
+  // back from a project: that strip comes into view with its title open; no sound is started
+  function comeBack() {
+    var o = null; try { o = JSON.parse(take()); } catch (e) {}
+    if (!o || !o.slug || !(Date.now() - o.t < MAXAGE)) return;
+    var s = String(o.slug).toLowerCase(), k = keys.filter(function (x) { return x.p.url.toLowerCase() === s; })[0];
+    if (!k) return;
+    keys.forEach(function (x) { x.li.classList.toggle('on', x === k); });
+    rove(keys.indexOf(k));
+    returned = k.p.url;
+    function show() {
+      if (!live()) return;
+      var r = k.li.getBoundingClientRect();
+      if (r.top < 64 || r.bottom > innerHeight - 70) k.li.scrollIntoView({ block: 'center', inline: 'nearest', behavior: 'auto' });
+    }
+    requestAnimationFrame(show); setTimeout(show, 350);   // and again, in case Cargo scrolled to the top after showing the page
+  }
+
+  /* ---------- building ---------- */
+  function rove(i) {   // the one key (and its title link) that Tab reaches
+    if (keys[cur]) { keys[cur].b.tabIndex = -1; keys[cur].a.tabIndex = -1; }
+    cur = i; keys[cur].b.tabIndex = 0; keys[cur].a.tabIndex = 0;
+  }
+  function build(box) {
+    // Cargo's own content (loose text included) moves into one hidden box: kept as the fallback
+    var keep = document.createElement('div'); keep.setAttribute('data-hc-pp-fallback', ''); keep.style.display = 'none';
+    while (box.firstChild) keep.appendChild(box.firstChild);
+    box.appendChild(keep);
+    root = document.createElement('div'); root.id = 'hc-pp'; root.innerHTML = HTML;
+    box.appendChild(root);
+    list = root.querySelector('#hc-pp-keys'); keys = []; cur = 0;
+
+    PALETTES.forEach(function (p, i) {
+      var h = hash(p.url), li = document.createElement('li');
+      li.className = 'hc-pp-k';
+      li.style.setProperty('--tilt', ((h % 41) / 10 - 2).toFixed(1) + 'deg');          // -2° to +2°, the same every visit
+      li.style.setProperty('--dy', ((h >> 8) % 11) + 'px');
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'hc-pp-key'; b.tabIndex = i ? -1 : 0; b.setAttribute('aria-label', p.title);
+      p.colours.forEach(function (c) {
+        var s = document.createElement('span'), j = function (n) { return ((h >> n) % 5) + 'px'; };
+        s.style.background = c[0];
+        s.style.setProperty('--share', Math.sqrt(c[1]).toFixed(3));                         // small accents get a fairer share of the key
+        s.style.setProperty('--edge', 'polygon(0 ' + j(c[0].charCodeAt(2) % 7) + ', 30% ' + j(3 + c[0].charCodeAt(4) % 5) + ', 62% ' + j(7) + ', 100% ' + j(c[0].charCodeAt(6) % 9) + ', 100% 100%, 0 100%)');
+        b.appendChild(s);
+      });
+      var a = document.createElement('a');
+      a.className = 'hc-pp-tag'; a.href = '/' + p.url; a.tabIndex = i ? -1 : 0;
+      a.innerHTML = '<b></b><i>see it</i>'; a.firstChild.textContent = p.title;
+      a.setAttribute('aria-label', 'See ' + p.title);
+      a.addEventListener('click', function () { remember(p); });
+      a.addEventListener('auxclick', function () { remember(p); });
+      li.appendChild(b); li.appendChild(a); list.appendChild(li);
+      keys.push({ li: li, b: b, a: a, p: p, plan: PLANS[p.url] || (PLANS[p.url] = planFor(p)) });
+    });
+
+    /* keyboard: one stop for the whole piano, arrows move along it */
+    keys.forEach(function (k, i) {
+      k.b.addEventListener('click', function () { press(k); });
+      k.b.addEventListener('focus', function () { keys.forEach(function (o) { if (o !== k) o.li.classList.remove('on'); }); if (cur !== i) rove(i); });
+      k.b.addEventListener('keydown', function (e) {
+        var to = { ArrowRight: i + 1, ArrowLeft: i - 1, ArrowDown: i + perRow(), ArrowUp: i - perRow(), Home: 0, End: keys.length - 1 }[e.key];
+        if (to !== undefined) { e.preventDefault(); focusKey(to); }
+      });
+    });
+    edges();
+    if (window.ResizeObserver) new ResizeObserver(function () { if (live()) edges(); }).observe(list);   // also Cargo's late phone viewport
+    comeBack();
+  }
+  function focusKey(i) { i = Math.max(0, Math.min(keys.length - 1, i)); rove(i); keys[cur].b.focus(); }
+  function perRow() { var top = keys[0].li.offsetTop, n = 0; while (n < keys.length && keys[n].li.offsetTop === top) n++; return n || 1; }
+  // titles near the ends of a row open inwards, so they never leave the screen
+  function edges() {
+    keys.forEach(function (k, i) {
+      var t = k.li.offsetTop, prev = keys[i - 1], next = keys[i + 1];
+      k.li.dataset.edge = !prev || prev.li.offsetTop !== t ? 'l' : !next || next.li.offsetTop !== t ? 'r' : '';
+    });
+  }
+  addEventListener('resize', function () { if (live()) edges(); });
+
+  function check() {
+    var here = PAGE.test(location.pathname);
+    document.documentElement.classList.toggle('hc-pp-on', here);   // Cargo changes pages without reloading
+    if (!quiet.isConnected && document.body) document.body.appendChild(quiet);
+    if (!here) { if (root && !live()) { stopWaiting(); root = null; } return; }   // left the page: nothing more plays
+    var box = document.querySelector('.project_content');
+    if (box && !box.querySelector('#hc-pp')) build(box);
+  }
+  var pending = null;
+  new MutationObserver(function () { clearTimeout(pending); pending = setTimeout(check, 120); })
+    .observe(document.documentElement, { childList: true, subtree: true });
+  addEventListener('popstate', check);
+  // the back button can bring the page back whole from the back/forward cache: then only the way back is redone
+  addEventListener('pageshow', function (e) { if (e.persisted && live()) comeBack(); });
+  check();
+  window.__hcPalettePiano = {
+    keys: function () { return keys.length; },
+    sound: function () { return { ctx: !!ctx, state: ctx ? ctx.state : null, waiting: timers.length, muted: muted, lastNote: lastNote }; },
+    returned: function () { return returned; }
+  };
+})();
+</script>

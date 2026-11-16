@@ -74,6 +74,7 @@ StatCounter"></a></div></noscript>
     10. Project pages       every project page laid out like about me: title, opening line, pictures, tags, previous / next
     11. Stylesheet check    if Cargo's own stylesheet arrives empty, fetches it again and puts it in place
     12. Birth-a-blob        draw a face on a blank blob and let it go to drift with the others
+    13. Palette piano       every project as a strip of its own colours, to click and play
      Each is its own script file, so if one ever breaks (or GitHub is down) the others and the site keep working.
      ================================================================ -->
 <style>html:not(.hc-pj-ready) body[data-pagetype="project"] .project_content { opacity: 0 !important; }</style>
@@ -81,7 +82,7 @@ StatCounter"></a></div></noscript>
 <script>
 (function () {
   var base = 'https://hallicivelek.github.io/hallicivelek-site/dist/js/';
-  ['hc-columns', 'hc-nav-active', 'hc-blobs', 'hc-pond', 'hc-stylecheck', 'hc-eyes', 'hc-playthings', 'hc-retro', 'hc-music', 'hc-fold', 'hc-project', 'hc-strata', 'hc-weather-free', 'hc-birth-a-blob', 'hc-debug'].forEach(function (name) {
+  ['hc-columns', 'hc-nav-active', 'hc-blobs', 'hc-pond', 'hc-stylecheck', 'hc-eyes', 'hc-playthings', 'hc-retro', 'hc-music', 'hc-fold', 'hc-project', 'hc-strata', 'hc-weather-free', 'hc-birth-a-blob', 'hc-palette-piano', 'hc-debug'].forEach(function (name) {
     var s = document.createElement('script');
     s.src = base + name + '.js';
     s.async = false;

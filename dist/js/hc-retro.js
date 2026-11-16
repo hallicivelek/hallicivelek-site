@@ -76,7 +76,7 @@
     if (!bar.isConnected) document.body.appendChild(bar);
     placeBack();
     var th = document.querySelector('.thumbnails[data-columnize]');
-    var onGrid = th && getComputedStyle(th).display !== 'none' && !/blob-?pond|playthings/i.test(location.pathname);
+    var onGrid = th && getComputedStyle(th).display !== 'none' && !/blob-?pond|playthings|palette-piano/i.test(location.pathname);
     if (onGrid) { if (award.previousSibling !== th) th.parentNode.insertBefore(award, th.nextSibling); }
     else if (award.isConnected) award.remove();
     var first = document.getElementById('hc-tag') || document.getElementById('hc-intro') || document.getElementById('hc-sort');
@@ -112,4 +112,4 @@
   addEventListener('popstate', function () { setTimeout(place, 150); });
   if (document.body) set(mode); else document.addEventListener('DOMContentLoaded', function () { set(mode); });
 })();
-window.__hcBuild = "2026-11-15 23:55";
+window.__hcBuild = "2026-11-16 03:47";

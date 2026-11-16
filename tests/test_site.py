@@ -6,7 +6,7 @@ The stand-in mimics what matters about hallicivelek.com on Cargo:
 - deliberately clashing global styles (.caption, h1, p, button) to prove the pond is fenced
 - NO viewport tag at first; a script near the end adds it, like Cargo does on phones
 It cannot test real Cargo, real Safari, or Cargo's limit on Custom HTML size."""
-import asyncio, functools, http.server, threading, tempfile, sys, re, zlib, struct, os
+import asyncio, functools, http.server, json, threading, tempfile, sys, re, zlib, struct, os
 from pathlib import Path
 from playwright.async_api import async_playwright
 
@@ -62,6 +62,7 @@ BLOCK_RESIZE = "(function(){ const add = window.addEventListener; window.addEven
 
 results = []
 PASTE = []
+PALETTES = json.loads((ROOT / 'src' / 'palettes.json').read_text())   # the palette piano's strips, in Halli's order
 SHOTS = os.environ.get('HC_SHOTS')   # a folder: also save screenshots of birth-a-blob after a release there
 def check(name, ok, detail=''):
     results.append(ok); print(('  PASS  ' if ok else '  FAIL  ') + name + (f'  ({detail})' if detail else ''))
@@ -523,7 +524,7 @@ async def main(base):
         check('no script errors (umbrella, reduced motion)', not errs, '; '.join(errs)[:300])
         await ctx.close()
 
-        # ---- playthings: five cards over Cargo's fallback, the pond card in preview mode ----
+        # ---- playthings: six cards over Cargo's fallback, the pond card in preview mode ----
         page = await b.new_page(viewport={'width': 1300, 'height': 900}); errs = []
         page.on('pageerror', lambda e: errs.append(str(e)))
         await page.goto(base + '/short/playthings/'); await page.wait_for_timeout(2500)
@@ -538,10 +539,13 @@ async def main(base):
             await ph.screenshot(path=os.path.join(SHOTS, 'playthings-phone.png')); await ph.close()
         hid = await page.evaluate("[...document.querySelectorAll('.thumbnails, #hc-sort')].every(e => getComputedStyle(e).display === 'none')")
         check("playthings: Cargo's project grid is hidden", hid)
-        check('playthings: five cards in order, intro, Cargo fallback hidden, the pencil loaded', r['cards'] == ['Birth-a-blob', 'Music Kontrapunkt Kontrol', 'Shakeskin', 'The Calculater', 'The blob-pond'] and (r['pencil'] or 0) > 0
+        check('playthings: six cards in order, intro, Cargo fallback hidden, the pencil loaded', r['cards'] == ['Birth-a-blob', 'Music Kontrapunkt Kontrol', 'Proper palette piano player', 'Shakeskin', 'The Calculater', 'The blob-pond'] and (r['pencil'] or 0) > 0
               and r['intro'] == "Things I've built and kept running (some since 2004)." and r['fallbackHidden'] and r['outsideNewTab'], str(r))
-        await page.hover('#hc-pt a.hc-pt-card >> nth=3'); await page.wait_for_timeout(400)
-        bg = await page.evaluate("getComputedStyle(document.querySelectorAll('#hc-pt a.hc-pt-card')[3]).backgroundColor")
+        pp = await page.evaluate("""() => { const a = [...document.querySelectorAll('#hc-pt a.hc-pt-card')].find(a => a.querySelector('h2').firstChild.textContent === 'Proper palette piano player');
+          return a ? { href: a.getAttribute('href'), blank: a.target, keys: a.querySelectorAll('.hc-pt-win svg g[clip-path]').length, media: a.querySelectorAll('audio, iframe, img').length } : null; }""")
+        check('playthings: the palette piano card links to /palette-piano on this site, a silent picture of six keys', bool(pp) and pp['href'] == '/palette-piano' and pp['blank'] == '' and pp['keys'] == 6 and pp['media'] == 0, str(pp))
+        await page.hover('#hc-pt a.hc-pt-card >> nth=4'); await page.wait_for_timeout(400)
+        bg = await page.evaluate("getComputedStyle(document.querySelectorAll('#hc-pt a.hc-pt-card')[4]).backgroundColor")
         check("playthings: hover is 20% white, not Cargo's yellow", bg == 'rgba(255, 255, 255, 0.2)', bg)
         f = next((fr for fr in page.frames if 'hc-preview' in fr.url), None)
         r = await f.evaluate("""() => ({ pond: !!document.getElementById('hc-pond'), preview: document.documentElement.classList.contains('hc-pond-preview'),
@@ -591,6 +595,100 @@ async def main(base):
         if SHOTS: await page.screenshot(path=os.path.join(SHOTS, 'desktop.png'))
         check('no script errors (birth a blob)', not errs, '; '.join(errs)[:300])
         await page.close()
+
+        # ---- palette piano: every project as a strip of its own colours; the way back from a project page ----
+        PIANO = """() => { const pp = document.getElementById('hc-pp'), q = document.getElementById('hc-pp-quiet'), pz = document.querySelector('button.hc-pause');
+          const qr = q && q.getBoundingClientRect(), zr = pz && pz.getBoundingClientRect();
+          return { title: pp && pp.querySelector('h1').textContent, lede: pp && pp.querySelector('.hc-pp-lede').textContent,
+            back: pp && pp.querySelector('a.hc-pp-back').getAttribute('href'), keys: document.querySelectorAll('#hc-pp li.hc-pp-k').length,
+            bands: document.querySelectorAll('#hc-pp button.hc-pp-key span').length, h1Color: pp && getComputedStyle(pp.querySelector('h1')).color,
+            keyBg: pp && getComputedStyle(pp.querySelector('button.hc-pp-key')).backgroundColor,
+            fallbackHidden: document.querySelectorAll('[data-hc-pp-fallback]').length === 1 && getComputedStyle(document.querySelector('[data-hc-pp-fallback]')).display === 'none',
+            gridHidden: [...document.querySelectorAll('.thumbnails, #hc-sort')].every(e => getComputedStyle(e).display === 'none'),
+            tabStops: document.querySelectorAll('#hc-pp [tabindex="0"]').length, titlesHidden: getComputedStyle(document.querySelector('#hc-pp a.hc-pp-tag')).opacity,
+            quiet: q && [q.textContent, getComputedStyle(q).position, getComputedStyle(q).display],
+            apart: !!(qr && zr && qr.width && zr.width && (qr.right <= zr.left || qr.bottom <= zr.top || qr.top >= zr.bottom)),
+            wide: document.documentElement.scrollWidth <= innerWidth }; }"""
+        ON = """(slug) => { const k = [...document.querySelectorAll('#hc-pp li.hc-pp-k')].find(l => l.querySelector('a.hc-pp-tag').getAttribute('href') === '/' + slug);
+          if (!k) return null; const r = k.getBoundingClientRect(), t = k.querySelector('a.hc-pp-tag');
+          return { on: k.classList.contains('on'), opened: getComputedStyle(t).opacity, inView: r.top >= 0 && r.bottom <= innerHeight,
+            others: document.querySelectorAll('#hc-pp li.hc-pp-k.on').length, sound: window.__hcPalettePiano.sound(), returned: window.__hcPalettePiano.returned(),
+            saved: sessionStorage.getItem('hc-from-piano'), scrollY: Math.round(scrollY) }; }"""
+        n_pal = len(PALETTES)
+        ctx = await b.new_context(viewport={'width': 1300, 'height': 900})
+        page = await ctx.new_page(); errs = []
+        page.on('pageerror', lambda e: errs.append(str(e)))
+        await page.goto(base + '/palette-piano/'); await page.wait_for_timeout(1500)
+        r = await page.evaluate(PIANO)
+        check('palette piano: built on its page (title, the line, back to playthings, one strip per project, Cargo styles kept out)',
+              r['title'] == 'Proper palette piano player' and r['lede'] == "Every project as a strip of its own colors, for you to click'n play."
+              and r['back'] == '/playthings' and r['keys'] == n_pal and r['bands'] >= n_pal * 3 and r['h1Color'] == 'rgb(73, 46, 70)' and r['keyBg'] == 'rgb(255, 255, 255)', str(r))
+        check("palette piano: Cargo's content kept as a hidden fallback, the grid hidden, one Tab stop (strip + its title), titles hidden until asked",
+              r['fallbackHidden'] and r['gridHidden'] and r['tabStops'] == 2 and r['titlesHidden'] == '0', str(r))
+        check('palette piano: the sound switch is fixed, shown, and clear of the blobs\' pause button', r['quiet'] == ['Turn the sound off', 'fixed', 'flex'] and r['apart'], str(r))
+        tags = await page.evaluate("[...document.querySelectorAll('#hc-pp a.hc-pp-tag')].map(a => [a.getAttribute('href'), a.querySelector('b').textContent])")
+        check('palette piano: every title links to its project on this site, in Halli\'s order', tags == [['/' + x['url'], x['title']] for x in PALETTES], str(tags[:2]))
+        before = await page.evaluate('window.__hcPalettePiano.sound()')
+        await page.click('#hc-pp button.hc-pp-key >> nth=1')
+        just = await page.evaluate('window.__hcPalettePiano.sound()'); await page.wait_for_timeout(900)
+        after = await page.evaluate(ON, PALETTES[1]['url'])
+        check('palette piano: pressing a strip starts the sound (audio running, notes waiting, then played) and opens its title',
+              not before['ctx'] and just['ctx'] and just['waiting'] > 0 and after['sound']['state'] == 'running' and after['sound']['lastNote'] > 0
+              and after['on'] and after['opened'] == '1' and after['others'] == 1, f'{before} / {just} / {after}')
+        await page.keyboard.press('ArrowRight'); await page.keyboard.press('ArrowRight')
+        kb = await page.evaluate("(() => { const ks = [...document.querySelectorAll('#hc-pp button.hc-pp-key')]; return [ks.indexOf(document.activeElement), document.querySelectorAll('#hc-pp [tabindex=\"0\"]').length]; })()")
+        await page.keyboard.press('End')
+        end = await page.evaluate("[...document.querySelectorAll('#hc-pp button.hc-pp-key')].indexOf(document.activeElement)")
+        check('palette piano: the arrow keys and End move along the strips, still one Tab stop', kb == [3, 2] and end == n_pal - 1, f'{kb} {end}')
+        await page.click('#hc-pp-quiet')
+        q = await page.evaluate("[document.getElementById('hc-pp-quiet').getAttribute('aria-pressed'), document.getElementById('hc-pp-quiet').textContent, window.__hcPalettePiano.sound()]")
+        check('palette piano: the sound switch turns the sound off', q[0] == 'true' and q[1] == 'Turn the sound on' and q[2]['muted'] and q[2]['waiting'] == 0, str(q))
+        # the way back: follow a strip's title to the project page, then come back
+        i = next(n for n, x in enumerate(PALETTES) if x['url'] == 'Cheerios')
+        await page.goto(base + '/palette-piano/?w=1'); await page.wait_for_timeout(1200)
+        await page.click(f'#hc-pp button.hc-pp-key >> nth={i}'); await page.wait_for_timeout(200)
+        await page.click(f'#hc-pp a.hc-pp-tag >> nth={i}'); await page.wait_for_url('**/Cheerios/'); await page.wait_for_timeout(1800)
+        pj = await page.evaluate("(() => { const a = document.querySelector('#hc-pj a.hc-pj-back'); return a && [a.textContent, a.getAttribute('href'), document.querySelectorAll('#hc-pj a.hc-pj-back').length]; })()")
+        check('project page from the piano: the back link becomes "← palette piano", to /palette-piano', pj == ['← palette piano', '/palette-piano', 1], str(pj))
+        await page.click('#hc-pj a.hc-pj-back'); await page.wait_for_url('**/palette-piano/'); await page.wait_for_timeout(1500)
+        r = await page.evaluate(ON, 'Cheerios')
+        check('back on the piano: the strip left from is in view with its title open, silently, and the way back is used up',
+              bool(r) and r['on'] and r['opened'] == '1' and r['inView'] and r['others'] == 1 and not r['sound']['ctx'] and r['returned'] == 'Cheerios' and r['saved'] is None, str(r))
+        await page.goto(base + '/short/Icelandsmites/?w=2'); await page.wait_for_timeout(1500)
+        other = await page.evaluate("document.querySelector('#hc-pj a.hc-pj-back').textContent")
+        await page.goto(base + '/palette-piano/?w=3'); await page.wait_for_timeout(1200)
+        await page.click(f'#hc-pp button.hc-pp-key >> nth={i}'); await page.wait_for_timeout(200)
+        await page.click(f'#hc-pp a.hc-pp-tag >> nth={i}'); await page.wait_for_url('**/Cheerios/'); await page.wait_for_timeout(1500)
+        await page.go_back(); await page.wait_for_timeout(1500)
+        r = await page.evaluate(ON, 'Cheerios')
+        check("back on the piano with the browser's back button: the strip in view, title open, the way back used up",
+              bool(r) and r['on'] and r['opened'] == '1' and r['inView'] and r['saved'] is None, str(r))
+        check('no script errors (palette piano)', not errs, '; '.join(errs)[:300])
+        await ctx.close()
+        ctx = await b.new_context(viewport={'width': 1300, 'height': 900})
+        page = await ctx.new_page()
+        await page.goto(base + '/Cheerios/?w=4'); await page.wait_for_timeout(1500)
+        direct = await page.evaluate("document.querySelector('#hc-pj a.hc-pj-back').textContent")
+        check("project page not from the piano (opened directly, or another project): \"← things I've made\" as before",
+              direct == "← things I've made" and other == "← things I've made", f'{direct} / {other}')
+        await ctx.close()
+        # phone: a strip far down the piano, and reduced motion
+        ctx = await b.new_context(viewport={'width': 390, 'height': 760}, device_scale_factor=2, is_mobile=True, has_touch=True, reduced_motion='reduce')
+        page = await ctx.new_page(); errs = []
+        page.on('pageerror', lambda e: errs.append(str(e)))
+        deep = PALETTES[-3]['url']
+        await page.goto(base + '/palette-piano/'); await page.wait_for_timeout(1200)
+        r = await page.evaluate(PIANO)
+        await page.evaluate("s => sessionStorage.setItem('hc-from-piano', JSON.stringify({ slug: s, t: Date.now() }))", deep)
+        await page.goto(base + '/palette-piano/?w=5'); await page.wait_for_timeout(1500)
+        on = await page.evaluate(ON, deep)
+        check('phone: the piano fits the screen, the sound switch clear of the pause button, and coming back scrolls down to a strip far down',
+              r['wide'] and r['apart'] and r['keys'] == n_pal and bool(on) and on['on'] and on['inView'] and on['scrollY'] > 500, f"{ {k: r[k] for k in ('wide', 'apart', 'keys')} } {on}")
+        still = await page.evaluate("""() => { const b = document.querySelectorAll('#hc-pp button.hc-pp-key')[0]; b.click();
+          return [b.classList.contains('down'), getComputedStyle(b).transform]; }""")
+        check('reduced motion: a pressed strip does not move', still == [True, 'none'], str(still))
+        check('no script errors (palette piano, phone)', not errs, '; '.join(errs)[:300])
+        await ctx.close()
 
         # ---- Cargo's own stylesheet arriving empty (Cargo's outage 2026-11-09) ----
         page = await b.new_page(viewport={'width': 1300, 'height': 900}); errs = []
@@ -676,11 +774,14 @@ if __name__ == '__main__':
                     ('short/stylecheck-ok', PAGE.replace('ADDONS', tags).replace('</head>', '<link rel="stylesheet" href="/stylesheet?ok"></head>', 1)),
                     ('short/birth-a-blob', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', '<p>Birth-a-blob: draw a face on a blob</p>')
                         .replace('</div></div>\n<script>', '</div>' + GRID + '</div>\n<script>', 1)),
+                    ('palette-piano', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', '<p>palette piano</p>')
+                        .replace('</div></div>\n<script>', '</div>' + GRID + '</div>\n<script>', 1)),
                     ('short/playthings', PAGE.replace('ADDONS', tags)
                         .replace('</style>', '  .project_content a:hover { background-color: rgb(255, 255, 0); color: rgb(0, 0, 0); }\n</style>', 1)
                         .replace('<p>PAGE CONTENT</p>', '<p>Music Kontrapunkt Kontrol, Shakeskin, The Calculater, the blob-pond</p>')
                         .replace('</div></div>\n<script>', '</div>' + GRID + '</div>\n<script>', 1))]:
         (site / d).mkdir(parents=True); (site / d / 'index.html').write_text(html)
+    (site / 'Cheerios').mkdir(); (site / 'Cheerios' / 'index.html').write_text((site / 'short' / 'Cheerios' / 'index.html').read_text())   # where the piano's links lead
     def png(w, h):   # a small striped test picture
         rows = b''.join(b'\x00' + b''.join(bytes((x * 7 % 256, y * 5 % 256, 160)) for x in range(w)) for y in range(h))
         chunk = lambda t, d: struct.pack('>I', len(d)) + t + d + struct.pack('>I', zlib.crc32(t + d) & 0xffffffff)

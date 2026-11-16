@@ -32,7 +32,7 @@ Everything reaches the live site through Cargo's **Custom HTML** setting. Two wa
 ## Build and test
 ```
 python3 build.py              # src/ → dist/hc-columns.html, dist/hc-pond.html, dist/custom-html.html; syntax-checks every script
-python3 tests/test_site.py    # 105 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, weather, umbrella, phone)
+python3 tests/test_site.py    # 121 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, weather, umbrella, phone)
 ```
 Tests need `python3 -m pip install --user playwright` (this Mac has no bare `pip`) and `python3 -m playwright install chromium`.
 The build was verified to reproduce the installed files byte-for-byte when this project was set up.
@@ -58,8 +58,9 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   the photo puts it back. Cargo leaves the page on Esc (to `/`, a document keydown listener); our window-capture
   listener keeps Esc from Cargo while the pencil is held **or a drawing exists** (Halli lost a drawing to a second Esc).
 - `src/hc-playthings.html` — **playthings**: on the page whose address contains `playthings`, hides whatever Halli
-  put on the Cargo page (kept as fallback) and draws four cards with live previews: Kontrapunkt (the blog in a
-  scaled-down iframe, gliding), Shakeskin (12 of Halli's friends' faces from shakeskin.com, one at a time with a shake;
+  put on the Cargo page (kept as fallback) and draws six cards (alphabetical, plain ASCII order), mostly live previews: Kontrapunkt (the blog in a
+  scaled-down iframe, gliding), Proper palette piano player (a silent drawn picture, no iframe: six tilted white keys painted
+  with real palettes from `palettes.json`, copied into `KEYS` in the file; links to `/palette-piano`), Shakeskin (12 of Halli's friends' faces from shakeskin.com, one at a time with a shake;
   shakeskin.com won't be framed), The Calculater (still iframe), the blob-pond (`/the-blob-pond?hc-preview`). Hover is
   20% white (overrides Cargo's yellow `.project_content a:hover`); Halli ruled out tilting. Reduced motion: no glide/shake.
 - `src/hc-birth-a-blob.html` — **Birth-a-blob** (page address contains `birth-a-blob`; ported from
@@ -68,6 +69,26 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   `window.hcBlobs.adopt(...)` (end of hc-blobs: also `paused()` and `spots()`), where it drifts as kind `made` for the
   rest of the visit (a tap gives it a wobble). Hides Cargo's content (fallback), grid and sort line; ids/classes `hc-bab-`,
   CSS under `#hc-bab`. Esc is kept from Cargo while the pencil is held or a face is drawn. Not saved anywhere.
+  Loaded by hc-pond.js (no paste).
+- `src/hc-palette-piano.html` — **Proper palette piano player** (page address contains `palette-piano`, a Cargo page
+  Halli made 2026-11-16; ported from `mockups/palette-piano`, sound approved by Halli): every project as a white key
+  painted with its own colours, in Halli's order, tilted like the pinboard prints. Pressing a strip plays its colours
+  (instrument, notes, order, pace, trill, held note all from the colours and address; always D major pentatonic; all
+  sounds made in the browser). The sound code and colour-to-music mapping are the mockup's, **unchanged** (copied line
+  for line; `window.PalettePiano` is its checking hook, as used by the mockup's `check_sound.py`). Title tag only on
+  hover / focus / after a press, linking to `/<project>`. Keyboard: one Tab stop, arrows / Home / End move, Enter or
+  Space plays, Tab reaches the title link. Reduced motion: strips don't move or grow. "Turn the sound off" is fixed
+  **bottom left** (the pause button and "back to 2026" have the bottom right; lifted above the Netscape bar, styled in
+  1999 mode). Hides Cargo's content (fallback), grid and sort line; ids/classes `hc-pp-` under `#hc-pp` (the sound code's
+  own `on` / `down` / `lit` classes are scoped there). **The way back:** following a title saves
+  `{slug, t}` in sessionStorage `hc-from-piano` (2 h); hc-project then shows "← palette piano" (to `/palette-piano`,
+  quiet ink, 44px tall) instead of "← things I've made" on that project only; coming back (link, back button, or the
+  back/forward cache via `pageshow`) scrolls to the strip and opens its title, silently, and uses the entry up.
+  **Colours:** `src/palettes.json` (one project per line: title, address, colours with their share), put into
+  `dist/hc-palette-piano.html` by `tools/build_palettes.py` (run by build.py; refuses an entry it can't read).
+  Re-bake with `python3 tools/build_palettes.py --refresh` (Playwright; Cargo thumbnails, the mockup's
+  `bake_palettes.py` colour reading moved there unchanged) when projects are added, renamed or re-thumbnailed — a
+  re-bake can change how a strip sounds. `window.__hcPalettePiano` (`keys()`, `sound()`, `returned()`) for tests.
   Loaded by hc-pond.js (no paste).
 - **Pond preview mode:** `?hc-preview` *inside an iframe* (pond_loader_template) adds `html.hc-pond-preview`: no Cargo
   header, no wake screen, no tray or caption, so audio never starts. Opened directly, `?hc-preview` does nothing.
@@ -245,6 +266,12 @@ header.css, remove "Other projects" from about me.
 The redesign looks fine on his iPhone and speed is fine. Wanton Boys Club GIF stays out for now.
 
 ## Where we left off (2026-11-04)
+- **2026-11-16:** the palette piano (`src/hc-palette-piano.html`, `src/palettes.json`, `tools/build_palettes.py`) and its
+  way back in hc-project; `palette-piano` added to hc-nav-active's PAGES and hc-retro's grid check. 120/120 tests pass.
+  Built, **not committed or pushed**; not yet seen on the live site or a real iPhone, and the sound has only been
+  checked in headless Chromium (audio running, notes scheduled), not listened to on the site. Its playthings card (sixth, between Music Kontrapunkt Kontrol and
+  Shakeskin) was added the same day: 121/121 tests pass, desktop and phone screenshots checked, not yet on the live site. The back/forward-cache return is in the code
+  but headless Chromium reloaded the page in the test, so only the reload path is tested.
 - **2026-11-15:** hc-weather-free (free clouds behind the blobs) replaces the hc-weather strip in the later-add-on list;
   95/95 tests pass. Built, **not committed or pushed**; not yet checked on the live site or a real iPhone.
 - **Waiting on Halli:** a new `?hc-debug` screenshot from his iPhone (hallicivelek.com/info-contact?hc-debug, scrolled

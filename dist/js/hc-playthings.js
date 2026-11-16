@@ -11,14 +11,19 @@
   var here = document.currentScript && document.currentScript.src;
   var PENCIL = (here ? new URL('../../assets/portrait/', here).href
                      : 'https://hallicivelek.github.io/hallicivelek-site/assets/portrait/') + 'pencil.png';
+  // six real palettes from src/palettes.json (colour, share): Rímnamín, FM Belfast, Fran Lebowitz, Blómakona, Retro Stefson - Kimbabwe, Joker Classique
+  var KEYS = [[["#daedf6",0.49],["#82c5e4",0.38],["#f7d34f",0.07],["#e29947",0.04],["#af2c20",0.03]],[["#eae7d4",0.46],["#6c72a8",0.22],["#f5a76d",0.13],["#5554a6",0.1],["#b66d95",0.08]],[["#dca21e",0.61],["#144463",0.2],["#249bdf",0.07],["#fdfdfc",0.06],["#9c873d",0.06]],[["#f6b3f5",0.67],["#9ec3c1",0.13],["#beb2e6",0.12],["#f3def7",0.05],["#6298e5",0.02]],[["#4192af",0.35],["#f9f9f8",0.21],["#1d596d",0.17],["#44737d",0.15],["#9bb8c3",0.12]],[["#f4da71",0.79],["#33a831",0.07],["#b9b76b",0.06],["#9d4eab",0.05],["#dfe0d0",0.03]]];
+  var TILTS = [-1.6, 1.2, -.7, 1.8, -1.3, .9];
   var THINGS = [
     { title: 'Birth-a-blob', href: '/birth-a-blob', bg: '#241B28', show: 'pencil',
       line: 'Draw a blob-face and set it free on the site.' },
     { title: 'Music Kontrapunkt Kontrol', href: 'https://kontrapunkt.hallicivelek.com/', bg: '#f3efe6', show: 'tall',
       line: 'An Italo Disco blog and a producer map (of who made what). Since 2004.' },
+    { title: 'Proper palette piano player', href: '/palette-piano', bg: '#f3efe6', show: 'keys',
+      line: "Every project as a strip of its own colors, for you to click'n play." },
     { title: 'Shakeskin', href: 'https://www.shakeskin.com/', bg: '#086eb2', show: 'faces',   // Shakeskin's own blue
       line: 'A gallery of shaken faces. Since 2004.' },
-    { title: 'The Calculater', href: 'https://www.thecalculater.net/', bg: '#a77bf0', show: 'still',
+    { title: 'The Calculater', href: 'https://thecalculater.net/', bg: '#a77bf0', show: 'still',
       line: 'Input digits and get results. Later.' },
     { title: 'The blob-pond', href: '/the-blob-pond', frame: '/the-blob-pond?hc-preview', bg: '#241B28', show: 'still',
       line: 'Blobs drift across the lines and play sweet notes. Made for sound!' }
@@ -46,6 +51,22 @@
           '<path d="M223.92,96.34c-6.57,3.42-14.56,2.260-19.86-2.96-6.84-6.74-11.96-24.34-1.43-30.350,5.89-3.37,11.52.76,13.16,6.51.6,2.1-1.08,3.71-2.27,5.22-7.18,9.11-21.05,1.75-26.28-5.43-3.19-4.38-10.03-16.45-8.84-22.08" stroke-width="4.63"/>' +
           '<path d="M381.69,157.59c0-3,3.75-6.9,5.62-9.03,18.84-21.63,49.32-7.22,50.75,19.77.97,18.350-17.09,44.12-37.11,29.37"/></g>' +
         '<image href="' + PENCIL + '" width="59" height="200" transform="translate(209 96) rotate(14) scale(.75) translate(-15 -191)"/></svg>';
+    } else if (t.show === 'keys') {
+      // 400 x 300 picture: a few white keys, each painted in bands of one project's colours, tilted a little (as on /palette-piano)
+      var svg = '<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" style="position:absolute;left:0;top:0;width:100%;height:100%"><defs>';
+      KEYS.forEach(function (_, i) { svg += '<clipPath id="hc-pt-k' + i + '"><rect x="4" y="4" width="40" height="182" rx="2" ry="2"/></clipPath>'; });
+      svg += '</defs>';
+      KEYS.forEach(function (cols, i) {
+        var tot = 0, y = 4; cols.forEach(function (c) { tot += Math.sqrt(c[1]); });
+        svg += '<g transform="translate(' + (43 + i * 54) + ' ' + (52 + (i * 5) % 9) + ') rotate(' + TILTS[i] + ' 24 95)">' +
+          '<rect width="48" height="190" rx="3" fill="#fff" style="filter:drop-shadow(0 5px 6px rgba(73,46,70,.22))"/><g clip-path="url(#hc-pt-k' + i + ')">';
+        cols.forEach(function (c, j) {
+          var h = 182 * Math.sqrt(c[1]) / tot;
+          svg += '<rect x="4" y="' + y.toFixed(1) + '" width="40" height="' + (h + 3).toFixed(1) + '" fill="' + c[0] + '"/>'; y += h;
+        });
+        svg += '</g></g>';
+      });
+      win.innerHTML = svg + '</svg>';
     } else if (t.show === 'faces') {
       win.classList.add('hc-pt-faces');
       FACES.forEach(function (f, i) {
@@ -93,4 +114,4 @@
   addEventListener('popstate', check);
   check();
 })();
-window.__hcBuild = "2026-11-15 23:55";
+window.__hcBuild = "2026-11-16 03:47";
