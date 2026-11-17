@@ -25,25 +25,35 @@
   #hc-pp *, #hc-pp *::before, #hc-pp *::after { box-sizing: border-box; }
   #hc-pp a { color: inherit; }
   #hc-pp .hc-pp-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; padding: 0; }
-  #hc-pp a.hc-pp-back { display: inline-block; font-size: 18px; text-decoration: none; margin-bottom: 8px; background: none !important; color: inherit !important; }
+  #hc-pp a.hc-pp-back { display: inline-block; font-size: 18px; text-decoration: none; margin-bottom: 0; background: none !important; color: inherit !important; }
   #hc-pp a.hc-pp-back:hover { text-decoration: underline; }
-  /* the header (Paco Benovo 2.0): the name and the acronym left, the words and the "Make a beat" pill right; one column on phones */
-  #hc-pp header.hc-pp-hd { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 56px; align-items: end; margin: 2px 0 28px; padding: 0; border: 0; background: none; }
+  /* the header (Paco Benovo 2.0), one centred lockup: ruled spaced-caps kicker, the name with its bracketed pairs and a tilted teal "2.0" badge,
+     then the words and the "Make a beat" pill centred below in a narrow column; the back link stays alone top left */
+  #hc-pp header.hc-pp-hd { display: block; text-align: center; margin: 64px 0 60px; padding: 0; border: 0; background: none; }
   #hc-pp .hc-pp-hd p { font-family: inherit; text-transform: none; color: inherit; max-width: none; }
   #hc-pp { --hc-pp-lede: 16px; }   /* the size of the "Who needs" line; the kicker above the name uses the same variable, so they always match */
-  #hc-pp .hc-pp-hd p.hc-pp-kicker { margin: 0; font-size: var(--hc-pp-lede); font-weight: bold; line-height: 1.45; letter-spacing: inherit; color: inherit; }
-  #hc-pp h1 { font-family: inherit; font-size: 68px; line-height: 1; margin: 6px 0 4px; font-weight: bold; letter-spacing: .01em; color: inherit; text-transform: none; white-space: nowrap; }
+  #hc-pp .hc-pp-hd p.hc-pp-kicker { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 0 0 18px; font-size: 13px; font-weight: 400; line-height: 1.45;
+    letter-spacing: .32em; text-indent: .32em; text-transform: uppercase; color: inherit; }
+  #hc-pp .hc-pp-hd p.hc-pp-kicker::before, #hc-pp .hc-pp-hd p.hc-pp-kicker::after { content: ""; flex: 0 1 64px; height: 2px; background: currentColor; opacity: .55; }
+  #hc-pp h1 { font-family: inherit; font-size: 96px; line-height: 1; margin: 0 0 8px; text-align: center; font-weight: 900; letter-spacing: .03em; color: inherit; text-transform: none; white-space: nowrap;
+    display: table; position: relative; margin-left: auto; margin-right: auto; }   /* shrink-wrapped to the name, so the 2.0 badge can hang off its right edge and the name itself is what sits centred */
   /* the name as five bracketed pairs: Pa co Be no vo, each with a thin U bracket under its letters and its word centred below; 2.0 follows plain.
      Every unit is an inline block, so a wrapping heading only breaks between Paco and Benovo or before 2.0; the margin underneath holds the labels. */
   #hc-pp h1 .hc-pp-w, #hc-pp h1 .hc-pp-yr { display: inline-block; white-space: nowrap; vertical-align: baseline; margin: 0 0 40px; padding: 0; }
   #hc-pp h1 .hc-pp-w { margin-right: .16em; }
-  #hc-pp h1 .hc-pp-pr { display: inline-block; position: relative; margin: 0 .09em 0 0; padding: 0; vertical-align: baseline; white-space: nowrap; }
+  #hc-pp h1 .hc-pp-w:nth-last-child(2) { margin-right: 0; }
+  #hc-pp h1 .hc-pp-pr { display: inline-block; position: relative; margin: 0; padding: 0; vertical-align: baseline; white-space: nowrap; }
   #hc-pp h1 .hc-pp-pr:last-child { margin-right: 0; }
-  #hc-pp h1 .hc-pp-lt { display: inline-block; margin: 0 -.01em 0 0; padding: 0; }
-  #hc-pp h1 .hc-pp-br { position: absolute; left: 0; right: 0; top: calc(100% - 2px); height: 8px; border: 2px solid currentColor; border-top: 0; border-radius: 0; background: none; }
+  #hc-pp h1 .hc-pp-lt { display: inline-block; margin: 0; padding: 0; }   /* pairs touch, so the gap between pairs is the same letter gap as inside them */
+  /* 2.0: a small tilted teal pill after the name (still one inline unit, so it can never wrap alone on a phone: the title is one line there) */
+  #hc-pp h1 .hc-pp-yr { margin: 0 0 0 .25em; font-size: .3em; font-weight: 900; letter-spacing: .04em; position: absolute; left: 100%; top: .32em;
+    background: #3BBFC9; color: #492E46; padding: .22em .55em .26em; border-radius: 999px; transform: rotate(7deg); line-height: 1.1; }
+  #hc-pp h1 .hc-pp-br { position: absolute; left: .06em; right: .06em; top: calc(100% - 2px); height: 8px; border: 2px solid currentColor; border-top: 0; border-radius: 0; background: none; }
   #hc-pp h1 .hc-pp-lb { position: absolute; left: 50%; top: calc(100% + 11px); transform: translateX(-50%); font-size: 13px; line-height: 1.2; font-weight: normal;
     letter-spacing: .16em; text-indent: .16em; white-space: nowrap; }
-  #hc-pp .hc-pp-hd p.hc-pp-intro { margin: 0 0 10px; font-size: var(--hc-pp-lede); line-height: 1.45; }
+  #hc-pp .hc-pp-hr { max-width: 600px; margin: 8px auto 0; }
+  #hc-pp .hc-pp-hd p.hc-pp-intro { margin: 0 0 10px; font-size: var(--hc-pp-lede); line-height: 1.45; text-align: center; text-wrap: pretty; }
+  #hc-pp .hc-pp-hd p.hc-pp-lead, #hc-pp .hc-pp-hd p.hc-pp-go { text-wrap: balance; }
   #hc-pp .hc-pp-hd p.hc-pp-lead { font-weight: bold; }
   #hc-pp .hc-pp-hd p.hc-pp-go { margin: 12px 0 12px; font-size: 18px; }
   #hc-pp .hc-pp-hd p.hc-pp-beatslot { margin: 0; line-height: 1; }
@@ -72,7 +82,7 @@
   /* the title only shows on hover, focus, or after a press: the work stands on its own */
   #hc-pp a.hc-pp-tag { position: absolute; left: 50%; top: calc(100% + 10px); z-index: 2; width: max-content; max-width: 210px;
     transform: translateX(-50%) rotate(calc(var(--tilt) * -1.4)); padding: 7px 12px 8px; background: #fff !important; color: inherit !important;
-    border-radius: 3px; font-size: 14px; line-height: 1.3; text-decoration: none; text-align: center;
+    border-radius: 6px; font-size: 14px; line-height: 1.3; text-decoration: none; text-align: center;
     box-shadow: 0 6px 14px -6px rgba(73, 46, 70, .4); opacity: 0; pointer-events: none; transition: opacity .15s; }
   #hc-pp li.hc-pp-k[data-edge="l"] a.hc-pp-tag { left: 0; transform: rotate(calc(var(--tilt) * -1.4)); text-align: left; }
   #hc-pp li.hc-pp-k[data-edge="r"] a.hc-pp-tag { left: auto; right: 0; transform: rotate(calc(var(--tilt) * -1.4)); text-align: right; }
@@ -100,22 +110,28 @@
   html.hc-gc button.hc-pp-quiet { background: #ff00ff !important; color: #ffff00 !important; border: 3px outset #ff99ff !important; box-shadow: none !important; }
 
   @media (max-width: 420px) { button.hc-pp-quiet { padding: 0 12px; font-size: 14px; }  html.hc-gc button.hc-pp-quiet { bottom: calc(70px + env(safe-area-inset-bottom, 0px)); } html.hc-ns button.hc-pp-quiet { bottom: 96px; } }   /* so it clears the pause button beside it on a 390 px phone */
-  @media (max-width: 1100px) { #hc-pp h1 { font-size: 60px; } #hc-pp header.hc-pp-hd { gap: 0 40px; } }
-  @media (max-width: 800px) { #hc-pp header.hc-pp-hd { grid-template-columns: 1fr; margin-bottom: 26px; } #hc-pp h1 { white-space: normal; } #hc-pp .hc-pp-hr { margin-top: 18px; } }
+  @media (max-width: 1100px) { #hc-pp h1 { font-size: 84px; } }
+  @media (max-width: 800px) { #hc-pp header.hc-pp-hd { margin-top: 44px; margin-bottom: 40px; } #hc-pp h1 { font-size: 72px; } }
   @media (max-width: 760px) {
     #hc-pp { padding: 18px 0 110px; }
-    #hc-pp a.hc-pp-back { margin-bottom: 6px; font-size: 17px; }
+    #hc-pp a.hc-pp-back { margin-bottom: 0; font-size: 17px; }
   }
   @media (max-width: 600px) {
-    #hc-pp h1 { font-size: 44px; margin: 4px 0 10px; }
+    #hc-pp header.hc-pp-hd { margin-top: 36px; }
+    #hc-pp .hc-pp-hd p.hc-pp-kicker { font-size: 11px; letter-spacing: .24em; text-indent: .24em; gap: 10px; }
+    #hc-pp .hc-pp-hd p.hc-pp-kicker::before, #hc-pp .hc-pp-hd p.hc-pp-kicker::after { flex-basis: 28px; }
+    #hc-pp h1 { font-size: 9.6vw; margin: 0 auto; white-space: nowrap; }   /* one line, so 2.0 never wraps alone */
+    #hc-pp h1 .hc-pp-w { margin-right: .12em; }
+    #hc-pp h1 .hc-pp-w:nth-last-child(2) { margin-right: 0; }
     #hc-pp h1 .hc-pp-lb { font-size: 11px; letter-spacing: .08em; text-indent: .08em; top: calc(100% + 10px); }
     #hc-pp h1 .hc-pp-br { border-width: 1.5px; border-top-width: 0; height: 7px; }
     #hc-pp h1 .hc-pp-w, #hc-pp h1 .hc-pp-yr { margin-bottom: 36px; }
+    #hc-pp h1 .hc-pp-yr { font-size: .34em; margin-left: .2em; }
     #hc-pp .hc-pp-hr { margin-top: 12px; }
     #hc-pp { --hc-pp-lede: 15px; }
     #hc-pp .hc-pp-hd p.hc-pp-intro { line-height: 1.4; margin-bottom: 7px; }
     #hc-pp .hc-pp-hd p.hc-pp-go { margin: 8px 0 10px; font-size: 16px; }
-    #hc-pp header.hc-pp-hd { margin-bottom: 22px; }
+    #hc-pp header.hc-pp-hd { margin-bottom: 30px; }
     #hc-pp #hc-pp-pd-btn { min-height: 46px; width: 100%; justify-content: center; }
     #hc-pp ul.hc-pp-keys { --cols: 7; gap: 28px 7px; }
     #hc-pp button.hc-pp-key { height: 150px; padding: 3px 3px 4px; }
@@ -493,7 +509,7 @@
   function pair(l, w) { return '<span class="hc-pp-pr"><span class="hc-pp-lt">' + l + '</span><span class="hc-pp-br"></span><span class="hc-pp-lb">' + w + '</span></span>'; }
   var HEADING = '<span aria-hidden="true">' +
     '<span class="hc-pp-w">' + pair('Pa', 'Palette') + pair('co', 'Colors') + '</span> ' +
-    '<span class="hc-pp-w">' + pair('Be', 'Beats') + pair('no', 'Noises') + pair('vo', 'Voices') + '</span> ' +
+    '<span class="hc-pp-w">' + pair('Be', 'Beats') + pair('no', 'Noises') + pair('vo', 'Voices') + '</span>' +
     '<span class="hc-pp-yr">2.0</span></span>';
   var HTML =
     '<a class="hc-pp-back" href="/playthings">← playthings</a>' +
@@ -504,9 +520,9 @@
         '<p class="hc-pp-sr">Palette, Colors, Beats, Noises, Voices</p>' +
       '</div>' +
       '<div class="hc-pp-hr">' +
-        '<p class="hc-pp-intro hc-pp-lead">Who needs crappy AI music when you can produce your very own crappy grooves RIGHT HERE.</p>' +
-        '<p class="hc-pp-intro">I took the colours from all my projects and made them into Paco Benovo: a keyboard with my voice as an expansion pack. This includes the beat maker where you can make your own beats with fills and tomtoms and trigger samples.</p>' +
-        '<p class="hc-pp-intro hc-pp-go"><b>Please click’n play &amp; plonk away.</b></p>' +
+        '<p class="hc-pp-intro hc-pp-lead">Who needs crappy AI music when you can produce your very own crappalicious grooves RIGHT&nbsp;HERE.</p>' +
+        '<p class="hc-pp-intro">I took the colours from all my projects and made them into Paco&nbsp;Benovo: a&nbsp;keyboard with my voice as an expansion&nbsp;pack. This includes the beat maker where you can make your own beats with fills and tomtoms and&nbsp;trigger&nbsp;samples.</p>' +
+        '<p class="hc-pp-intro hc-pp-go"><b>Please click’n play &amp; plonk&nbsp;away.</b></p>' +
         '<p class="hc-pp-beatslot" id="hc-pp-beatslot"></p>' +
       '</div>' +
     '</header>' +

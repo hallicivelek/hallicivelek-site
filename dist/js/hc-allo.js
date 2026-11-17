@@ -19,10 +19,16 @@
     + '  body .project_content p { font-size: 18px; } '
     + '  body .project_content [style*="font-size:15px"], body .project_content [style*="font-size: 15px"] { font-size: 17px !important; } '
     + '  body .project_content [style*="font-size:16px"], body .project_content [style*="font-size: 16px"] { font-size: 18px !important; }} ';
+  /* About (Cargo page id 4440666, the .entry's data-id, so no other page is touched): the name 900 (its inline weight is "bold", hence !important),
+     the "More, if you're curious" rows 800, and plain paragraphs 18px on every width (paragraphs with their own inline font-size keep it). */
+  var AB = '#project .entry[data-id="4440666"]';
+  css += AB + ' h1 { font-weight: 900 !important; } ' + AB + ' details > summary { font-weight: 800; } ' + AB + ' .project_content p { font-size: 18px; } ' + AB + ' h3 { font-weight: 900 !important; } ';
+  /* Links in Cargo page text were Cargo's pure black; give them the site's plum ink like the rest of the text (a link with its own inline colour keeps it). */
+  css += 'body .project_content a:not([style*="color"]) { color: rgb(73, 46, 70); } ';
   var st = document.createElement('style');
   st.id = 'hc-allo-style';
   st.textContent = css;
   document.head.appendChild(st);
   if (document.fonts && document.fonts.load) { try { document.fonts.load('400 16px Allo'); document.fonts.load('700 16px Allo'); } catch (e) {} }
 })();
-window.__hcBuild = "2026-11-17 21:54";
+window.__hcBuild = "2026-11-17 23:22";

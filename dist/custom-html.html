@@ -428,8 +428,20 @@ StatCounter"></a></div></noscript>
 <!-- Current page in the nav for hallicivelek.com — paste into Cargo's Custom HTML.
      Cargo marks filter pages (art direction, illustration) as active itself, but not
      the "music / mixes" and "info + contact" pages. This marks whichever nav link
-     matches the page you're on, using Cargo's own link_active class (so your existing
-     blue style applies), and adds aria-current="page" for screen readers on every page. -->
+     matches the page you're on, using Cargo's own link_active class (the colour and weight
+     come from the style block below), and adds aria-current="page" for screen readers on every page. -->
+<!-- Nav look: plum ink, weight 500 at rest, 800 on hover / focus / the current page (no teal or blue). Each link reserves the width of its
+     800 weight (a hidden copy of its own text, data-text, set by the script below), so nothing moves when a link gets heavier.
+     Applies to the desktop nav and to the phone menu. Weight changes ease over .15s (Allo is a variable font). -->
+<style>
+  .site_header .navigation li a, .site_header .navigation li.link_active a { color: rgb(73, 46, 70) !important; font-weight: 500 !important;
+    display: inline-block; transition: font-weight .15s ease; }
+  .site_header .navigation li a::after { content: attr(data-text); display: block; height: 0; overflow: hidden; visibility: hidden; pointer-events: none;
+    font-weight: 800 !important; }
+  .site_header .navigation li a:hover, .site_header .navigation li a:focus-visible, .site_header .navigation li.link_active a,
+  .site_header .navigation li a[aria-current="page"] { color: rgb(73, 46, 70) !important; font-weight: 800 !important; }
+  @media (prefers-reduced-motion: reduce) { .site_header .navigation li a { transition: none; } }
+</style>
 <script>
 (function () {
   if (window.__hcNav) return;
@@ -441,6 +453,7 @@ StatCounter"></a></div></noscript>
     var links = [].slice.call(document.querySelectorAll('.site_header .navigation a'));
     if (!links.length) return;
     var here = clean(location.pathname);
+    links.forEach(function (a) { a.setAttribute('data-text', a.textContent.replace(/\s+/g, ' ').trim()); });   // width reserve for the 800 weight
 
     // undo our own marking from the previous page
     links.forEach(function (a) {

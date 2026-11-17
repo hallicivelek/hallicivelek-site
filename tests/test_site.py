@@ -70,6 +70,12 @@ def check(name, ok, detail=''):
     results.append(ok); print(('  PASS  ' if ok else '  FAIL  ') + name + (f'  ({detail})' if detail else ''))
 
 
+ABOUT = ('<div id="project" class="project clear"><div class="entry" data-id="4440666"><div class="project_content"><div style="max-width: 700px; margin: 0 auto; text-align: left">'
+  '<h1 style="font-size:44px;line-height:1.1;margin:0 0 14px;font-weight:bold;text-align:center">Halli Civelek</h1>'
+  '<p id="ab-plain" style="margin:0 0 22px;line-height:1.55">Plain paragraph with no font size of its own.</p>'
+  '<p id="ab-own" style="font-size:22px;margin:0 0 22px">Paragraph with its own size.</p>'
+  '<details><summary style="cursor:pointer;font-size:17px">What I do at Throskahjalp</summary><p style="font-size:15px">Inside</p></details></div></div></div></div>')
+
 async def main(base):
     async with async_playwright() as p:
         b = await p.chromium.launch(args=['--autoplay-policy=no-user-gesture-required'])
@@ -604,8 +610,8 @@ async def main(base):
           return { title: pp && pp.querySelector('h1').getAttribute('aria-label'), kicker: pp && pp.querySelector('.hc-pp-kicker').textContent,
             pairs: pp && [...pp.querySelectorAll('h1 .hc-pp-pr')].map(e => [e.querySelector('.hc-pp-lt').textContent, e.querySelector('.hc-pp-lb').textContent]),
             hiddenVis: pp && pp.querySelector('h1 > span').getAttribute('aria-hidden'), srLine: pp && pp.querySelector('h1').nextElementSibling.textContent, oldAcro: pp && !!pp.querySelector('.hc-pp-acro'),
-            yr: pp && pp.querySelector('h1 .hc-pp-yr').textContent, yrBrackets: pp && pp.querySelector('h1 .hc-pp-yr').querySelectorAll('.hc-pp-br').length,
-            intro: pp && [...pp.querySelectorAll('.hc-pp-hr p.hc-pp-intro')].map(p => p.textContent),
+            h1Weight: pp && getComputedStyle(pp.querySelector('h1')).fontWeight, yr: pp && pp.querySelector('h1 .hc-pp-yr').textContent, yrBrackets: pp && pp.querySelector('h1 .hc-pp-yr').querySelectorAll('.hc-pp-br').length,
+            intro: pp && [...pp.querySelectorAll('.hc-pp-hr p.hc-pp-intro')].map(p => p.textContent.split(String.fromCharCode(160)).join(' ')),
             introWeights: pp && [...pp.querySelectorAll('.hc-pp-hr p.hc-pp-intro')].map(p => getComputedStyle(p).fontWeight),
             cols: pp && getComputedStyle(pp.querySelector('header.hc-pp-hd')).gridTemplateColumns.split(' ').length,
             stripTop: pp && Math.round(pp.querySelector('ul.hc-pp-keys').getBoundingClientRect().top - pp.parentNode.getBoundingClientRect().top),
@@ -614,7 +620,7 @@ async def main(base):
             keyBg: pp && getComputedStyle(pp.querySelector('button.hc-pp-key')).backgroundColor,
             fallbackHidden: document.querySelectorAll('[data-hc-pp-fallback]').length === 1 && getComputedStyle(document.querySelector('[data-hc-pp-fallback]')).display === 'none',
             gridHidden: [...document.querySelectorAll('.thumbnails, #hc-sort')].every(e => getComputedStyle(e).display === 'none'),
-            tabStops: document.querySelectorAll('#hc-pp [tabindex="0"]').length, titlesHidden: getComputedStyle(document.querySelector('#hc-pp a.hc-pp-tag')).opacity,
+            tabStops: document.querySelectorAll('#hc-pp [tabindex="0"]').length, titlesHidden: getComputedStyle(document.querySelector('#hc-pp a.hc-pp-tag')).opacity, tagRadius: getComputedStyle(document.querySelector('#hc-pp a.hc-pp-tag')).borderTopLeftRadius,
             quiet: q && [q.textContent, getComputedStyle(q).position, getComputedStyle(q).display],
             apart: !!(qr && zr && qr.width && zr.width && (qr.right <= zr.left || qr.bottom <= zr.top || qr.top >= zr.bottom)),
             wide: document.documentElement.scrollWidth <= innerWidth }; }"""
@@ -632,9 +638,9 @@ async def main(base):
         check('palette piano: built on its page (title, the line, back to playthings, one strip per project, Cargo styles kept out)',
               r['title'] == 'Paco Benovo 2.0' and r['kicker'] == 'Civelektronique presents:' and r['pairs'] == [['Pa', 'Palette'], ['co', 'Colors'], ['Be', 'Beats'], ['no', 'Noises'], ['vo', 'Voices']]
               and r['hiddenVis'] == 'true' and r['srLine'] == 'Palette, Colors, Beats, Noises, Voices' and not r['oldAcro'] and r['yr'] == '2.0' and r['yrBrackets'] == 0
-              and r['intro'] == ['Who needs crappy AI music when you can produce your very own crappy grooves RIGHT HERE.',
+              and r['intro'] == ['Who needs crappy AI music when you can produce your very own crappalicious grooves RIGHT HERE.',
                                  'I took the colours from all my projects and made them into Paco Benovo: a keyboard with my voice as an expansion pack. This includes the beat maker where you can make your own beats with fills and tomtoms and trigger samples.',
-                                 'Please click’n play & plonk away.'] and r['introWeights'][0] == '700' and r['introWeights'][1] == '400' and r['cols'] == 2
+                                 'Please click’n play & plonk away.'] and r['introWeights'][0] == '700' and r['introWeights'][1] == '400' and r['h1Weight'] == '900' 
               and r['back'] == '/playthings' and r['backText'] == '← playthings' and r['keys'] == n_pal and r['bands'] >= n_pal * 3 and r['h1Color'] == 'rgb(73, 46, 70)' and r['keyBg'] == 'rgb(255, 255, 255)', str(r))
         BRK = """() => { const R = e => e.getBoundingClientRect(), out = [];
           for (const pr of document.querySelectorAll('#hc-pp h1 .hc-pp-pr')) {
@@ -645,15 +651,27 @@ async def main(base):
           const lowest = Math.max(...out.map(o => o.lb[3]));
           return { out, clear: ks.getBoundingClientRect().top >= lowest, wide: Math.max(...out.map(o => o.lb[1])) <= innerWidth && Math.max(...[...document.querySelectorAll('#hc-pp h1 .hc-pp-yr, #hc-pp h1 .hc-pp-w')].map(e => R(e).right)) <= innerWidth,
             wraps: [...document.querySelectorAll('#hc-pp h1 .hc-pp-w, #hc-pp h1 .hc-pp-yr')].map(e => Math.round(R(e).top)) }; }"""
-        for vw, vh in ((1440, 900), (390, 844)):
+        for vw, vh in ((1440, 900), (1280, 800), (390, 844), (375, 667)):
             await page.set_viewport_size({'width': vw, 'height': vh}); await page.wait_for_timeout(400)
+            LINES = """() => [...document.querySelectorAll('#hc-pp .hc-pp-hr p.hc-pp-intro')].map(p => { const out = []; const w = document.createTreeWalker(p, NodeFilter.SHOW_TEXT); let n, line = '', top = null;
+              while (n = w.nextNode()) for (let i = 0; i < n.length; i++) { const r = document.createRange(); r.setStart(n, i); r.setEnd(n, i + 1); const b = r.getClientRects()[0]; if (!b) { line += n.data[i]; continue; }
+                if (top !== null && Math.abs(b.top - top) > 6) { out.push(line.trim()); line = ''; } top = b.top; line += n.data[i]; }
+              out.push(line.trim()); return out.map(l => l.split(String.fromCharCode(160)).join(' ')); })"""
+            ls = await page.evaluate(LINES); flat = [l for para in ls for l in para]
+            bad = [l for l in flat if len(l.split()) < 2 or l.endswith(' a') or l.endswith(' A')]
+            hs = await page.evaluate("Math.max(...[...document.querySelectorAll('#hc-pp h1 *')].map(e => e.getBoundingClientRect().right)) <= innerWidth")
+            check(f'palette piano intro at {vw}: no line is a single word or ends with "a", back link well above the kicker, title and badge inside the screen', not bad and hs and len(flat) >= 6, str(ls))
+            gap = await page.evaluate("document.querySelector('#hc-pp .hc-pp-kicker').getBoundingClientRect().top - document.querySelector('#hc-pp a.hc-pp-back').getBoundingClientRect().bottom")
+            check(f'palette piano header at {vw}: kicker at least 30px below the back link', gap >= 30, str(gap))
+            off = await page.evaluate("(() => { const l = [...document.querySelectorAll('#hc-pp h1 .hc-pp-lt')].map(e => e.getBoundingClientRect()), k = document.querySelector('#hc-pp .hc-pp-kicker').getBoundingClientRect(), y = document.querySelector('#hc-pp h1 .hc-pp-yr').getBoundingClientRect(); return [(Math.min(...l.map(r => r.left)) + Math.max(...l.map(r => r.right))) / 2 - (k.left + k.right) / 2, y.right <= innerWidth]; })()")
+            check(f'palette piano header at {vw}: the name Paco Benovo is centred on the column within 2px (offset {off[0]:.1f}px), the 2.0 badge fully on screen', abs(off[0]) <= 2 and off[1], str(off))
             g = await page.evaluate(BRK); o = g['out']
             overlap = any(o[i]['lb'][1] > o[j]['lb'][0] and o[j]['lb'][1] > o[i]['lb'][0] and o[i]['lb'][3] > o[j]['lb'][2] and o[j]['lb'][3] > o[i]['lb'][2] for i in range(5) for j in range(i + 1, 5))
-            check(f'palette piano heading at {vw}: brackets match their letter pairs within 1px, labels centred on them, no label overlap, content clear below, heading inside the screen',
-                  len(o) == 5 and all(x['dl'] <= 1 and x['dr'] <= 1 and x['dc'] <= 1 and x['below'] and x['ink'] for x in o) and not overlap and g['clear'] and g['wide'], str(g))
+            check(f'palette piano heading at {vw}: brackets sit just inside their letter pairs (at most 10px), labels centred on them, no label overlap, content clear below, heading inside the screen',
+                  len(o) == 5 and all(x['dl'] <= 10 and x['dr'] <= 10 and x['dc'] <= 1 and x['below'] and x['ink'] for x in o) and not overlap and g['clear'] and g['wide'], str(g))
         await page.set_viewport_size({'width': 1300, 'height': 900})
         check("palette piano: Cargo's content kept as a hidden fallback, the grid hidden, one Tab stop (strip + its title), titles hidden until asked",
-              r['fallbackHidden'] and r['gridHidden'] and r['tabStops'] == 2 and r['titlesHidden'] == '0', str(r))
+              r['fallbackHidden'] and r['gridHidden'] and r['tabStops'] == 2 and r['titlesHidden'] == '0' and r['tagRadius'] == '6px', str(r))
         check('palette piano: the sound switch is fixed, shown, and clear of the blobs\' pause button', r['quiet'] == ['Turn the sound off', 'fixed', 'flex'] and r['apart'], str(r))
         tags = await page.evaluate("[...document.querySelectorAll('#hc-pp a.hc-pp-tag')].map(a => [a.getAttribute('href'), a.querySelector('b').textContent])")
         check('palette piano: every title links to its project on this site, in Halli\'s order', tags == [['/' + x['url'], x['title']] for x in PALETTES], str(tags[:2]))
@@ -752,7 +770,7 @@ async def main(base):
               pl['pill'] and pl['inHeader'] and pl['apart'] and pl['onScreen'] and pl['wide'], str(pl))
         await page.set_viewport_size({'width': 1440, 'height': 760}); await page.wait_for_timeout(300)
         sp = await page.evaluate(PLACE)
-        check(f'palette piano (1440x760): the strips start at y={sp["stripY"]} (content top + {sp["stripTop"]}), no lower than about 340', sp['stripTop'] <= 345, str(sp))
+        check(f'palette piano (1440x760): the strips start at y={sp["stripY"]} (content top + {sp["stripTop"]}), no lower than about 640 (the centred header is taller)', sp['stripTop'] <= 640, str(sp))
         await page.set_viewport_size({'width': 1440, 'height': 900}); await page.wait_for_timeout(300)
         pctx = await b.new_context(viewport={'width': 1440, 'height': 900}); po = await pctx.new_page()
         await po.goto(base + '/palette-piano/'); await po.wait_for_timeout(1500)
@@ -1062,13 +1080,13 @@ async def main(base):
             check(f'beat maker ({w}x{h}): medium widths get the full-screen panel (covers the screen, page locked, back to the same scroll after Esc)', r['rect'] == [0, 0, w, h] and r['bodyPos'] == 'fixed' and sy == 120, f'{r["rect"]} {r["bodyPos"]} {sy}')
             await ctx.close()
         KICK = """() => { const k = document.querySelector('#hc-pp .hc-pp-kicker'), l = document.querySelector('#hc-pp .hc-pp-lead'), f = e => { const s = getComputedStyle(e); return [s.fontSize, s.fontWeight, s.letterSpacing, s.color, s.fontFamily, s.fontStyle]; };
-          return { kicker: f(k), lead: f(l), text: k.textContent }; }"""
+          return { kicker: f(k), lead: f(l), text: k.textContent, upper: getComputedStyle(k).textTransform }; }"""
         for w, h, mobile in [(1440, 900, False), (390, 844, True), (800, 900, False)]:
             ctx = await b.new_context(viewport={'width': w, 'height': h}, is_mobile=mobile, has_touch=mobile); page = await ctx.new_page()
             await page.goto(base + '/paco-benovo/'); await page.wait_for_timeout(1500)
             r = await page.evaluate(KICK)
-            check(f'palette piano ({w} wide): "Civelektronique presents:" has the same size, weight, letter-spacing, colour and font as "Who needs..." ({r["kicker"][0]}, {r["kicker"][1]})',
-                  r['kicker'] == r['lead'] and r['kicker'][1] in ('700', 'bold'), str(r))
+            check(f'palette piano ({w} wide): "Civelektronique presents:" is the small light spaced-caps kicker ({r["kicker"][0]}, {r["kicker"][1]}), same colour and font as "Who needs..."',
+                  r['kicker'][0] in ('13px', '11px') and r['kicker'][1] == '400' and r['kicker'][3:] == r['lead'][3:] and r['upper'] == 'uppercase', str(r))
             await ctx.close()
 
         # ---- Cargo's own stylesheet arriving empty (Cargo's outage 2026-11-09) ----
@@ -1150,6 +1168,29 @@ async def main(base):
                 await ap.screenshot(path=os.path.join(ALLO_SHOTS, f'{name}-{w}x{h}.png'))
             await ap.close()
 
+        # ---- About: name 900, "more" rows 800, plain paragraphs 18px; playthings intro 800 and titles 900 ----
+        for w, h in [(1440, 900), (390, 844)]:
+            ap = await b.new_page(viewport={'width': w, 'height': h}); aerrs = []
+            ap.on('pageerror', lambda e: aerrs.append(str(e)))
+            await ap.goto(base + '/short/about-me/'); await ap.wait_for_timeout(2000)
+            r = await ap.evaluate("""() => { const g = (s, k) => getComputedStyle(document.querySelector(s))[k];
+              return { h1w: g('h1', 'fontWeight'), h1s: g('h1', 'fontSize'), sw: g('summary', 'fontWeight'), plain: g('#ab-plain', 'fontSize'), own: g('#ab-own', 'fontSize'), over: document.documentElement.scrollWidth <= innerWidth + 1 } }""")
+            check(f'about ({w}): name is 900 at 44px, "more" rows 800, plain paragraph 18px, own-size paragraph keeps 22px, no sideways scroll',
+                  r['h1w'] == '900' and r['h1s'] == '44px' and r['sw'] == '800' and r['plain'] == '18px' and r['own'] == '22px' and r['over'] and not aerrs, str(r))
+            await ap.close()
+        # other pages are untouched: a project page's plain paragraph, a normal page's h1 weight
+        ap = await b.new_page(viewport={'width': 1440, 'height': 900}); await ap.goto(base + '/short/info-contact/'); await ap.wait_for_timeout(1500)
+        r = await ap.evaluate("() => getComputedStyle(document.querySelector('h1') || document.body).fontWeight")
+        check('about rules stay on the about page (another page has no 900 h1)', r != '900', str(r)); await ap.close()
+        for w, h in [(1440, 900), (390, 844)]:
+            ap = await b.new_page(viewport={'width': w, 'height': h}); await ap.goto(base + '/short/playthings/'); await ap.wait_for_timeout(2500)
+            r = await ap.evaluate("""() => { const i = getComputedStyle(document.querySelector('#hc-pt .hc-pt-intro')); const t = [...document.querySelectorAll('#hc-pt h2')].map(e => getComputedStyle(e).fontWeight + '/' + getComputedStyle(e).fontSize);
+              return { iw: i.fontWeight, is: i.fontSize, t, over: document.documentElement.scrollWidth <= innerWidth + 1, tall: [...document.querySelectorAll('#hc-pt h2')].map(e => Math.round(e.getBoundingClientRect().height / parseFloat(getComputedStyle(e).lineHeight))) } }""")
+            check(f'playthings ({w}): intro 800 at {"28px" if w > 760 else "22px"}, six card titles 900 at 26px, no sideways scroll',
+                  r['iw'] == '800' and r['is'] == ('28px' if w > 760 else '22px') and len(r['t']) == 6 and all(x == '900/26px' for x in r['t']) and r['over'], str(r))
+            if w == 390: check('playthings (390): no card title wraps past two lines', all(x <= 2 for x in r['tall']), str(r['tall']))
+            await ap.close()
+
         await b.close()
 
 
@@ -1169,7 +1210,8 @@ if __name__ == '__main__':
     (site / 'assets' / 'palette-piano').mkdir(parents=True)   # the owner's recordings for the palette piano, where hc-palette-piano.js looks for them
     for f in (ROOT / 'assets' / 'palette-piano').glob('*.mp3'): (site / 'assets' / 'palette-piano' / f.name).write_bytes(f.read_bytes())
     (site / 'Halli-Civelek-artist-portrait_300.jpg').write_bytes((ROOT / 'assets' / 'portrait' / 'face-no-irises.jpg').read_bytes())   # stand-in for Cargo's photo
-    for d, html in [('short/blob-pond', PAGE.replace('ADDONS', tags)), ('the-blob-pond', PAGE.replace('ADDONS', tags)),
+    for d, html in [('short/about-me', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', ABOUT)),
+                    ('short/blob-pond', PAGE.replace('ADDONS', tags)), ('the-blob-pond', PAGE.replace('ADDONS', tags)),
                     ('short/info-contact', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', '<div class="project_content"><img src="/Halli-Civelek-artist-portrait_300.jpg" width="300" height="359"></div>')),
                     ('short/filter/artdirection', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID)),
                     ('short/filter/illustration', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID_IMG)),

@@ -1,5 +1,5 @@
 /* hc-nav-active for hallicivelek.com: built from src/hc-nav-active.html by build.py, do not edit here */
-(function () { var s = document.createElement("style"); s.textContent = "\n  html:not(.hc-pj-ready) .project_content { opacity: 0 !important; }\n  .project_content { transition: opacity .25s ease; }\n"; document.head.appendChild(s); })();
+(function () { var s = document.createElement("style"); s.textContent = "\n  .site_header .navigation li a, .site_header .navigation li.link_active a { color: rgb(73, 46, 70) !important; font-weight: 500 !important;\n    display: inline-block; transition: font-weight .15s ease; }\n  .site_header .navigation li a::after { content: attr(data-text); display: block; height: 0; overflow: hidden; visibility: hidden; pointer-events: none;\n    font-weight: 800 !important; }\n  .site_header .navigation li a:hover, .site_header .navigation li a:focus-visible, .site_header .navigation li.link_active a,\n  .site_header .navigation li a[aria-current=\"page\"] { color: rgb(73, 46, 70) !important; font-weight: 800 !important; }\n  @media (prefers-reduced-motion: reduce) { .site_header .navigation li a { transition: none; } }\n\n\n  html:not(.hc-pj-ready) .project_content { opacity: 0 !important; }\n  .project_content { transition: opacity .25s ease; }\n"; document.head.appendChild(s); })();
 (function () {
   if (window.__hcNav) return;
   window.__hcNav = true;
@@ -10,6 +10,7 @@
     var links = [].slice.call(document.querySelectorAll('.site_header .navigation a'));
     if (!links.length) return;
     var here = clean(location.pathname);
+    links.forEach(function (a) { a.setAttribute('data-text', a.textContent.replace(/\s+/g, ' ').trim()); });   // width reserve for the 800 weight
 
     // undo our own marking from the previous page
     links.forEach(function (a) {
@@ -74,4 +75,4 @@
   }, true);
   addEventListener('popstate', function () { wait(location.pathname); });
 })();
-window.__hcBuild = "2026-11-17 21:54";
+window.__hcBuild = "2026-11-17 23:22";

@@ -298,4 +298,4 @@
   check();
   window.__hcBirthABlob = { strokes: function () { return strokes.length; } };
 })();
-window.__hcBuild = "2026-11-17 21:54";
+window.__hcBuild = "2026-11-17 23:22";
