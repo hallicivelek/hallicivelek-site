@@ -20,7 +20,7 @@
     { title: 'Music Kontrapunkt Kontrol', href: 'https://kontrapunkt.hallicivelek.com/', bg: '#f3efe6', show: 'tall',
       line: 'An Italo Disco blog and a producer map (of who made what). Since 2004.' },
     { title: 'Paco Benovo 2.0', href: '/paco-benovo', bg: '#f3efe6', show: 'keys',
-      line: "Every project as a strip of its own colors, for you to click'n play." },
+      line: 'All my projects turned into playable colour strips, with a beat maker, samples to trigger and my voice as a DeLuxe expansion pack.' },
     { title: 'Shakeskin', href: 'https://www.shakeskin.com/', bg: '#086eb2', show: 'faces',   // Shakeskin's own blue
       line: 'A gallery of shaken faces. Since 2004.' },
     { title: 'The Calculater', href: 'https://thecalculater.net/', bg: '#a77bf0', show: 'still',
@@ -114,4 +114,4 @@
   addEventListener('popstate', check);
   check();
 })();
-window.__hcBuild = "2026-11-17 02:40";
+window.__hcBuild = "2026-11-17 02:56";
