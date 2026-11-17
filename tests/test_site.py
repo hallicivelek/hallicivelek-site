@@ -64,6 +64,8 @@ results = []
 PASTE = []
 PALETTES = json.loads((ROOT / 'src' / 'palettes.json').read_text())   # the palette piano's strips, in Halli's order
 SHOTS = os.environ.get('HC_SHOTS')   # a folder: also save screenshots of birth-a-blob after a release there
+SHOTS_PP = os.environ.get('PP_SHOTS')   # set to a folder to save the beat maker screenshots
+
 def check(name, ok, detail=''):
     results.append(ok); print(('  PASS  ' if ok else '  FAIL  ') + name + (f'  ({detail})' if detail else ''))
 
@@ -951,11 +953,111 @@ async def main(base):
             await page.evaluate("window.__hcRetro.set('gc')"); await page.wait_for_timeout(800)
             gc = await page.evaluate(PLACE)
             await page.evaluate("window.__hcRetro.set('off')")
-            ok = all(x['pill'] and x['inHeader'] and x['apart'] and x['onScreen'] and x['aboveBar'] and x['wide'] for x in (normal, normal_open, ns, gc)) and all(x['panel'] and x['panelAbove'] for x in (normal_open, ns, gc))
-            if mobile: ok = ok and normal_open['panelShare'] <= 0.37 and all(x['fullWidth'] for x in (normal, ns, gc))
+            ok = all(x['pill'] and x['inHeader'] and x['apart'] and x['onScreen'] and x['aboveBar'] and x['wide'] for x in (normal, normal_open, ns, gc)) and all(x['panel'] and (x['panelAbove'] or mobile) for x in (normal_open, ns, gc))
+            if mobile: ok = ok and normal_open['panelShare'] >= 0.99 and all(x['fullWidth'] for x in (normal, ns, gc))
             check(f'beat maker ({w} wide): the pill in the header (full width on phones, also in Netscape and GeoCities modes), the sound switch clear of the pause button and "back to 2026" and above the Netscape status bar, the panel above it'
-                  + (' (36% of the screen at most, as in the mockup)' if mobile else ''), ok, f'{normal} | {normal_open} | ns {ns} | gc {gc}')
+                  + (' (the open panel fills the screen on phones)' if mobile else ''), ok, f'{normal} | {normal_open} | ns {ns} | gc {gc}')
             check(f'no script errors (beat maker, {w} wide)', not errs, '; '.join(errs)[:300])
+            await ctx.close()
+
+        # ---- the beat maker fills the screen below 1000 px wide; the kicker matches the "Who needs" line ----
+        FULL = """() => { const p = document.getElementById('hc-pp-pd-panel'), R = e => e.getBoundingClientRect(), pr = R(p), de = document.documentElement,
+            rows = [...p.querySelectorAll('.hc-pp-pd-steps')].map(x => [x.children.length, Math.round(R(x).top), Math.round(R(x.children[0]).width * 10) / 10]),
+            vis = e => { if (!e) return false; const s = getComputedStyle(e), r = R(e); if (s.display === 'none' || s.visibility === 'hidden' || !r.width) return false;
+              const t = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); return !t || !p.contains(t) ? !p.contains(t) && t === e || (!!t && e.contains(t)) : false; },
+            scrollers = [p, ...p.querySelectorAll('*')].filter(e => e.scrollHeight > e.clientHeight + 1 && ['auto', 'scroll'].includes(getComputedStyle(e).overflowY)).length,
+            bottom = document.elementFromPoint(innerWidth / 2, innerHeight - 3), sw = p.querySelector('.hc-pp-pd-snd'), x = p.querySelector('.hc-pp-pd-x');
+          return { open: !p.hidden, rect: [Math.round(pr.left), Math.round(pr.top), Math.round(pr.width), Math.round(pr.height)], vp: [innerWidth, innerHeight], rows,
+            panelScroll: [p.scrollHeight, p.clientHeight], scrollers, bodyPos: getComputedStyle(document.body).position, scrollY: Math.round(scrollY), htmlOverflow: de.style.overflow,
+            hidden: { quiet: !vis(document.getElementById('hc-pp-quiet')), pause: !vis(document.querySelector('button.hc-pause')), back: !vis(document.querySelector('.hc-back')), bar: !vis(document.querySelector('.hc-ns-bar')),
+              pill: !vis(document.getElementById('hc-pp-pd-btn')) }, bottomInPanel: !!bottom && p.contains(bottom),
+            done: x.textContent, doneSize: [Math.round(R(x).width), Math.round(R(x).height)], doneRight: Math.round(innerWidth - R(x).right), sound: sw && [sw.textContent, sw.getAttribute('aria-pressed'), Math.round(R(sw).height)],
+            fills: [...p.querySelectorAll('.hc-pp-pd-fill')].map(f => Math.round(R(f).top)), wide: de.scrollWidth <= innerWidth }; }"""
+        for w, h in [(390, 844), (375, 667)]:
+            ctx = await b.new_context(viewport={'width': w, 'height': h}, device_scale_factor=3, is_mobile=True, has_touch=True,
+                                      user_agent='Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Mobile/15E148 Safari/604.1')
+            page = await ctx.new_page(); errs = []
+            page.on('pageerror', lambda e: errs.append(str(e)))
+            await page.goto(base + '/paco-benovo/'); await page.wait_for_timeout(1500)
+            await page.evaluate("window.scrollTo(0, 150)"); await page.wait_for_timeout(200)
+            y0 = await page.evaluate("Math.round(scrollY)")
+            await page.evaluate("document.getElementById('hc-pp-pd-btn').click()"); await page.wait_for_timeout(500)
+            r = await page.evaluate(FULL)
+            if SHOTS_PP: await page.screenshot(path=os.path.join(SHOTS_PP, 'beat-phone-full.png' if h == 844 else 'beat-se-full.png'))
+            cover = r['rect'] == [0, 0, w, h]
+            check(f'beat maker ({w}x{h}): the open panel covers the whole screen, one row of 16 steps for each of the four instruments, Done at the top right, fills in one row',
+                  r['open'] and cover and [x[0] for x in r['rows']] == [16] * 4 and len({x[1] for x in r['rows']}) == 4 and all(x[2] >= 18 for x in r['rows'])
+                  and r['done'] == 'Done' and r['doneSize'][0] >= 44 and r['doneSize'][1] >= 44 and r['doneRight'] <= 20 and len(set(r['fills'])) == 1 and r['wide'] and not errs, f'{r} {errs[:1]}')
+            if h == 844:
+                check(f'beat maker ({w}x{h}): everything fits without scrolling (nothing scrolls inside the panel)', r['panelScroll'][0] <= r['panelScroll'][1] + 1 and r['scrollers'] == 0, str(r['panelScroll']))
+            else:
+                print(f'   note (375x667): panel scrollHeight {r["panelScroll"][0]} in {r["panelScroll"][1]}')
+                check(f'beat maker ({w}x{h}): fits too, or at most the pads area scrolls (scrollHeight {r["panelScroll"][0]} in {r["panelScroll"][1]})',
+                      r['panelScroll'][0] <= r['panelScroll'][1] + 1 or r['rows'][3][1] + 40 < r['panelScroll'][1], str(r))
+            check(f'beat maker ({w}x{h}): the page behind is locked while open (body fixed, no page scroll) and the bottom buttons are not visible, the sound switch is in the panel',
+                  r['bodyPos'] == 'fixed' and r['scrollY'] == 0 and r['bottomInPanel'] and r['hidden']['quiet'] and r['hidden']['pause'] and r['hidden']['pill'] and r['sound'] and r['sound'][2] >= 44, str(r))
+            # the panel's sound switch is the page's own: muting here flips the sound switch and the audio state, and back
+            m1 = await page.evaluate("""() => { document.querySelector('#hc-pp-pd-panel .hc-pp-pd-snd').click(); const q = document.getElementById('hc-pp-quiet');
+              return [window.__hcPalettePiano.sound().muted, q.getAttribute('aria-pressed'), q.textContent, document.querySelector('#hc-pp-pd-panel .hc-pp-pd-snd').textContent]; }""")
+            m2 = await page.evaluate("""() => { document.querySelector('#hc-pp-pd-panel .hc-pp-pd-snd').click();
+              return [window.__hcPalettePiano.sound().muted, document.getElementById('hc-pp-quiet').getAttribute('aria-pressed'), document.querySelector('#hc-pp-pd-panel .hc-pp-pd-snd').textContent]; }""")
+            check(f'beat maker ({w}x{h}): the sound switch inside the panel uses the page\'s mute (muted, shown in both, and back)',
+                  m1 == [True, 'true', 'Turn the sound on', 'Sound off'] and m2 == [False, 'false', 'Sound on'], f'{m1} {m2}')
+            # a tap in the gap between two squares picks the square under the finger
+            g = await page.evaluate("""() => { const st = document.querySelector('#hc-pp-pd-panel .hc-pp-pd-steps'), a = st.children[5].getBoundingClientRect(), c = st.children[6].getBoundingClientRect();
+              return [(a.right + c.left) / 2, a.top + a.height / 2]; }""")
+            before = await page.evaluate("window.PPDrums.pattern()[0]")
+            await page.touchscreen.tap(g[0], g[1]); await page.wait_for_timeout(100)
+            pat = await page.evaluate("window.PPDrums.pattern()[0]")
+            diff = [i for i in range(16) if pat[i] != before[i]]
+            check(f'beat maker ({w}x{h}): a tap between two squares still picks one of the two squares beside it (exactly one step changed)', len(diff) == 1 and diff[0] in (5, 6), f'{before} -> {pat}')
+            for i in diff: await page.evaluate(f"window.PPDrums.set(0, {i}, {before[i]})")
+            # Netscape and GeoCities modes: the status bar and buttons stay behind the panel
+            modes = []
+            for mode in ('ns', 'gc'):
+                await page.evaluate(f"window.__hcRetro.set('{mode}')"); await page.wait_for_timeout(700)
+                rr = await page.evaluate(FULL); modes.append(rr)
+                if SHOTS_PP and h == 844: await page.screenshot(path=os.path.join(SHOTS_PP, f'beat-phone-{mode}.png'))
+            await page.evaluate("window.__hcRetro.set('off')"); await page.wait_for_timeout(300)
+            check(f'beat maker ({w}x{h}): in Netscape and GeoCities modes the panel still covers the screen with nothing on top (status bar and buttons hidden)',
+                  all(x['rect'] == [0, 0, w, h] and x['bottomInPanel'] and x['hidden']['quiet'] and x['hidden']['pause'] and x['hidden']['back'] and x['hidden']['bar'] for x in modes), str(modes))
+            # Esc closes it, the scroll position comes back exactly
+            await page.keyboard.press('Escape'); await page.wait_for_timeout(300)
+            r2 = await page.evaluate("""() => ({ open: !document.getElementById('hc-pp-pd-panel').hidden, scrollY: Math.round(scrollY), pos: getComputedStyle(document.body).position, bs: document.body.getAttribute('style'),
+              path: location.pathname, quiet: getComputedStyle(document.getElementById('hc-pp-quiet')).visibility })""")
+            check(f'beat maker ({w}x{h}): Esc closes the panel (and Cargo does not leave the page), the scroll is back at y={y0}, body unlocked', not r2['open'] and r2['scrollY'] == y0 and r2['pos'] != 'fixed' and not r2['bs'] and '/paco-benovo' in r2['path'] and r2['quiet'] == 'visible', f'{r2} y0={y0}')
+            await page.evaluate("document.getElementById('hc-pp-pd-btn').click()"); await page.wait_for_timeout(300)
+            await page.click('#hc-pp-pd-panel .hc-pp-pd-x'); await page.wait_for_timeout(300)
+            r2 = await page.evaluate("[Math.round(scrollY), getComputedStyle(document.body).position, document.getElementById('hc-pp-pd-panel').hidden]")
+            check(f'beat maker ({w}x{h}): Done closes it, back at the same scroll position', r2 == [y0, 'static', True], f'{r2} y0={y0}')
+            # leaving the page with the panel open unlocks the page
+            await page.evaluate("document.getElementById('hc-pp-pd-btn').click()"); await page.wait_for_timeout(300)
+            await page.evaluate("() => { history.pushState({}, '', '/playthings/'); window.__hcPaletteDrums.check(); }"); await page.wait_for_timeout(300)
+            r2 = await page.evaluate("[getComputedStyle(document.body).position, document.body.getAttribute('style'), document.documentElement.style.overflow, document.documentElement.classList.contains('hc-pp-pd-full'), !!document.getElementById('hc-pp-pd-panel')]")
+            check(f'beat maker ({w}x{h}): leaving the page with the panel open tears it down and restores the page scroll', r2[0] != 'fixed' and not r2[1] and not r2[2] and not r2[3] and not r2[4], str(r2))
+            if h == 844 and SHOTS_PP:
+                await page.goto(base + '/paco-benovo/?hdr'); await page.wait_for_timeout(1500)
+                await page.screenshot(path=os.path.join(SHOTS_PP, 'header-phone.png'))
+            check(f'no script errors (full-screen beat maker, {w}x{h})', not errs, '; '.join(errs)[:300])
+            await ctx.close()
+        for w, h in [(800, 1000), (700, 900), (999, 700)]:   # medium widths use the full-screen panel too
+            ctx = await b.new_context(viewport={'width': w, 'height': h}); page = await ctx.new_page()
+            await page.goto(base + '/paco-benovo/'); await page.wait_for_timeout(1500)
+            await page.evaluate("window.scrollTo(0, 120)")
+            await page.evaluate("document.getElementById('hc-pp-pd-btn').click()"); await page.wait_for_timeout(400)
+            r = await page.evaluate(FULL)
+            await page.keyboard.press('Escape'); await page.wait_for_timeout(200)
+            sy = await page.evaluate("Math.round(scrollY)")
+            check(f'beat maker ({w}x{h}): medium widths get the full-screen panel (covers the screen, page locked, back to the same scroll after Esc)', r['rect'] == [0, 0, w, h] and r['bodyPos'] == 'fixed' and sy == 120, f'{r["rect"]} {r["bodyPos"]} {sy}')
+            await ctx.close()
+        KICK = """() => { const k = document.querySelector('#hc-pp .hc-pp-kicker'), l = document.querySelector('#hc-pp .hc-pp-lead'), f = e => { const s = getComputedStyle(e); return [s.fontSize, s.fontWeight, s.letterSpacing, s.color, s.fontFamily, s.fontStyle]; };
+          return { kicker: f(k), lead: f(l), text: k.textContent }; }"""
+        for w, h, mobile in [(1440, 900, False), (390, 844, True), (800, 900, False)]:
+            ctx = await b.new_context(viewport={'width': w, 'height': h}, is_mobile=mobile, has_touch=mobile); page = await ctx.new_page()
+            await page.goto(base + '/paco-benovo/'); await page.wait_for_timeout(1500)
+            r = await page.evaluate(KICK)
+            check(f'palette piano ({w} wide): "Civelektronique presents:" has the same size, weight, letter-spacing, colour and font as "Who needs..." ({r["kicker"][0]}, {r["kicker"][1]})',
+                  r['kicker'] == r['lead'] and r['kicker'][1] in ('700', 'bold'), str(r))
             await ctx.close()
 
         # ---- Cargo's own stylesheet arriving empty (Cargo's outage 2026-11-09) ----
