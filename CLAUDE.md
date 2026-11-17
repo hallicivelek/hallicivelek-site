@@ -32,7 +32,7 @@ Everything reaches the live site through Cargo's **Custom HTML** setting. Two wa
 ## Build and test
 ```
 python3 build.py              # src/ → dist/hc-columns.html, dist/hc-pond.html, dist/custom-html.html; syntax-checks every script
-python3 tests/test_site.py    # 157 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, weather, umbrella, phone)
+python3 tests/test_site.py    # 159 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, weather, umbrella, phone)
 ```
 Tests need `python3 -m pip install --user playwright` (this Mac has no bare `pip`) and `python3 -m playwright install chromium`.
 The build was verified to reproduce the installed files byte-for-byte when this project was set up.
@@ -59,8 +59,8 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   listener keeps Esc from Cargo while the pencil is held **or a drawing exists** (Halli lost a drawing to a second Esc).
 - `src/hc-playthings.html` — **playthings**: on the page whose address contains `playthings`, hides whatever Halli
   put on the Cargo page (kept as fallback) and draws six cards (alphabetical, plain ASCII order), mostly live previews: Kontrapunkt (the blog in a
-  scaled-down iframe, gliding), Proper palette piano player (a silent drawn picture, no iframe: six tilted white keys painted
-  with real palettes from `palettes.json`, copied into `KEYS` in the file; links to `/palette-piano`), Shakeskin (12 of Halli's friends' faces from shakeskin.com, one at a time with a shake;
+  scaled-down iframe, gliding), Paco Benovo 2.0 (a silent drawn picture, no iframe: six tilted white keys painted
+  with real palettes from `palettes.json`, copied into `KEYS` in the file; links to `/paco-benovo`), Shakeskin (12 of Halli's friends' faces from shakeskin.com, one at a time with a shake;
   shakeskin.com won't be framed), The Calculater (still iframe), the blob-pond (`/the-blob-pond?hc-preview`). Hover is
   20% white (overrides Cargo's yellow `.project_content a:hover`); Halli ruled out tilting. Reduced motion: no glide/shake.
 - `src/hc-birth-a-blob.html` — **Birth-a-blob** (page address contains `birth-a-blob`; ported from
@@ -70,7 +70,7 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   rest of the visit (a tap gives it a wobble). Hides Cargo's content (fallback), grid and sort line; ids/classes `hc-bab-`,
   CSS under `#hc-bab`. Esc is kept from Cargo while the pencil is held or a face is drawn. Not saved anywhere.
   Loaded by hc-pond.js (no paste).
-- `src/hc-palette-piano.html` — **Proper palette piano player 2.0 (Voice Enhanced™)** (page address contains `palette-piano`, a Cargo page
+- `src/hc-palette-piano.html` — **Paco Benovo 2.0** (was "Proper palette piano player 2.0 (Voice Enhanced™)"; page address contains `paco-benovo` (the main one since 2026-11-17; the playthings card and the project back link go there) or `palette-piano` (old links keep working); both are Cargo pages of the same shape, `PAGE` in the add-on, `PAGES` in hc-nav-active and the grid check in hc-retro accept both; ids, `hc-pp-` classes and the asset folder keep the old names; a Cargo page
   Halli made 2026-11-16; ported from `mockups/palette-piano`, sound approved by Halli): every project as a white key
   painted with its own colours, in Halli's order, tilted like the pinboard prints. Pressing a strip plays its colours
   (instrument, notes, order, pace, trill, held note all from the colours and address; always D hirajoshi (D E F A Bb); all
@@ -106,7 +106,7 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   **bottom left** (the pause button and "back to 2026" have the bottom right; lifted above the Netscape bar, styled in
   1999 mode). Hides Cargo's content (fallback), grid and sort line; ids/classes `hc-pp-` under `#hc-pp` (the sound code's
   own `on` / `down` / `lit` classes are scoped there). **The way back:** following a title saves
-  `{slug, t}` in sessionStorage `hc-from-piano` (2 h); hc-project then shows "← palette piano" (to `/palette-piano`,
+  `{slug, t}` in sessionStorage `hc-from-piano` (2 h); hc-project then shows "← Paco Benovo" (to `/paco-benovo`,
   quiet ink, 44px tall) instead of "← things I've made" on that project only; coming back (link, back button, or the
   back/forward cache via `pageshow`) scrolls to the strip and opens its title, silently, and uses the entry up.
   **Colours:** `src/palettes.json` (one project per line: title, address, colours with their share), put into
@@ -291,6 +291,7 @@ header.css, remove "Other projects" from about me.
 The redesign looks fine on his iPhone and speed is fine. Wanton Boys Club GIF stays out for now.
 
 ## Where we left off (2026-11-04)
+- **2026-11-17 (Paco Benovo header):** built and tested, **not pushed**. Add-on header from the approved mockup (variant B: acronym not italic): kicker "Civelektronique presents:", h1 "Paco Benovo 2.0", acronym, two paragraphs, bold "Please click’n play & plonk away.", then the "Make a beat" pill (large plum pill with ▶, full width on phones), built into `#hc-pp-beatslot` by the beat maker's check() (no watcher), removed on leaving and rebuilt on return; panel still docks at the bottom, now above "Turn the sound off" (bottom left, as before). Card is "Paco Benovo 2.0" (third), project back link "← Paco Benovo". The piano now builds on both `/paco-benovo` (new Cargo page, main; same structure as the old one, checked read-only) and `/palette-piano`. 159/159 tests; strips start 328 px below the content top (y=416 in the stand-in, which has an 88 px header). On 390 px phones the sound switch is slightly smaller and lifted above "back to 2026" in Netscape and GeoCities modes (it collided before). Not checked live or on an iPhone.
 - **2026-11-17 (later):** palette piano 2.0 changes **Committed, pushed and live** (build `2026-11-17 01:23`, 157/157 tests; on the live site: new title and intro, perc row, no voice row, shuffle button, 15/15 recordings load, no scrollbar in the open panel at 699x616; not checked there at 1440 wide, by ear, or on an iPhone): new title and intro (add-on,
   mockup `jam.html`, playthings card), perc row instead of the voice row, shuffle, compact two-column beat panel without scrollbars,
   bombaclat pad (`assets/palette-piano/bombaclat.mp3`, new file to commit). Mockup and add-on logic match (same patch applied to

@@ -7,10 +7,10 @@
      (a solo). The project's title opens under a strip on hover, focus, or after a press ("the work stands on its own");
      it links to the project on this site. Keyboard: the piano is one Tab stop, the arrow keys / Home / End move along it,
      Enter or Space plays, Tab goes on to that strip's title link. Reduced motion: the strips don't move or grow, a trill
-     lights once. "Turn the sound off" sits bottom left, "Make a beat" right of it (the blobs' pause button and 1999 mode's
-     "back to 2026" have the bottom right).
+     lights once. "Turn the sound off" sits bottom left (the blobs' pause button and 1999 mode's "back to 2026" have the
+     bottom right); "Make a beat" is a pill in the header, its panel docks at the bottom.
      The way back: following a title saves the strip in sessionStorage ("hc-from-piano"); hc-project then shows
-     "← palette piano" instead of "← things I've made", and coming back here scrolls to that strip and opens its title,
+     "← Paco Benovo" instead of "← things I've made", and coming back here scrolls to that strip and opens its title,
      silently (also after the browser's back button and the back/forward cache).
      Ported from mockups/palette-piano: the first script is jam.html's sound, mapping and key-press code, unchanged
      (2026-11-17; before that synth.html's); the second is the beat maker, drums.js, fenced for the live site. While the
@@ -21,14 +21,23 @@
   html.hc-pp-on .thumbnails, html.hc-pp-on #hc-sort { display: none !important; }
   #hc-pp { box-sizing: border-box; width: min(1180px, 92vw); position: relative; left: 50%; transform: translateX(-50%);
     text-align: left; font-family: pacaembu, sans-serif; color: #492E46; letter-spacing: .02em; line-height: 1.5;
-    padding: 44px 0 120px; }
+    padding: 8px 0 120px; }
   #hc-pp *, #hc-pp *::before, #hc-pp *::after { box-sizing: border-box; }
   #hc-pp a { color: inherit; }
   #hc-pp .hc-pp-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; padding: 0; }
-  #hc-pp a.hc-pp-back { display: inline-block; font-size: 18px; text-decoration: none; margin-bottom: 18px; background: none !important; color: inherit !important; }
+  #hc-pp a.hc-pp-back { display: inline-block; font-size: 18px; text-decoration: none; margin-bottom: 8px; background: none !important; color: inherit !important; }
   #hc-pp a.hc-pp-back:hover { text-decoration: underline; }
-  #hc-pp h1 { font-family: inherit; font-size: 44px; line-height: 1.1; margin: 0 0 14px; font-weight: bold; letter-spacing: 0; color: inherit; text-transform: none; text-wrap: balance; }
-  #hc-pp p.hc-pp-lede { font-size: 21px; line-height: 1.45; margin: 0 0 40px; max-width: 34em; color: inherit; }
+  /* the header (Paco Benovo 2.0): the name and the acronym left, the words and the "Make a beat" pill right; one column on phones */
+  #hc-pp header.hc-pp-hd { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 56px; align-items: end; margin: 2px 0 28px; padding: 0; border: 0; background: none; }
+  #hc-pp .hc-pp-hd p { font-family: inherit; text-transform: none; color: inherit; max-width: none; }
+  #hc-pp p.hc-pp-kicker { margin: 0; font-size: 15px; line-height: 1.5; letter-spacing: .12em; color: rgba(73, 46, 70, .66); }
+  #hc-pp h1 { font-family: inherit; font-size: 68px; line-height: 1; margin: 6px 0 16px; font-weight: bold; letter-spacing: .01em; color: inherit; text-transform: none; white-space: nowrap; }
+  #hc-pp p.hc-pp-acro { margin: 0; font-size: 13px; font-style: normal; font-weight: normal; letter-spacing: .16em; line-height: 1.6; }
+  #hc-pp p.hc-pp-acro b { font-weight: bold; }
+  #hc-pp .hc-pp-hd p.hc-pp-intro { margin: 0 0 10px; font-size: 16px; line-height: 1.45; }
+  #hc-pp .hc-pp-hd p.hc-pp-lead { font-weight: bold; }
+  #hc-pp .hc-pp-hd p.hc-pp-go { margin: 12px 0 12px; font-size: 18px; }
+  #hc-pp .hc-pp-hd p.hc-pp-beatslot { margin: 0; line-height: 1; }
 
   /* the keys: each project a strip of its own colours, painted in bands on a white key, tilted a little like the prints on the pinboard */
   #hc-pp ul.hc-pp-keys { display: grid; grid-template-columns: repeat(var(--cols), 1fr); --cols: 24; gap: 34px 8px; padding: 0; margin: 0; list-style: none; }
@@ -81,13 +90,21 @@
     border-color: #fff #404040 #404040 #fff !important; border-radius: 0; box-shadow: none !important; font-family: Arial, Helvetica, sans-serif !important; }
   html.hc-gc button.hc-pp-quiet { background: #ff00ff !important; color: #ffff00 !important; border: 3px outset #ff99ff !important; box-shadow: none !important; }
 
+  @media (max-width: 420px) { button.hc-pp-quiet { padding: 0 12px; font-size: 14px; }  html.hc-gc button.hc-pp-quiet { bottom: calc(70px + env(safe-area-inset-bottom, 0px)); } html.hc-ns button.hc-pp-quiet { bottom: 96px; } }   /* so it clears the pause button beside it on a 390 px phone */
+  @media (max-width: 1100px) { #hc-pp h1 { font-size: 60px; } #hc-pp header.hc-pp-hd { gap: 0 40px; } }
+  @media (max-width: 800px) { #hc-pp header.hc-pp-hd { grid-template-columns: 1fr; margin-bottom: 26px; } #hc-pp h1 { white-space: normal; } #hc-pp .hc-pp-hr { margin-top: 18px; } }
   @media (max-width: 760px) {
-    #hc-pp { padding: 22px 0 110px; }
-    #hc-pp a.hc-pp-back { margin-bottom: 10px; font-size: 17px; }
-    #hc-pp h1 { font-size: 34px; margin-bottom: 8px; }
-    #hc-pp p.hc-pp-lede { font-size: 18px; margin-bottom: 30px; }
+    #hc-pp { padding: 18px 0 110px; }
+    #hc-pp a.hc-pp-back { margin-bottom: 6px; font-size: 17px; }
   }
   @media (max-width: 600px) {
+    #hc-pp h1 { font-size: 44px; margin: 4px 0 10px; }
+    #hc-pp p.hc-pp-acro { font-size: 11.5px; letter-spacing: .1em; }
+    #hc-pp .hc-pp-hr { margin-top: 12px; }
+    #hc-pp .hc-pp-hd p.hc-pp-intro { font-size: 15px; line-height: 1.4; margin-bottom: 7px; }
+    #hc-pp .hc-pp-hd p.hc-pp-go { margin: 8px 0 10px; font-size: 16px; }
+    #hc-pp header.hc-pp-hd { margin-bottom: 22px; }
+    #hc-pp #hc-pp-pd-btn { min-height: 46px; width: 100%; justify-content: center; }
     #hc-pp ul.hc-pp-keys { --cols: 7; gap: 28px 7px; }
     #hc-pp button.hc-pp-key { height: 150px; padding: 3px 3px 4px; }
     #hc-pp a.hc-pp-tag { max-width: 170px; }
@@ -97,18 +114,19 @@
     #hc-pp button.hc-pp-key.down, #hc-pp .hc-pp-key span.lit { transform: none; }
   }
 
-  /* the beat maker (from the mockup's drums.js): "Make a beat" right of the sound switch (placed by measuring, see place()), the
-     panel above them; both on <body>, only on this page. Everything under its own ids, so Cargo's button, select and input
+  /* the beat maker (from the mockup's drums.js): "Make a beat" is a pill in the page's header (built there by the add-on, only on this
+     page), the panel docks at the bottom above "Turn the sound off" (placed by measuring, see place()), on <body>. Everything under its own ids, so Cargo's button, select and input
      styles stay out (#hc-pp-pd-panel button etc. reset them; the class rules after them win over the reset) */
-  #hc-pp-pd-btn { display: none; position: fixed; left: 200px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 1001;
-    min-height: 44px; margin: 0; padding: 0 18px; border: 0; border-radius: 999px; background: #fff; color: #492E46;
-    font-family: pacaembu, sans-serif; font-size: 15px; font-weight: normal; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;
-    box-shadow: 0 6px 16px -6px rgba(73, 46, 70, .5); -webkit-tap-highlight-color: transparent; }
-  html.hc-pp-on #hc-pp-pd-btn { display: inline-flex; align-items: center; }
-  #hc-pp-pd-btn[aria-expanded="true"] { background: #492E46; color: #F3DCDF; }
+  #hc-pp-pd-btn { display: inline-flex; align-items: center; gap: 10px; position: static; min-height: 52px; margin: 0; padding: 0 28px; border: 0; border-radius: 999px;
+    background: #492E46; color: #F3DCDF; font-family: pacaembu, sans-serif; font-size: 18px; font-weight: bold; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;
+    box-shadow: 0 8px 18px -8px rgba(73, 46, 70, .6); transition: transform .12s ease; -webkit-tap-highlight-color: transparent; }
+  #hc-pp-pd-btn::before { content: "▶"; font-size: 12px; }
+  #hc-pp-pd-btn:hover { transform: translateY(-1px); }
+  #hc-pp-pd-btn[aria-expanded="true"] { background: #fff; color: #492E46; }
+  #hc-pp-pd-btn[aria-expanded="true"]::before { content: "▼"; }
   #hc-pp-pd-btn:focus { outline: none; }
   #hc-pp-pd-btn:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }
-  html.hc-ns #hc-pp-pd-btn { background: #c0c0c0 !important; color: #000 !important; border: 2px solid !important;
+  html.hc-ns #hc-pp-pd-btn { font-size: 16px !important; background: #c0c0c0 !important; color: #000 !important; border: 2px solid !important;
     border-color: #fff #404040 #404040 #fff !important; border-radius: 0; box-shadow: none !important; font-family: Arial, Helvetica, sans-serif !important; }
   html.hc-ns #hc-pp-pd-btn[aria-expanded="true"] { border-color: #404040 #fff #fff #404040 !important; }
   html.hc-gc #hc-pp-pd-btn { background: #ff00ff !important; color: #ffff00 !important; border: 3px outset #ff99ff !important; box-shadow: none !important; }
@@ -196,7 +214,7 @@
 (function () {
   if (window.__hcPalettePiano) return;
   window.__hcPalettePiano = true;
-  var PAGE = /palette-piano/i;
+  var PAGE = /paco-benovo|palette-piano/i;
   var PALETTES = [{"title":"Þroskahjálp - the art calendar","url":"Troskahjalp-the-art-calendar","colours":[["#fefdfd",0.659],["#d1b171",0.087],["#ce8d58",0.136],["#e1d9cd",0.062],["#99795b",0.056]]},{"title":"Retro Stefson - Retro Stefson","url":"Retro-Stefson-Retro-Stefson","colours":[["#8b2e21",0.301],["#3d4e54",0.209],["#537279",0.17],["#f0f4f3",0.168],["#89c0bd",0.152]]},{"title":"Cheerios","url":"Cheerios","colours":[["#fad612",0.356],["#fffffe",0.354],["#f2e292",0.14],["#d2bd43",0.09],["#ccc3ac",0.06]]},{"title":"FM Belfast - how to make friends","url":"FM-Belfast-how-to-make-friends","colours":[["#eae7d4",0.462],["#6c72a8",0.22],["#f5a76d",0.132],["#5554a6",0.104],["#b66d95",0.082]]},{"title":"The Mouse Wrestler","url":"The-Mouse-Wrestler","colours":[["#1b272c",0.669],["#fdfdfd",0.209],["#d9e0e4",0.043],["#5c8099",0.04],["#33444d",0.039]]},{"title":"Retro Stefson - Kimbabwe","url":"Retro-Stefson-Kimbabwe","colours":[["#4192af",0.348],["#f9f9f8",0.212],["#1d596d",0.173],["#44737d",0.148],["#9bb8c3",0.119]]},{"title":"Sesar A - Gerðuþaðsjálfur (Doityourself)","url":"Sesar-A-Gerdutadsjalfur-Doityourself","colours":[["#fefefd",0.899],["#bfb7b8",0.062],["#e3e1df",0.026],["#a29a99",0.013]]},{"title":"Rímnamín","url":"Rimnamin","colours":[["#daedf6",0.492],["#82c5e4",0.378],["#f7d34f",0.07],["#e29947",0.035],["#af2c20",0.025]]},{"title":"Apparat Organ Quartet - Romantika","url":"Apparat-Organ-Quartet-Romantika","colours":[["#fefefe",0.632],["#b5d4db",0.176],["#89aab0",0.082],["#f6dc31",0.059],["#6e7673",0.051]]},{"title":"Millilending","url":"Millilending","colours":[["#fefefe",0.555],["#d5d4e0",0.286],["#b7b9c4",0.091],["#6c7172",0.051],["#7277ba",0.017]]},{"title":"Herbergi í öðrum heimi","url":"Herbergi-i-odrum-heimi","colours":[["#f4f3f1",0.354],["#a9503e",0.319],["#d9d8d5",0.118],["#b5aba8",0.108],["#222330",0.101]]},{"title":"Blue walker","url":"Blue-walker","colours":[["#ffffff",0.819],["#21c7e6",0.101],["#c2eef6",0.043],["#70d9ed",0.036]]},{"title":"Retro Stefson visual identity","url":"Retro-Stefson-visual-identity","colours":[["#000000",1]]},{"title":"Sesar A - Stormurinn á eftir logninu","url":"Sesar-A-Stormurinn-a-eftir-logninu","colours":[["#d64c1d",0.373],["#fbfafa",0.243],["#c3b8b3",0.136],["#b48f88",0.126],["#505a59",0.123]]},{"title":"Fastland soccer uniform","url":"Fastland-soccer-uniform","colours":[["#fdfdfc",0.714],["#f8ed12",0.142],["#09adec",0.062],["#e42093",0.051],["#d2c7d6",0.03]]},{"title":"Smite The World","url":"Smite-The-World","colours":[["#fdfdfd",0.736],["#dcdcdc",0.106],["#b9b9b9",0.071],["#949494",0.05],["#6d6d6d",0.037]]},{"title":"Liggikrútt","url":"Liggikrutt","colours":[["#ffffff",0.901],["#dce0e7",0.061],["#bcc4d1",0.031],["#93a0b6",0.006]]},{"title":"Fluffyhead","url":"Fluffyhead","colours":[["#91d8f7",0.597],["#fcfeff",0.227],["#2aaae1",0.093],["#cdedfa",0.056],["#62c2eb",0.026]]},{"title":"Retro Stefson - Montaña","url":"Retro-Stefson-Montana","colours":[["#080f12",0.382],["#7099b4",0.185],["#4e7799",0.18],["#282d31",0.156],["#b15649",0.097]]},{"title":"Halli lettering","url":"Halli-lettering","colours":[["#f4cb48",0.853],["#dcd3a1",0.063],["#dda452",0.052],["#e3ebd5",0.017],["#e3b7c2",0.015]]},{"title":"Pungstöppuslayer","url":"Pungstoppuslayer","colours":[["#ffffff",0.809],["#d4d8dc",0.171],["#b1b9c2",0.02]]},{"title":"Retro Stefson - Qween","url":"Retro-Stefson-Qween","colours":[["#fefefe",0.32],["#252322",0.383],["#4a4745",0.117],["#635f5d",0.1],["#7b7675",0.079]]},{"title":"Uppskriftabók - skáldverk","url":"Uppskriftabok-skaldverk","colours":[["#f4f0ee",0.831],["#15100d",0.107],["#d0cbc6",0.028],["#b0a9a2",0.02],["#5b5550",0.013]]},{"title":"Fran Lebowitz","url":"Fran-Lebowitz","colours":[["#dca21e",0.614],["#144463",0.204],["#249bdf",0.065],["#fdfdfc",0.059],["#9c873d",0.058]]},{"title":"Blómakona","url":"Blomakona","colours":[["#f6b3f5",0.674],["#9ec3c1",0.134],["#beb2e6",0.124],["#f3def7",0.052],["#6298e5",0.017]]},{"title":"Magse - Maximum Weights vol. 1","url":"Magse-Maximum-Weights-vol-1","colours":[["#f5f2ef",0.312],["#088990",0.222],["#d9b9a2",0.211],["#4641a4",0.151],["#9e80a5",0.104]]},{"title":"Adventure Girl","url":"Adventure-Girl","colours":[["#fefefe",0.821],["#ced4d2",0.077],["#a3a99b",0.048],["#41a1d9",0.029],["#d4ac43",0.025]]},{"title":"Joker Classique","url":"Joker-Classique","colours":[["#f4da71",0.785],["#33a831",0.075],["#b9b76b",0.056],["#9d4eab",0.053],["#dfe0d0",0.031]]},{"title":"Cat family","url":"Cat-family","colours":[["#f2f1ee",0.922],["#c7ced6",0.061],["#8b9fc0",0.011],["#7289b2",0.007]]},{"title":"hairtower","url":"hairtower","colours":[["#ffffff",0.805],["#4d95e5",0.07],["#d4e2ec",0.064],["#a7c8e5",0.041],["#75abe2",0.02]]},{"title":"Sitjikall","url":"Sitjikall","colours":[["#ffffff",0.865],["#e2e5ea",0.068],["#c6cdd8",0.059],["#9faabd",0.008]]},{"title":"Bluefluffy","url":"Bluefluffy","colours":[["#2aaee7",0.51],["#010101",0.372],["#111523",0.044],["#2a7fab",0.04],["#1a475e",0.033]]},{"title":"Skokkikona","url":"Skokkikona","colours":[["#fefefe",0.762],["#c4d66c",0.136],["#c6d2d0",0.039],["#adbcbb",0.037],["#b2c186",0.026]]},{"title":"Krjúpandi blómakona","url":"Krjupandi-blomakona","colours":[["#fefefe",0.749],["#cbd5de",0.16],["#aab2c7",0.067],["#8395b6",0.024]]},{"title":"Tyrole and the crew","url":"Tyrole-and-the-crew","colours":[["#f5f7f8",0.368],["#bdd6df",0.209],["#43acdd",0.16],["#aaaea3",0.132],["#051118",0.132]]},{"title":"Boyband","url":"Boyband","colours":[["#f7ffff",0.89],["#d4e9f4",0.038],["#b3d4ea",0.042],["#67b3df",0.024],["#267abf",0.007]]},{"title":"Main Girl","url":"Main-Girl-1","colours":[["#ffffff",0.738],["#469cc0",0.122],["#529d19",0.051],["#65b51e",0.048],["#3c778b",0.041]]},{"title":"Adopt this cat","url":"Adopt-this-cat","colours":[["#fefefe",0.63],["#ede1c6",0.14],["#e9c690",0.13],["#eba05c",0.063],["#bad3b5",0.037]]},{"title":"Blue sinker","url":"Blue-sinker","colours":[["#ecf4f5",0.287],["#050708",0.273],["#b5d8de",0.179],["#182326",0.176],["#3dc7e0",0.085]]},{"title":"Icelandsmites","url":"Icelandsmites","colours":[["#fdfdfd",0.662],["#dddddd",0.108],["#b9b9b9",0.094],["#979797",0.081],["#757575",0.054]]},{"title":"Nothing/Ekkert","url":"Nothing-Ekkert","colours":[["#fefefe",0.767],["#dfdfdf",0.138],["#bfbfbf",0.071],["#9e9e9e",0.015],["#868686",0.008]]},{"title":"Grapewaves","url":"Grapewaves","colours":[["#fdfdfd",0.615],["#e1e1e1",0.125],["#c3c3c3",0.102],["#a6a6a6",0.087],["#888888",0.071]]},{"title":"The Future Selfie","url":"The-Future-Selfie","colours":[["#fdfdfd",0.684],["#dedede",0.203],["#c0c0c0",0.063],["#989898",0.028],["#505050",0.021]]},{"title":"Pumpkinator","url":"Pumpkinator","colours":[["#fffefb",0.52],["#fc9f06",0.253],["#f98001",0.145],["#ef4e01",0.042],["#fdcd71",0.039]]},{"title":"Beardgrumphead","url":"Beardgrumphead","colours":[["#fefffe",0.532],["#fac7b6",0.38],["#fa9a7a",0.032],["#ace3f5",0.023],["#7ad3f0",0.033]]},{"title":"Things","url":"Things","colours":[["#2daae4",0.958],["#64c0ea",0.042]]},{"title":"Blue lady 1","url":"Blue-lady-1","colours":[["#ffffff",0.774],["#27c8e7",0.155],["#8fe2f1",0.071]]},{"title":"Selfie","url":"Selfie-1","colours":[["#e8d4a6",0.661],["#69ab9b",0.271],["#668697",0.024],["#3d0f75",0.023],["#5f5f8d",0.021]]},{"title":"Fartrunner","url":"Fartrunner","colours":[["#fefefe",0.717],["#eadce4",0.116],["#30517a",0.074],["#ebb4c5",0.061],["#e18aa4",0.031]]},{"title":"Presidential Election","url":"Presidential-Election","colours":[["#fefefe",0.717],["#d6d6d6",0.196],["#b6b6b6",0.078],["#939393",0.01]]},{"title":"Pedro Pilatus album artwork","url":"Pedro-Pilatus-album-artwork","colours":[["#46abc6",0.62],["#fdfdfd",0.235],["#f9dc16",0.074],["#866140",0.048],["#b5d5dd",0.023]]},{"title":"Beardmen","url":"Beardmen","colours":[["#ffffff",0.524],["#1a75bb",0.255],["#26a8df",0.183],["#bfe1f1",0.02],["#97cce7",0.019]]},{"title":"Toasterman On The Move!","url":"Toasterman-On-The-Move","colours":[["#ffffff",0.882],["#ecddea",0.11],["#d9b9d6",0.008]]},{"title":"Swimbert","url":"Swimbert-1","colours":[["#ffffff",0.758],["#4da6be",0.108],["#478ba2",0.077],["#dee0e0",0.031],["#b9c2c5",0.026]]},{"title":"Strollin' Into The Club Like","url":"Strollin-Into-The-Club-Like","colours":[["#ffffff",0.884],["#dce4f7",0.057],["#b8c8f1",0.035],["#6488e5",0.014],["#8da8eb",0.009]]},{"title":"Charles","url":"Charles-1","colours":[["#d0dea7",0.735],["#d3b28e",0.137],["#3f6b8c",0.051],["#b5916b",0.042],["#976331",0.034]]},{"title":"Greek","url":"Greek","colours":[["#ffffff",0.788],["#1475a9",0.082],["#69bdd5",0.046],["#bbb4dc",0.045],["#79a0c8",0.039]]},{"title":"Halli with a helmet on","url":"Halli-with-a-helmet-on","colours":[["#dbe7ee",0.661],["#6099ab",0.243],["#8bdbfe",0.079],["#7ac1de",0.018]]},{"title":"some finger drawings","url":"some-finger-drawings","colours":[["#d1342d",0.728],["#fefdfc",0.216],["#f5dddb",0.027],["#e59490",0.015],["#e8b3af",0.014]]},{"title":"Healthy Problems","url":"Healthy-Problems-1","colours":[["#fefefe",0.583],["#2861a0",0.315],["#c8d5e2",0.028],["#789abf",0.049],["#abbfd5",0.026]]},{"title":"Firehair","url":"Firehair-1","colours":[["#f0ab9f",0.787],["#cb9a9a",0.079],["#9de0ee",0.064],["#a48692",0.04],["#92c1d4",0.031]]},{"title":"Apparat Organ Quartet","url":"Apparat-Organ-Quartet","colours":[["#ffffff",0.912],["#121212",0.05],["#dddddd",0.018],["#353535",0.012],["#777777",0.008]]},{"title":"I LOuVrE U","url":"I-LOuVrE-U","colours":[["#853103",0.353],["#fefefe",0.246],["#924161",0.324],["#b57392",0.044],["#d2a3b7",0.033]]},{"title":"Man With Horns aka Horny Hombre","url":"Man-With-Horns-aka-Horny-Hombre","colours":[["#abd8fd",0.747],["#3b679c",0.161],["#7ab2d7",0.047],["#d6f0f9",0.024],["#5895c1",0.021]]},{"title":"The Lyrebird","url":"The-Lyrebird","colours":[["#97ac18",0.713],["#c1d23c",0.16],["#e8abe7",0.057],["#cc9e9f",0.041],["#000000",0.03]]},{"title":"Purrrtay","url":"Purrrtay","colours":[["#ffffff",0.699],["#f59a35",0.147],["#b76a4b",0.093],["#cfa392",0.031],["#dfc4bb",0.03]]},{"title":"sharkknife","url":"sharkknife","colours":[["#50dcff",0.665],["#ffffff",0.277],["#49b7d2",0.021],["#2c6e7d",0.02],["#468fa0",0.017]]},{"title":"Automysophobia","url":"Automysophobia","colours":[["#fcfdfd",0.454],["#60c4f1",0.222],["#576687",0.223],["#cae3ef",0.068],["#a3b3c1",0.033]]},{"title":"Phuture Joga","url":"Phuture-Joga","colours":[["#ffffff",0.618],["#ecb4f8",0.224],["#a194cf",0.086],["#bea8dd",0.044],["#d3d7e6",0.029]]},{"title":"DesignMarch","url":"DesignMarch","colours":[["#fefefe",0.737],["#d3e9f3",0.145],["#c5c7c9",0.08],["#9fa0a1",0.038]]},{"title":"Krónan","url":"Kronan","colours":[["#fefefe",0.648],["#d22b31",0.168],["#b01925",0.072],["#cccccd",0.059],["#b2917d",0.053]]},{"title":"Unicef Christmas Card","url":"Unicef-Christmas-Card","colours":[["#22779c",0.29],["#fefefd",0.281],["#6199b5",0.199],["#03587b",0.196],["#ce942a",0.034]]},{"title":"Í barnastærðum","url":"I-barnastardum","colours":[["#cfcdcd",0.681],["#4090a9",0.128],["#a3a6a5",0.179],["#e9d625",0.011]]},{"title":"Breakbeat","url":"Breakbeat","colours":[["#90a580",0.459],["#f9faf8",0.235],["#abcbd0",0.181],["#a1483b",0.07],["#7a7b60",0.055]]},{"title":"Snake shelf","url":"Snake-shelf","colours":[["#fefefe",0.672],["#4e982b",0.133],["#93c9d5",0.076],["#70ab50",0.06],["#c4dfdc",0.06]]},{"title":"Santa & Ogre","url":"Santa-Ogre","colours":[["#58bee6",0.325],["#dfeff5",0.303],["#a0d6eb",0.204],["#e4b5ad",0.117],["#b63739",0.051]]},{"title":"6 train head","url":"6-train-head","colours":[["#825232",0.255],["#449cbd",0.271],["#67b207",0.215],["#956947",0.211],["#5e9318",0.048]]},{"title":"Ornament Boy","url":"Ornament-Boy","colours":[["#fefefd",0.292],["#c3955e",0.258],["#ac754b",0.225],["#88d2df",0.123],["#eccf7c",0.102]]},{"title":"Rejected Tortilla Lord","url":"Rejected-Tortilla-Lord","colours":[["#ffffff",0.607],["#e9d977",0.148],["#9cbe18",0.104],["#62411c",0.097],["#7e6635",0.044]]},{"title":"The Flash Game","url":"The-Flash-Game","colours":[["#faf0c3",0.288],["#e59e91",0.243],["#265f7b",0.219],["#609a04",0.206],["#7584a6",0.044]]},{"title":"Morkinskinka","url":"Morkinskinka","colours":[["#42a0d2",0.52],["#916536",0.17],["#dba246",0.115],["#34799c",0.102],["#b57f33",0.093]]},{"title":"Idea for a fireworks company: Fuse","url":"Idea-for-a-fireworks-company-Fuse","colours":[["#ffffff",0.925],["#dcdcdc",0.022],["#8d8d8d",0.021],["#b9b9b9",0.017],["#333333",0.015]]},{"title":"Italo Disco - Opal","url":"Italo-Disco-Opal","colours":[["#f8fafb",0.385],["#4ab3f2",0.338],["#f5461e",0.113],["#a88974",0.091],["#a3d7f6",0.073]]},{"title":"A Mix of Oddities and Rarities","url":"A-Mix-of-Oddities-and-Rarities","colours":[["#fdfdfb",0.428],["#f6c53e",0.297],["#f97849",0.182],["#f6a25e",0.055],["#f7d5b7",0.038]]},{"title":"Hotplay from Europe - Minimix","url":"Hotplay-from-Europe-Minimix","colours":[["#090808",0.882],["#222830",0.044],["#2b3b4d",0.034],["#484a4c",0.027],["#315b89",0.013]]},{"title":"Italo mix 2007","url":"Italo-mix-2007","colours":[["#684d31",0.37],["#58a9bc",0.184],["#886542",0.172],["#6fc3c5",0.138],["#463726",0.136]]},{"title":"Italo Rider mix","url":"Italo-Rider-mix","colours":[["#cb8041",0.3],["#e39a57",0.265],["#b7662d",0.217],["#bd2811",0.124],["#523b2c",0.094]]},{"title":"Hey","url":"Hey","colours":[["#ccd4c4",0.802],["#b7b5a8",0.101],["#9e9a95",0.071],["#7b7173",0.02],["#564850",0.007]]},{"title":"Idea: Shoelaces","url":"Idea-Shoelaces","colours":[["#ffffff",0.925],["#dcdcdc",0.022],["#8d8d8d",0.021],["#b9b9b9",0.017],["#333333",0.015]]},{"title":"Idea: Remembering Measure Tape","url":"Idea-Remembering-Measure-Tape","colours":[["#ffffff",0.925],["#dcdcdc",0.022],["#8d8d8d",0.021],["#b9b9b9",0.017],["#333333",0.015]]},{"title":"Best GIF I've ever made (2006)","url":"Best-GIF-I-ve-ever-made-2006","colours":[["#fdfefe",0.694],["#dfe1df",0.12],["#bacdd6",0.068],["#cfc09c",0.068],["#b5a170",0.049]]},{"title":"The Office Chair","url":"The-Office-Chair","colours":[["#98918b",0.66],["#010202",0.118],["#0e0e0f",0.087],["#6f6863",0.082],["#2a2829",0.053]]},{"title":"Fletcher","url":"Fletcher","colours":[["#fefefe",0.598],["#bce2eb",0.337],["#f5cfcc",0.042],["#7cc1cb",0.012],["#63abb3",0.011]]},{"title":"Duckrador","url":"Duckrador","colours":[["#121212",0.864],["#fce6b9",0.09],["#eeb132",0.017],["#2c2927",0.015],["#c69535",0.014]]}];   // src/palettes.json, put in by tools/build_palettes.py
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -433,8 +451,19 @@
   /* ---------- the page ---------- */
   var HTML =
     '<a class="hc-pp-back" href="/playthings">← playthings</a>' +
-    '<h1>Proper palette piano player 2.0 (Voice Enhanced™)</h1>' +
-    '<p class="hc-pp-lede">I took the colours from all my projects and made a grand “piano”. With my voice as an expansion pack. Click ’n’ play &amp; plonk away.</p>' +
+    '<header class="hc-pp-hd">' +
+      '<div class="hc-pp-hl">' +
+        '<p class="hc-pp-kicker">Civelektronique presents:</p>' +
+        '<h1>Paco Benovo 2.0</h1>' +
+        '<p class="hc-pp-acro"><b>PA</b>LETTE <b>CO</b>LORS · <b>BE</b>ATS <b>NO</b>ISES <b>VO</b>ICES</p>' +
+      '</div>' +
+      '<div class="hc-pp-hr">' +
+        '<p class="hc-pp-intro hc-pp-lead">Who needs crappy AI music when you can produce your very own crappy grooves RIGHT HERE.</p>' +
+        '<p class="hc-pp-intro">I took the colours from all my projects and made them into Paco Benovo: a keyboard with my voice as an expansion pack. This includes the beat maker where you can make your own beats with fills and tomtoms and trigger samples.</p>' +
+        '<p class="hc-pp-intro hc-pp-go"><b>Please click’n play &amp; plonk away.</b></p>' +
+        '<p class="hc-pp-beatslot" id="hc-pp-beatslot"></p>' +
+      '</div>' +
+    '</header>' +
     '<p class="hc-pp-sr" id="hc-pp-keyhelp">Use the arrow keys to move between projects. Enter or Space plays the colours, and Tab goes to the link for that project.</p>' +
     '<ul class="hc-pp-keys" id="hc-pp-keys" aria-label="Palette piano, one key for each project" aria-describedby="hc-pp-keyhelp"></ul>';
   var PLANS = {};   // every strip's plan, worked out once (the same every visit)
@@ -1083,10 +1112,9 @@
     var here = PAGE.test(location.pathname);
     document.documentElement.classList.toggle('hc-pp-on', here);   // Cargo changes pages without reloading
     if (!quiet.isConnected && document.body) document.body.appendChild(quiet);
+    if (here) { var box = document.querySelector('.project_content'); if (box && !box.querySelector('#hc-pp')) build(box); }   // the header first: the beat maker's pill goes into it
     if (window.__hcPaletteDrums) window.__hcPaletteDrums.check();   // the beat maker (the second script below): there only on this page
     if (!here) { if (root && !live()) { stopWaiting(); root = null; } return; }   // left the page: nothing more plays
-    var box = document.querySelector('.project_content');
-    if (box && !box.querySelector('#hc-pp')) build(box);
   }
   var pending = null;
   new MutationObserver(function () { clearTimeout(pending); pending = setTimeout(check, 120); })
@@ -1106,16 +1134,16 @@
 /* The beat maker: a small drum machine, fill pads and voice pads, for the palette piano page only.
    Ported from mockups/palette-piano/drums.js (approved by Halli 2026-11-17); the logic is the mockup's (as changed 2026-11-17 for "2.0": a perc row instead of the voice row, shuffle, a two-column panel), except for
    the fencing for the live site: every id and class is prefixed hc-pp-pd-, the CSS is in the <style> above under
-   #hc-pp-pd-btn / #hc-pp-pd-panel, the pill and panel live on <body> only while the page address contains "palette-piano"
+   #hc-pp-pd-btn / #hc-pp-pd-panel, the pill (in the header) and panel (on <body>) live only while the page address contains "palette-piano"
    (taken away again when the visitor leaves: the beat stops, fills and recordings are let go, the panel closes), the pill sits
-   right of "Turn the sound off" (measured, see place()), and the owner's recordings come from assets/palette-piano/ on
+   in the header (its panel above "Turn the sound off", measured, see place()), and the owner's recordings come from assets/palette-piano/ on
    GitHub Pages, fetched only once the visitor reaches for the piano or the beat maker. Missing recordings: the pads stay
    greyed out and the piano plays its synths instead.
    Uses window.PalettePiano.audio() ({ ctx, out }). Provides window.PPClock, window.PPVoices and window.PPDrums. */
 (function () {
   'use strict';
   if (window.__hcPaletteDrums) return;
-  var PAGE = /palette-piano/i;
+  var PAGE = /paco-benovo|palette-piano/i;
   // the recordings live next to this script on GitHub Pages: dist/js/hc-palette-piano.js -> assets/palette-piano/ (as hc-eyes)
   var here = document.currentScript && document.currentScript.src;
   var VBASE = here ? new URL('../../assets/palette-piano/', here).href
@@ -1701,21 +1729,13 @@
   function raf() { if (!rafOn && ui.panel && !ui.panel.hidden) { rafOn = true; requestAnimationFrame(frame); } }
 
   /* ---------------------------------------------------------------- on the live page: where it sits, and only on this page */
-  // The pill sits right of "Turn the sound off" (hc-palette-piano, fixed bottom left), on the same line; if that would run
-  // into the blobs' pause button or 1999 mode's "back to 2026" (bottom right), it goes up above the sound switch instead.
-  // The panel sits above them both. Measured, as hc-retro places "back to 2026".
+  // The pill is built into the page's header (#hc-pp-beatslot) by check(); only the panel is placed: docked at the bottom,
+  // above "Turn the sound off" (fixed bottom left), or at the default height until that button exists. Measured.
   function place() {
-    if (!ui.btn || !ui.btn.isConnected) return;
-    var q = document.getElementById('hc-pp-quiet'), qr = q && q.getBoundingClientRect(), b = ui.btn, w = b.offsetWidth, top;
-    if (!qr || !qr.width) { b.style.left = ''; b.style.bottom = ''; top = b.getBoundingClientRect().top; }
-    else {
-      var right = innerWidth;
-      [].forEach.call(document.querySelectorAll('button.hc-pause, .hc-back'), function (x) {
-        var r = x.getBoundingClientRect(); if (r.width && r.bottom > qr.top - 4 && r.top < qr.bottom + 4) right = Math.min(right, r.left); });
-      if (qr.right + 10 + w <= right - 8) { b.style.left = (qr.right + 10) + 'px'; b.style.bottom = (innerHeight - qr.bottom) + 'px'; top = qr.top; }
-      else { b.style.left = qr.left + 'px'; b.style.bottom = (innerHeight - qr.top + 10) + 'px'; top = qr.top - 10 - b.offsetHeight; }
-    }
-    if (ui.panel) ui.panel.style.bottom = Math.round(innerHeight - top + (innerWidth <= 640 ? 8 : 12)) + 'px';
+    if (!ui.panel) return;
+    var q = document.getElementById('hc-pp-quiet'), qr = q && q.getBoundingClientRect();
+    if (qr && qr.width) ui.panel.style.bottom = Math.round(innerHeight - qr.top + (innerWidth <= 640 ? 8 : 12)) + 'px';
+    else ui.panel.style.bottom = '';
   }
   // leaving the page: the beat stops, fills and recordings are let go, the panel closes, the pill and panel are taken away
   function leave() {
@@ -1734,9 +1754,10 @@
     if (!document.body) return;
     if (!ui.btn) build();
     if (!ui.panel.isConnected) document.body.appendChild(ui.panel);
-    if (!ui.btn.isConnected) document.body.appendChild(ui.btn);
+    var slot = document.getElementById('hc-pp-beatslot');   // the header is built by hc-palette-piano's check(), which runs first
+    if (slot && ui.btn.parentNode !== slot) slot.appendChild(ui.btn);
     var q = document.getElementById('hc-pp-quiet');
-    if (sizes && q) { sizes.observe(q); sizes.observe(ui.btn); }
+    if (sizes && q) sizes.observe(q);
     place();
   }
   addEventListener('resize', place);

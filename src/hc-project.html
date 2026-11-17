@@ -1,6 +1,6 @@
 <!-- Project pages for hallicivelek.com, in the style of about me and music. On any page whose address ends in one of
      Cargo's projects, the project's own content is re-laid out (nothing is retyped, the same elements are moved):
-       ← things I've made (← palette piano when the visit came from there), the title (Cargo's), and the first paragraph as a larger opening line above the pictures
+       ← things I've made (← Paco Benovo when the visit came from there), the title (Cargo's), and the first paragraph as a larger opening line above the pictures
        text joined into real paragraphs, left-aligned, max 700px (Cargo's line breaks were made for centred text)
        a short one-line text right before a picture becomes a small label above it ("Close up", "1 – Frequency")
        pictures at their own size up to 940px; small pictures side by side in pairs (both may have labels)
@@ -189,8 +189,8 @@
     var seq = SEQUENCE.indexOf(slug) >= 0, extra = PROJECTS[slug] || {}, ms = models(), m = idx >= 0 ? (ms[idx].attributes || {}) : { title: titleHere() };
     var list = tokens(box);
     var root = el('div'); root.id = 'hc-pj';
-    var piano = fromPiano(slug), back = el('a', 'hc-pj-back' + (piano ? ' hc-pj-piano' : ''), piano ? '← palette piano' : "← things I've made");
-    back.href = piano ? '/palette-piano' : '/'; root.appendChild(back);
+    var piano = fromPiano(slug), back = el('a', 'hc-pj-back' + (piano ? ' hc-pj-piano' : ''), piano ? '← Paco Benovo' : "← things I've made");
+    back.href = piano ? '/paco-benovo' : '/'; root.appendChild(back);
     root.appendChild(el('h1', '', String(m.title || slug).replace(/ - /g, ' – ')));
 
     // the first paragraph (Halli's "what and for whom") becomes the opening line, above the first picture

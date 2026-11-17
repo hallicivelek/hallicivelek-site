@@ -7,10 +7,10 @@
      (a solo). The project's title opens under a strip on hover, focus, or after a press ("the work stands on its own");
      it links to the project on this site. Keyboard: the piano is one Tab stop, the arrow keys / Home / End move along it,
      Enter or Space plays, Tab goes on to that strip's title link. Reduced motion: the strips don't move or grow, a trill
-     lights once. "Turn the sound off" sits bottom left, "Make a beat" right of it (the blobs' pause button and 1999 mode's
-     "back to 2026" have the bottom right).
+     lights once. "Turn the sound off" sits bottom left (the blobs' pause button and 1999 mode's "back to 2026" have the
+     bottom right); "Make a beat" is a pill in the header, its panel docks at the bottom.
      The way back: following a title saves the strip in sessionStorage ("hc-from-piano"); hc-project then shows
-     "← palette piano" instead of "← things I've made", and coming back here scrolls to that strip and opens its title,
+     "← Paco Benovo" instead of "← things I've made", and coming back here scrolls to that strip and opens its title,
      silently (also after the browser's back button and the back/forward cache).
      Ported from mockups/palette-piano: the first script is jam.html's sound, mapping and key-press code, unchanged
      (2026-11-17; before that synth.html's); the second is the beat maker, drums.js, fenced for the live site. While the
@@ -21,14 +21,23 @@
   html.hc-pp-on .thumbnails, html.hc-pp-on #hc-sort { display: none !important; }
   #hc-pp { box-sizing: border-box; width: min(1180px, 92vw); position: relative; left: 50%; transform: translateX(-50%);
     text-align: left; font-family: pacaembu, sans-serif; color: #492E46; letter-spacing: .02em; line-height: 1.5;
-    padding: 44px 0 120px; }
+    padding: 8px 0 120px; }
   #hc-pp *, #hc-pp *::before, #hc-pp *::after { box-sizing: border-box; }
   #hc-pp a { color: inherit; }
   #hc-pp .hc-pp-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; padding: 0; }
-  #hc-pp a.hc-pp-back { display: inline-block; font-size: 18px; text-decoration: none; margin-bottom: 18px; background: none !important; color: inherit !important; }
+  #hc-pp a.hc-pp-back { display: inline-block; font-size: 18px; text-decoration: none; margin-bottom: 8px; background: none !important; color: inherit !important; }
   #hc-pp a.hc-pp-back:hover { text-decoration: underline; }
-  #hc-pp h1 { font-family: inherit; font-size: 44px; line-height: 1.1; margin: 0 0 14px; font-weight: bold; letter-spacing: 0; color: inherit; text-transform: none; text-wrap: balance; }
-  #hc-pp p.hc-pp-lede { font-size: 21px; line-height: 1.45; margin: 0 0 40px; max-width: 34em; color: inherit; }
+  /* the header (Paco Benovo 2.0): the name and the acronym left, the words and the "Make a beat" pill right; one column on phones */
+  #hc-pp header.hc-pp-hd { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 0 56px; align-items: end; margin: 2px 0 28px; padding: 0; border: 0; background: none; }
+  #hc-pp .hc-pp-hd p { font-family: inherit; text-transform: none; color: inherit; max-width: none; }
+  #hc-pp p.hc-pp-kicker { margin: 0; font-size: 15px; line-height: 1.5; letter-spacing: .12em; color: rgba(73, 46, 70, .66); }
+  #hc-pp h1 { font-family: inherit; font-size: 68px; line-height: 1; margin: 6px 0 16px; font-weight: bold; letter-spacing: .01em; color: inherit; text-transform: none; white-space: nowrap; }
+  #hc-pp p.hc-pp-acro { margin: 0; font-size: 13px; font-style: normal; font-weight: normal; letter-spacing: .16em; line-height: 1.6; }
+  #hc-pp p.hc-pp-acro b { font-weight: bold; }
+  #hc-pp .hc-pp-hd p.hc-pp-intro { margin: 0 0 10px; font-size: 16px; line-height: 1.45; }
+  #hc-pp .hc-pp-hd p.hc-pp-lead { font-weight: bold; }
+  #hc-pp .hc-pp-hd p.hc-pp-go { margin: 12px 0 12px; font-size: 18px; }
+  #hc-pp .hc-pp-hd p.hc-pp-beatslot { margin: 0; line-height: 1; }
 
   /* the keys: each project a strip of its own colours, painted in bands on a white key, tilted a little like the prints on the pinboard */
   #hc-pp ul.hc-pp-keys { display: grid; grid-template-columns: repeat(var(--cols), 1fr); --cols: 24; gap: 34px 8px; padding: 0; margin: 0; list-style: none; }
@@ -81,13 +90,21 @@
     border-color: #fff #404040 #404040 #fff !important; border-radius: 0; box-shadow: none !important; font-family: Arial, Helvetica, sans-serif !important; }
   html.hc-gc button.hc-pp-quiet { background: #ff00ff !important; color: #ffff00 !important; border: 3px outset #ff99ff !important; box-shadow: none !important; }
 
+  @media (max-width: 420px) { button.hc-pp-quiet { padding: 0 12px; font-size: 14px; }  html.hc-gc button.hc-pp-quiet { bottom: calc(70px + env(safe-area-inset-bottom, 0px)); } html.hc-ns button.hc-pp-quiet { bottom: 96px; } }   /* so it clears the pause button beside it on a 390 px phone */
+  @media (max-width: 1100px) { #hc-pp h1 { font-size: 60px; } #hc-pp header.hc-pp-hd { gap: 0 40px; } }
+  @media (max-width: 800px) { #hc-pp header.hc-pp-hd { grid-template-columns: 1fr; margin-bottom: 26px; } #hc-pp h1 { white-space: normal; } #hc-pp .hc-pp-hr { margin-top: 18px; } }
   @media (max-width: 760px) {
-    #hc-pp { padding: 22px 0 110px; }
-    #hc-pp a.hc-pp-back { margin-bottom: 10px; font-size: 17px; }
-    #hc-pp h1 { font-size: 34px; margin-bottom: 8px; }
-    #hc-pp p.hc-pp-lede { font-size: 18px; margin-bottom: 30px; }
+    #hc-pp { padding: 18px 0 110px; }
+    #hc-pp a.hc-pp-back { margin-bottom: 6px; font-size: 17px; }
   }
   @media (max-width: 600px) {
+    #hc-pp h1 { font-size: 44px; margin: 4px 0 10px; }
+    #hc-pp p.hc-pp-acro { font-size: 11.5px; letter-spacing: .1em; }
+    #hc-pp .hc-pp-hr { margin-top: 12px; }
+    #hc-pp .hc-pp-hd p.hc-pp-intro { font-size: 15px; line-height: 1.4; margin-bottom: 7px; }
+    #hc-pp .hc-pp-hd p.hc-pp-go { margin: 8px 0 10px; font-size: 16px; }
+    #hc-pp header.hc-pp-hd { margin-bottom: 22px; }
+    #hc-pp #hc-pp-pd-btn { min-height: 46px; width: 100%; justify-content: center; }
     #hc-pp ul.hc-pp-keys { --cols: 7; gap: 28px 7px; }
     #hc-pp button.hc-pp-key { height: 150px; padding: 3px 3px 4px; }
     #hc-pp a.hc-pp-tag { max-width: 170px; }
@@ -97,18 +114,19 @@
     #hc-pp button.hc-pp-key.down, #hc-pp .hc-pp-key span.lit { transform: none; }
   }
 
-  /* the beat maker (from the mockup's drums.js): "Make a beat" right of the sound switch (placed by measuring, see place()), the
-     panel above them; both on <body>, only on this page. Everything under its own ids, so Cargo's button, select and input
+  /* the beat maker (from the mockup's drums.js): "Make a beat" is a pill in the page's header (built there by the add-on, only on this
+     page), the panel docks at the bottom above "Turn the sound off" (placed by measuring, see place()), on <body>. Everything under its own ids, so Cargo's button, select and input
      styles stay out (#hc-pp-pd-panel button etc. reset them; the class rules after them win over the reset) */
-  #hc-pp-pd-btn { display: none; position: fixed; left: 200px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 1001;
-    min-height: 44px; margin: 0; padding: 0 18px; border: 0; border-radius: 999px; background: #fff; color: #492E46;
-    font-family: pacaembu, sans-serif; font-size: 15px; font-weight: normal; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;
-    box-shadow: 0 6px 16px -6px rgba(73, 46, 70, .5); -webkit-tap-highlight-color: transparent; }
-  html.hc-pp-on #hc-pp-pd-btn { display: inline-flex; align-items: center; }
-  #hc-pp-pd-btn[aria-expanded="true"] { background: #492E46; color: #F3DCDF; }
+  #hc-pp-pd-btn { display: inline-flex; align-items: center; gap: 10px; position: static; min-height: 52px; margin: 0; padding: 0 28px; border: 0; border-radius: 999px;
+    background: #492E46; color: #F3DCDF; font-family: pacaembu, sans-serif; font-size: 18px; font-weight: bold; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;
+    box-shadow: 0 8px 18px -8px rgba(73, 46, 70, .6); transition: transform .12s ease; -webkit-tap-highlight-color: transparent; }
+  #hc-pp-pd-btn::before { content: "▶"; font-size: 12px; }
+  #hc-pp-pd-btn:hover { transform: translateY(-1px); }
+  #hc-pp-pd-btn[aria-expanded="true"] { background: #fff; color: #492E46; }
+  #hc-pp-pd-btn[aria-expanded="true"]::before { content: "▼"; }
   #hc-pp-pd-btn:focus { outline: none; }
   #hc-pp-pd-btn:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }
-  html.hc-ns #hc-pp-pd-btn { background: #c0c0c0 !important; color: #000 !important; border: 2px solid !important;
+  html.hc-ns #hc-pp-pd-btn { font-size: 16px !important; background: #c0c0c0 !important; color: #000 !important; border: 2px solid !important;
     border-color: #fff #404040 #404040 #fff !important; border-radius: 0; box-shadow: none !important; font-family: Arial, Helvetica, sans-serif !important; }
   html.hc-ns #hc-pp-pd-btn[aria-expanded="true"] { border-color: #404040 #fff #fff #404040 !important; }
   html.hc-gc #hc-pp-pd-btn { background: #ff00ff !important; color: #ffff00 !important; border: 3px outset #ff99ff !important; box-shadow: none !important; }
@@ -196,7 +214,7 @@
 (function () {
   if (window.__hcPalettePiano) return;
   window.__hcPalettePiano = true;
-  var PAGE = /palette-piano/i;
+  var PAGE = /paco-benovo|palette-piano/i;
   var PALETTES = /*PALETTES*/[];   // src/palettes.json, put in by tools/build_palettes.py
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -433,8 +451,19 @@
   /* ---------- the page ---------- */
   var HTML =
     '<a class="hc-pp-back" href="/playthings">← playthings</a>' +
-    '<h1>Proper palette piano player 2.0 (Voice Enhanced™)</h1>' +
-    '<p class="hc-pp-lede">I took the colours from all my projects and made a grand “piano”. With my voice as an expansion pack. Click ’n’ play &amp; plonk away.</p>' +
+    '<header class="hc-pp-hd">' +
+      '<div class="hc-pp-hl">' +
+        '<p class="hc-pp-kicker">Civelektronique presents:</p>' +
+        '<h1>Paco Benovo 2.0</h1>' +
+        '<p class="hc-pp-acro"><b>PA</b>LETTE <b>CO</b>LORS · <b>BE</b>ATS <b>NO</b>ISES <b>VO</b>ICES</p>' +
+      '</div>' +
+      '<div class="hc-pp-hr">' +
+        '<p class="hc-pp-intro hc-pp-lead">Who needs crappy AI music when you can produce your very own crappy grooves RIGHT HERE.</p>' +
+        '<p class="hc-pp-intro">I took the colours from all my projects and made them into Paco Benovo: a keyboard with my voice as an expansion pack. This includes the beat maker where you can make your own beats with fills and tomtoms and trigger samples.</p>' +
+        '<p class="hc-pp-intro hc-pp-go"><b>Please click’n play &amp; plonk away.</b></p>' +
+        '<p class="hc-pp-beatslot" id="hc-pp-beatslot"></p>' +
+      '</div>' +
+    '</header>' +
     '<p class="hc-pp-sr" id="hc-pp-keyhelp">Use the arrow keys to move between projects. Enter or Space plays the colours, and Tab goes to the link for that project.</p>' +
     '<ul class="hc-pp-keys" id="hc-pp-keys" aria-label="Palette piano, one key for each project" aria-describedby="hc-pp-keyhelp"></ul>';
   var PLANS = {};   // every strip's plan, worked out once (the same every visit)
@@ -1083,10 +1112,9 @@
     var here = PAGE.test(location.pathname);
     document.documentElement.classList.toggle('hc-pp-on', here);   // Cargo changes pages without reloading
     if (!quiet.isConnected && document.body) document.body.appendChild(quiet);
+    if (here) { var box = document.querySelector('.project_content'); if (box && !box.querySelector('#hc-pp')) build(box); }   // the header first: the beat maker's pill goes into it
     if (window.__hcPaletteDrums) window.__hcPaletteDrums.check();   // the beat maker (the second script below): there only on this page
     if (!here) { if (root && !live()) { stopWaiting(); root = null; } return; }   // left the page: nothing more plays
-    var box = document.querySelector('.project_content');
-    if (box && !box.querySelector('#hc-pp')) build(box);
   }
   var pending = null;
   new MutationObserver(function () { clearTimeout(pending); pending = setTimeout(check, 120); })
@@ -1106,16 +1134,16 @@
 /* The beat maker: a small drum machine, fill pads and voice pads, for the palette piano page only.
    Ported from mockups/palette-piano/drums.js (approved by Halli 2026-11-17); the logic is the mockup's (as changed 2026-11-17 for "2.0": a perc row instead of the voice row, shuffle, a two-column panel), except for
    the fencing for the live site: every id and class is prefixed hc-pp-pd-, the CSS is in the <style> above under
-   #hc-pp-pd-btn / #hc-pp-pd-panel, the pill and panel live on <body> only while the page address contains "palette-piano"
+   #hc-pp-pd-btn / #hc-pp-pd-panel, the pill (in the header) and panel (on <body>) live only while the page address contains "palette-piano"
    (taken away again when the visitor leaves: the beat stops, fills and recordings are let go, the panel closes), the pill sits
-   right of "Turn the sound off" (measured, see place()), and the owner's recordings come from assets/palette-piano/ on
+   in the header (its panel above "Turn the sound off", measured, see place()), and the owner's recordings come from assets/palette-piano/ on
    GitHub Pages, fetched only once the visitor reaches for the piano or the beat maker. Missing recordings: the pads stay
    greyed out and the piano plays its synths instead.
    Uses window.PalettePiano.audio() ({ ctx, out }). Provides window.PPClock, window.PPVoices and window.PPDrums. */
 (function () {
   'use strict';
   if (window.__hcPaletteDrums) return;
-  var PAGE = /palette-piano/i;
+  var PAGE = /paco-benovo|palette-piano/i;
   // the recordings live next to this script on GitHub Pages: dist/js/hc-palette-piano.js -> assets/palette-piano/ (as hc-eyes)
   var here = document.currentScript && document.currentScript.src;
   var VBASE = here ? new URL('../../assets/palette-piano/', here).href
@@ -1701,21 +1729,13 @@
   function raf() { if (!rafOn && ui.panel && !ui.panel.hidden) { rafOn = true; requestAnimationFrame(frame); } }
 
   /* ---------------------------------------------------------------- on the live page: where it sits, and only on this page */
-  // The pill sits right of "Turn the sound off" (hc-palette-piano, fixed bottom left), on the same line; if that would run
-  // into the blobs' pause button or 1999 mode's "back to 2026" (bottom right), it goes up above the sound switch instead.
-  // The panel sits above them both. Measured, as hc-retro places "back to 2026".
+  // The pill is built into the page's header (#hc-pp-beatslot) by check(); only the panel is placed: docked at the bottom,
+  // above "Turn the sound off" (fixed bottom left), or at the default height until that button exists. Measured.
   function place() {
-    if (!ui.btn || !ui.btn.isConnected) return;
-    var q = document.getElementById('hc-pp-quiet'), qr = q && q.getBoundingClientRect(), b = ui.btn, w = b.offsetWidth, top;
-    if (!qr || !qr.width) { b.style.left = ''; b.style.bottom = ''; top = b.getBoundingClientRect().top; }
-    else {
-      var right = innerWidth;
-      [].forEach.call(document.querySelectorAll('button.hc-pause, .hc-back'), function (x) {
-        var r = x.getBoundingClientRect(); if (r.width && r.bottom > qr.top - 4 && r.top < qr.bottom + 4) right = Math.min(right, r.left); });
-      if (qr.right + 10 + w <= right - 8) { b.style.left = (qr.right + 10) + 'px'; b.style.bottom = (innerHeight - qr.bottom) + 'px'; top = qr.top; }
-      else { b.style.left = qr.left + 'px'; b.style.bottom = (innerHeight - qr.top + 10) + 'px'; top = qr.top - 10 - b.offsetHeight; }
-    }
-    if (ui.panel) ui.panel.style.bottom = Math.round(innerHeight - top + (innerWidth <= 640 ? 8 : 12)) + 'px';
+    if (!ui.panel) return;
+    var q = document.getElementById('hc-pp-quiet'), qr = q && q.getBoundingClientRect();
+    if (qr && qr.width) ui.panel.style.bottom = Math.round(innerHeight - qr.top + (innerWidth <= 640 ? 8 : 12)) + 'px';
+    else ui.panel.style.bottom = '';
   }
   // leaving the page: the beat stops, fills and recordings are let go, the panel closes, the pill and panel are taken away
   function leave() {
@@ -1734,9 +1754,10 @@
     if (!document.body) return;
     if (!ui.btn) build();
     if (!ui.panel.isConnected) document.body.appendChild(ui.panel);
-    if (!ui.btn.isConnected) document.body.appendChild(ui.btn);
+    var slot = document.getElementById('hc-pp-beatslot');   // the header is built by hc-palette-piano's check(), which runs first
+    if (slot && ui.btn.parentNode !== slot) slot.appendChild(ui.btn);
     var q = document.getElementById('hc-pp-quiet');
-    if (sizes && q) { sizes.observe(q); sizes.observe(ui.btn); }
+    if (sizes && q) sizes.observe(q);
     place();
   }
   addEventListener('resize', place);

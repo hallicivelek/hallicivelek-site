@@ -107,8 +107,8 @@
     var seq = SEQUENCE.indexOf(slug) >= 0, extra = PROJECTS[slug] || {}, ms = models(), m = idx >= 0 ? (ms[idx].attributes || {}) : { title: titleHere() };
     var list = tokens(box);
     var root = el('div'); root.id = 'hc-pj';
-    var piano = fromPiano(slug), back = el('a', 'hc-pj-back' + (piano ? ' hc-pj-piano' : ''), piano ? '← palette piano' : "← things I've made");
-    back.href = piano ? '/palette-piano' : '/'; root.appendChild(back);
+    var piano = fromPiano(slug), back = el('a', 'hc-pj-back' + (piano ? ' hc-pj-piano' : ''), piano ? '← Paco Benovo' : "← things I've made");
+    back.href = piano ? '/paco-benovo' : '/'; root.appendChild(back);
     root.appendChild(el('h1', '', String(m.title || slug).replace(/ - /g, ' – ')));
 
     // the first paragraph (Halli's "what and for whom") becomes the opening line, above the first picture
@@ -270,4 +270,4 @@
   document.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('a[href]')) setTimeout(look, 50); }, true);
   look();
 })();
-window.__hcBuild = "2026-11-17 01:23";
+window.__hcBuild = "2026-11-17 02:40";

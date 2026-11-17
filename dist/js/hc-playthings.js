@@ -19,7 +19,7 @@
       line: 'Draw a blob-face and set it free on the site.' },
     { title: 'Music Kontrapunkt Kontrol', href: 'https://kontrapunkt.hallicivelek.com/', bg: '#f3efe6', show: 'tall',
       line: 'An Italo Disco blog and a producer map (of who made what). Since 2004.' },
-    { title: 'Proper palette piano player 2.0 (Voice Enhanced™)', href: '/palette-piano', bg: '#f3efe6', show: 'keys',
+    { title: 'Paco Benovo 2.0', href: '/paco-benovo', bg: '#f3efe6', show: 'keys',
       line: "Every project as a strip of its own colors, for you to click'n play." },
     { title: 'Shakeskin', href: 'https://www.shakeskin.com/', bg: '#086eb2', show: 'faces',   // Shakeskin's own blue
       line: 'A gallery of shaken faces. Since 2004.' },
@@ -52,7 +52,7 @@
           '<path d="M381.69,157.59c0-3,3.75-6.9,5.62-9.03,18.84-21.63,49.32-7.22,50.75,19.77.97,18.350-17.09,44.12-37.11,29.37"/></g>' +
         '<image href="' + PENCIL + '" width="59" height="200" transform="translate(209 96) rotate(14) scale(.75) translate(-15 -191)"/></svg>';
     } else if (t.show === 'keys') {
-      // 400 x 300 picture: a few white keys, each painted in bands of one project's colours, tilted a little (as on /palette-piano)
+      // 400 x 300 picture: a few white keys, each painted in bands of one project's colours, tilted a little (as on /paco-benovo)
       var svg = '<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false" style="position:absolute;left:0;top:0;width:100%;height:100%"><defs>';
       KEYS.forEach(function (_, i) { svg += '<clipPath id="hc-pt-k' + i + '"><rect x="4" y="4" width="40" height="182" rx="2" ry="2"/></clipPath>'; });
       svg += '</defs>';
@@ -114,4 +114,4 @@
   addEventListener('popstate', check);
   check();
 })();
-window.__hcBuild = "2026-11-17 01:23";
+window.__hcBuild = "2026-11-17 02:40";

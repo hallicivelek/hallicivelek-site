@@ -55,7 +55,7 @@
 (function () {
   if (window.__hcPjWait) return;
   window.__hcPjWait = true;
-  var PAGES = /^\/(playthings|palette-piano|music(-?mixes)?(-\d+)?|about-me|info-contact|the-blob-pond|blob-?pond|filter\/[^/]+)?\/?$/i;   // never projects
+  var PAGES = /^\/(playthings|paco-benovo|palette-piano|music(-?mixes)?(-\d+)?|about-me|info-contact|the-blob-pond|blob-?pond|filter\/[^/]+)?\/?$/i;   // never projects
   var timer = null, root = document.documentElement;
   function ready() { clearTimeout(timer); root.classList.add('hc-pj-ready'); }
   function wait(path) {
@@ -74,4 +74,4 @@
   }, true);
   addEventListener('popstate', function () { wait(location.pathname); });
 })();
-window.__hcBuild = "2026-11-17 01:23";
+window.__hcBuild = "2026-11-17 02:40";
