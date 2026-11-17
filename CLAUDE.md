@@ -291,7 +291,7 @@ header.css, remove "Other projects" from about me.
 The redesign looks fine on his iPhone and speed is fine. Wanton Boys Club GIF stays out for now.
 
 ## Where we left off (2026-11-04)
-- **2026-11-17 (later):** palette piano 2.0 changes **built and tested, not committed or pushed**: new title and intro (add-on,
+- **2026-11-17 (later):** palette piano 2.0 changes **Committed, pushed and live** (build `2026-11-17 01:23`, 157/157 tests; on the live site: new title and intro, perc row, no voice row, shuffle button, 15/15 recordings load, no scrollbar in the open panel at 699x616; not checked there at 1440 wide, by ear, or on an iPhone): new title and intro (add-on,
   mockup `jam.html`, playthings card), perc row instead of the voice row, shuffle, compact two-column beat panel without scrollbars,
   bombaclat pad (`assets/palette-piano/bombaclat.mp3`, new file to commit). Mockup and add-on logic match (same patch applied to
   both); differences are only the add-on's fencing and the mockup's own page. Screenshots `mockups/palette-piano/beat-{1440,1280,390}.png`.
