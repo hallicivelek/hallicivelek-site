@@ -1,5 +1,5 @@
 /* hc-palette-piano for hallicivelek.com: built from dist/hc-palette-piano.html by build.py, do not edit here */
-(function () { var s = document.createElement("style"); s.textContent = "\n  html.hc-pp-on .thumbnails, html.hc-pp-on #hc-sort { display: none !important; }\n  #hc-pp { box-sizing: border-box; width: min(1180px, 92vw); position: relative; left: 50%; transform: translateX(-50%);\n    text-align: left; font-family: pacaembu, sans-serif; color: #492E46; letter-spacing: .02em; line-height: 1.5;\n    padding: 44px 0 120px; }\n  #hc-pp *, #hc-pp *::before, #hc-pp *::after { box-sizing: border-box; }\n  #hc-pp a { color: inherit; }\n  #hc-pp .hc-pp-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; padding: 0; }\n  #hc-pp a.hc-pp-back { display: inline-block; font-size: 18px; text-decoration: none; margin-bottom: 18px; background: none !important; color: inherit !important; }\n  #hc-pp a.hc-pp-back:hover { text-decoration: underline; }\n  #hc-pp h1 { font-family: inherit; font-size: 44px; line-height: 1.1; margin: 0 0 14px; font-weight: bold; letter-spacing: 0; color: inherit; text-transform: none; }\n  #hc-pp p.hc-pp-lede { font-size: 21px; line-height: 1.45; margin: 0 0 40px; max-width: 34em; color: inherit; }\n\n  /* the keys: each project a strip of its own colours, painted in bands on a white key, tilted a little like the prints on the pinboard */\n  #hc-pp ul.hc-pp-keys { display: grid; grid-template-columns: repeat(var(--cols), 1fr); --cols: 24; gap: 34px 8px; padding: 0; margin: 0; list-style: none; }\n  #hc-pp li.hc-pp-k { position: relative; margin: 0; padding: 0; list-style: none; line-height: 1.5; transform: translateY(var(--dy)) rotate(var(--tilt)); }\n  #hc-pp li.hc-pp-k::before, #hc-pp li.hc-pp-k::marker { content: none; }\n  #hc-pp button.hc-pp-key { display: flex; flex-direction: column; width: 100%; min-width: 0; height: 214px; padding: 4px 4px 5px; border: 0; margin: 0;\n    background: #fff; border-radius: 3px 3px 14px 14px; cursor: pointer; font: inherit; letter-spacing: 0; text-transform: none; color: inherit;\n    box-shadow: 0 1px 1px rgba(73, 46, 70, .12), 0 6px 14px -6px rgba(73, 46, 70, .35);\n    transition: transform .12s ease, box-shadow .12s ease; -webkit-tap-highlight-color: transparent;\n    /* soloing: a finger sweeping sideways (or held still a moment) plays the bands; an up-or-down swipe still scrolls the page */\n    touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }\n  /* each band overlaps the one above with a slightly uneven top edge, like paint or cut paper */\n  #hc-pp .hc-pp-key span { display: block; flex: var(--share) 1 0; min-height: 9px; margin-top: -4px; clip-path: var(--edge);\n    transition: transform .6s ease, filter .6s ease; }\n  #hc-pp .hc-pp-key span:first-child { margin-top: 0; clip-path: none; border-radius: 1px 1px 0 0; }\n  #hc-pp .hc-pp-key span:last-child { border-radius: 0 0 11px 11px; }\n  #hc-pp .hc-pp-key span.lit { transform: scaleX(1.22); filter: brightness(1.08) saturate(1.25); transition: transform .08s ease-out, filter .08s; }\n  #hc-pp button.hc-pp-key:hover { background: #fff; box-shadow: 0 1px 1px rgba(73, 46, 70, .12), 0 10px 18px -6px rgba(73, 46, 70, .4); }\n  #hc-pp button.hc-pp-key.down { transform: translateY(5px); box-shadow: 0 1px 1px rgba(73, 46, 70, .15), 0 2px 5px -2px rgba(73, 46, 70, .35); }\n  #hc-pp button.hc-pp-key:focus { outline: none; }\n  #hc-pp button.hc-pp-key:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n\n  /* the title only shows on hover, focus, or after a press: the work stands on its own */\n  #hc-pp a.hc-pp-tag { position: absolute; left: 50%; top: calc(100% + 10px); z-index: 2; width: max-content; max-width: 210px;\n    transform: translateX(-50%) rotate(calc(var(--tilt) * -1.4)); padding: 7px 12px 8px; background: #fff !important; color: inherit !important;\n    border-radius: 3px; font-size: 14px; line-height: 1.3; text-decoration: none; text-align: center;\n    box-shadow: 0 6px 14px -6px rgba(73, 46, 70, .4); opacity: 0; pointer-events: none; transition: opacity .15s; }\n  #hc-pp li.hc-pp-k[data-edge=\"l\"] a.hc-pp-tag { left: 0; transform: rotate(calc(var(--tilt) * -1.4)); text-align: left; }\n  #hc-pp li.hc-pp-k[data-edge=\"r\"] a.hc-pp-tag { left: auto; right: 0; transform: rotate(calc(var(--tilt) * -1.4)); text-align: right; }\n  #hc-pp .hc-pp-tag b { display: block; font-weight: bold; }\n  #hc-pp .hc-pp-tag i { font-style: normal; color: rgba(73, 46, 70, .66); text-decoration: underline; text-underline-offset: 3px; }\n  #hc-pp .hc-pp-tag:hover i { color: #492E46; }\n  #hc-pp a.hc-pp-tag:focus { outline: none; }\n  #hc-pp a.hc-pp-tag:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 2px; }\n  #hc-pp li.hc-pp-k:hover a.hc-pp-tag, #hc-pp li.hc-pp-k:focus-within a.hc-pp-tag, #hc-pp li.hc-pp-k.on a.hc-pp-tag { opacity: 1; pointer-events: auto; }\n  #hc-pp li.hc-pp-k:hover, #hc-pp li.hc-pp-k:focus-within, #hc-pp li.hc-pp-k.on { z-index: 3; }\n  #hc-pp ul.hc-pp-keys:has(li.hc-pp-k:hover) li.hc-pp-k.on:not(:hover):not(:focus-within) a.hc-pp-tag { opacity: 0; pointer-events: none; }\n  #hc-pp li.hc-pp-k { scroll-margin: 96px 0 140px; }   /* clear of Cargo's fixed header and the buttons at the bottom */\n  @media (max-width: 1000px) { #hc-pp ul.hc-pp-keys { --cols: 14; } }\n\n  /* sound on/off: bottom left, the blobs' pause button (and 1999 mode's way back) keep the bottom right */\n  button.hc-pp-quiet { display: none; position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 1001;\n    min-height: 44px; margin: 0; padding: 0 18px; border: 0; border-radius: 999px; background: #492E46; color: #F3DCDF;\n    font-family: pacaembu, sans-serif; font-size: 15px; font-weight: normal; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;\n    box-shadow: 0 6px 16px -6px rgba(73, 46, 70, .5); }\n  html.hc-pp-on button.hc-pp-quiet { display: inline-flex; align-items: center; }\n  button.hc-pp-quiet[aria-pressed=\"true\"] { background: #fff; color: #492E46; }\n  button.hc-pp-quiet:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n  html.hc-ns button.hc-pp-quiet { bottom: 40px; background: #c0c0c0 !important; color: #000 !important; border: 2px solid !important;\n    border-color: #fff #404040 #404040 #fff !important; border-radius: 0; box-shadow: none !important; font-family: Arial, Helvetica, sans-serif !important; }\n  html.hc-gc button.hc-pp-quiet { background: #ff00ff !important; color: #ffff00 !important; border: 3px outset #ff99ff !important; box-shadow: none !important; }\n\n  @media (max-width: 760px) {\n    #hc-pp { padding: 22px 0 110px; }\n    #hc-pp a.hc-pp-back { margin-bottom: 10px; font-size: 17px; }\n    #hc-pp h1 { font-size: 34px; margin-bottom: 8px; }\n    #hc-pp p.hc-pp-lede { font-size: 18px; margin-bottom: 30px; }\n  }\n  @media (max-width: 600px) {\n    #hc-pp ul.hc-pp-keys { --cols: 7; gap: 28px 7px; }\n    #hc-pp button.hc-pp-key { height: 150px; padding: 3px 3px 4px; }\n    #hc-pp a.hc-pp-tag { max-width: 170px; }\n  }\n  @media (prefers-reduced-motion: reduce) {\n    #hc-pp button.hc-pp-key, #hc-pp .hc-pp-key span, #hc-pp a.hc-pp-tag { transition: none !important; }\n    #hc-pp button.hc-pp-key.down, #hc-pp .hc-pp-key span.lit { transform: none; }\n  }\n\n  /* the beat maker (from the mockup's drums.js): \"Make a beat\" right of the sound switch (placed by measuring, see place()), the\n     panel above them; both on <body>, only on this page. Everything under its own ids, so Cargo's button, select and input\n     styles stay out (#hc-pp-pd-panel button etc. reset them; the class rules after them win over the reset) */\n  #hc-pp-pd-btn { display: none; position: fixed; left: 200px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 1001;\n    min-height: 44px; margin: 0; padding: 0 18px; border: 0; border-radius: 999px; background: #fff; color: #492E46;\n    font-family: pacaembu, sans-serif; font-size: 15px; font-weight: normal; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;\n    box-shadow: 0 6px 16px -6px rgba(73, 46, 70, .5); -webkit-tap-highlight-color: transparent; }\n  html.hc-pp-on #hc-pp-pd-btn { display: inline-flex; align-items: center; }\n  #hc-pp-pd-btn[aria-expanded=\"true\"] { background: #492E46; color: #F3DCDF; }\n  #hc-pp-pd-btn:focus { outline: none; }\n  #hc-pp-pd-btn:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n  html.hc-ns #hc-pp-pd-btn { background: #c0c0c0 !important; color: #000 !important; border: 2px solid !important;\n    border-color: #fff #404040 #404040 #fff !important; border-radius: 0; box-shadow: none !important; font-family: Arial, Helvetica, sans-serif !important; }\n  html.hc-ns #hc-pp-pd-btn[aria-expanded=\"true\"] { border-color: #404040 #fff #fff #404040 !important; }\n  html.hc-gc #hc-pp-pd-btn { background: #ff00ff !important; color: #ffff00 !important; border: 3px outset #ff99ff !important; box-shadow: none !important; }\n  html.hc-gc #hc-pp-pd-btn[aria-expanded=\"true\"] { border-style: inset !important; }\n\n  #hc-pp-pd-panel { position: fixed; left: 16px; right: 16px; bottom: 72px; z-index: 1001; box-sizing: border-box; max-width: 780px; margin: 0 auto;\n    padding: 12px 14px 14px; border: 0; background: #fff; color: #492E46; border-radius: 6px 6px 16px 16px;\n    font: 15px/1.3 pacaembu, sans-serif; letter-spacing: .04em; text-align: left; text-transform: none;\n    box-shadow: 0 1px 1px rgba(73, 46, 70, .12), 0 14px 30px -10px rgba(73, 46, 70, .45); transform: rotate(-.3deg); transform-origin: 50% 100%;\n    max-height: 45vh; overflow-y: auto; overscroll-behavior: contain; }   /* desktop: at most 45% of the screen, so strips stay in view */\n  #hc-pp-pd-panel[hidden], html:not(.hc-pp-on) #hc-pp-pd-panel { display: none !important; }\n  #hc-pp-pd-panel * { box-sizing: border-box; }\n  #hc-pp-pd-panel div, #hc-pp-pd-panel span, #hc-pp-pd-panel label { margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: none; }\n  #hc-pp-pd-panel button, #hc-pp-pd-panel select, #hc-pp-pd-panel input { margin: 0; padding: 1px 6px; border: 0; background: none; box-shadow: none; text-transform: none;\n    font: inherit; letter-spacing: .04em; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }\n  #hc-pp-pd-panel button:focus, #hc-pp-pd-panel select:focus { outline: none; }\n  #hc-pp-pd-panel button:focus-visible, #hc-pp-pd-panel input:focus-visible, #hc-pp-pd-panel select:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 2px; }\n  #hc-pp-pd-panel .hc-pp-pd-top { position: sticky; top: -12px; z-index: 1; display: flex; align-items: center; gap: 10px; margin: -12px -14px 10px; padding: 12px 14px 0; background: #fff; }\n  #hc-pp-pd-panel .hc-pp-pd-go, #hc-pp-pd-panel .hc-pp-pd-clear, #hc-pp-pd-panel .hc-pp-pd-x { min-height: 40px; border: 0; border-radius: 999px; padding: 0 16px; }\n  #hc-pp-pd-panel .hc-pp-pd-go { background: #492E46; color: #F3DCDF; min-width: 84px; }\n  #hc-pp-pd-panel .hc-pp-pd-clear { background: rgba(73, 46, 70, .09); }\n  #hc-pp-pd-panel .hc-pp-pd-x { margin-left: auto; background: none; min-width: 40px; padding: 0 10px; color: rgba(73, 46, 70, .66); }\n  #hc-pp-pd-panel .hc-pp-pd-speed { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; max-width: 300px; }\n  #hc-pp-pd-panel .hc-pp-pd-speed label { color: rgba(73, 46, 70, .66); font-size: 14px; }\n  #hc-pp-pd-panel .hc-pp-pd-num { min-width: 2.2em; text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; }\n  #hc-pp-pd-panel .hc-pp-pd-speed input { flex: 1; min-width: 0; width: auto; height: 28px; padding: 0; accent-color: #492E46; margin: 0; }\n  #hc-pp-pd-panel .hc-pp-pd-rows { display: grid; gap: 5px; }\n  #hc-pp-pd-panel .hc-pp-pd-row { display: grid; grid-template-columns: 132px 1fr; align-items: center; gap: 6px; }\n  #hc-pp-pd-panel .hc-pp-pd-name { font-size: 14px; color: rgba(73, 46, 70, .66); }\n  #hc-pp-pd-panel .hc-pp-pd-vname { display: flex; align-items: center; gap: 4px; min-width: 0; }\n  #hc-pp-pd-panel .hc-pp-pd-pick { flex: 1; min-width: 0; height: 30px; padding: 0 4px; border: 0; border-radius: 5px; background: rgba(73, 46, 70, .09); color: #492E46; font: inherit; font-size: 13px; letter-spacing: .02em; cursor: pointer; text-overflow: ellipsis; }\n  #hc-pp-pd-panel .hc-pp-pd-steps { display: grid; grid-template-columns: repeat(16, 1fr); gap: 4px; }\n  #hc-pp-pd-panel .hc-pp-pd-step { height: 30px; min-width: 0; padding: 0; border: 0; border-radius: 5px; background: rgba(73, 46, 70, .09); }\n  #hc-pp-pd-panel .hc-pp-pd-step.hc-pp-pd-b { background: rgba(73, 46, 70, .17); }\n  #hc-pp-pd-panel .hc-pp-pd-step[aria-pressed=\"true\"] { background: #492E46; }\n  #hc-pp-pd-panel .hc-pp-pd-step.hc-pp-pd-now { transform: translateY(-2px); background: rgba(73, 46, 70, .4); }\n  #hc-pp-pd-panel .hc-pp-pd-step.hc-pp-pd-now[aria-pressed=\"true\"] { background: #8d6a89; }\n  #hc-pp-pd-panel .hc-pp-pd-pads { display: grid; gap: 8px; margin-top: 12px; }\n  #hc-pp-pd-panel .hc-pp-pd-grp { min-width: 0; }\n  #hc-pp-pd-panel .hc-pp-pd-cap { display: block; margin: 0 0 4px; font-size: 13px; color: rgba(73, 46, 70, .66); }\n  #hc-pp-pd-panel .hc-pp-pd-fills { display: flex; gap: 8px; }\n  #hc-pp-pd-panel .hc-pp-pd-fill { flex: 1; min-width: 72px; height: 50px; border: 0; border-radius: 10px; background: #F3DCDF; font-weight: 700; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none; box-shadow: 0 2px 0 rgba(73, 46, 70, .25); }\n  #hc-pp-pd-panel .hc-pp-pd-fill.hc-pp-pd-on { transform: translateY(2px); box-shadow: none; background: #492E46; color: #F3DCDF; }\n  #hc-pp-pd-panel .hc-pp-pd-says { display: flex; flex-wrap: wrap; gap: 6px 5px; }\n  #hc-pp-pd-panel .hc-pp-pd-say { min-width: 0; min-height: 44px; padding: 0 10px; border: 0; border-radius: 10px; background: #F3DCDF; font-size: 14px; user-select: none; -webkit-user-select: none; box-shadow: 0 2px 0 rgba(73, 46, 70, .25); }\n  #hc-pp-pd-panel .hc-pp-pd-say:active, #hc-pp-pd-panel .hc-pp-pd-say.hc-pp-pd-on { transform: translateY(2px); box-shadow: none; }\n  #hc-pp-pd-panel .hc-pp-pd-say.hc-pp-pd-on { background: #492E46; color: #F3DCDF; }\n  #hc-pp-pd-panel .hc-pp-pd-say[aria-disabled=\"true\"] { opacity: .42; cursor: default; box-shadow: none; background: rgba(73, 46, 70, .07); }\n  #hc-pp-pd-panel .hc-pp-pd-say[aria-disabled=\"true\"]:active { transform: none; }\n  @media (max-width: 640px) {\n    #hc-pp-pd-panel { left: 10px; right: 10px; bottom: 68px; padding: 10px 10px 12px; max-height: 36vh; overflow-y: auto; overscroll-behavior: contain; }\n    #hc-pp-pd-panel .hc-pp-pd-top { position: sticky; top: -10px; z-index: 1; background: #fff; margin: -10px -10px 8px; padding: 10px 10px 6px; gap: 8px; }\n    #hc-pp-pd-panel .hc-pp-pd-go, #hc-pp-pd-panel .hc-pp-pd-clear { padding: 0 12px; min-width: 0; }\n    #hc-pp-pd-panel .hc-pp-pd-speed label { display: none; }\n    #hc-pp-pd-panel .hc-pp-pd-row { grid-template-columns: 1fr; gap: 2px; }\n    #hc-pp-pd-panel .hc-pp-pd-vname { gap: 8px; } #hc-pp-pd-panel .hc-pp-pd-pick { flex: none; max-width: 60%; height: 34px; padding: 0 8px; font-size: 14px; }\n    #hc-pp-pd-panel .hc-pp-pd-name { font-size: 13px; line-height: 1; }\n    #hc-pp-pd-panel .hc-pp-pd-steps { grid-template-columns: repeat(8, 1fr); gap: 4px; }\n    #hc-pp-pd-panel .hc-pp-pd-step { height: 30px; }\n    #hc-pp-pd-panel .hc-pp-pd-fill { height: 44px; }\n    #hc-pp-pd-panel .hc-pp-pd-say { padding: 0 12px; }\n  }\n  @media (prefers-reduced-motion: reduce) {\n    #hc-pp-pd-panel *, #hc-pp-pd-btn { transition: none !important; animation: none !important; }\n    #hc-pp-pd-panel .hc-pp-pd-step.hc-pp-pd-now, #hc-pp-pd-panel .hc-pp-pd-fill.hc-pp-pd-on, #hc-pp-pd-panel .hc-pp-pd-say:active, #hc-pp-pd-panel .hc-pp-pd-say.hc-pp-pd-on { transform: none; }\n  }\n"; document.head.appendChild(s); })();
+(function () { var s = document.createElement("style"); s.textContent = "\n  html.hc-pp-on .thumbnails, html.hc-pp-on #hc-sort { display: none !important; }\n  #hc-pp { box-sizing: border-box; width: min(1180px, 92vw); position: relative; left: 50%; transform: translateX(-50%);\n    text-align: left; font-family: pacaembu, sans-serif; color: #492E46; letter-spacing: .02em; line-height: 1.5;\n    padding: 44px 0 120px; }\n  #hc-pp *, #hc-pp *::before, #hc-pp *::after { box-sizing: border-box; }\n  #hc-pp a { color: inherit; }\n  #hc-pp .hc-pp-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; padding: 0; }\n  #hc-pp a.hc-pp-back { display: inline-block; font-size: 18px; text-decoration: none; margin-bottom: 18px; background: none !important; color: inherit !important; }\n  #hc-pp a.hc-pp-back:hover { text-decoration: underline; }\n  #hc-pp h1 { font-family: inherit; font-size: 44px; line-height: 1.1; margin: 0 0 14px; font-weight: bold; letter-spacing: 0; color: inherit; text-transform: none; text-wrap: balance; }\n  #hc-pp p.hc-pp-lede { font-size: 21px; line-height: 1.45; margin: 0 0 40px; max-width: 34em; color: inherit; }\n\n  /* the keys: each project a strip of its own colours, painted in bands on a white key, tilted a little like the prints on the pinboard */\n  #hc-pp ul.hc-pp-keys { display: grid; grid-template-columns: repeat(var(--cols), 1fr); --cols: 24; gap: 34px 8px; padding: 0; margin: 0; list-style: none; }\n  #hc-pp li.hc-pp-k { position: relative; margin: 0; padding: 0; list-style: none; line-height: 1.5; transform: translateY(var(--dy)) rotate(var(--tilt)); }\n  #hc-pp li.hc-pp-k::before, #hc-pp li.hc-pp-k::marker { content: none; }\n  #hc-pp button.hc-pp-key { display: flex; flex-direction: column; width: 100%; min-width: 0; height: 214px; padding: 4px 4px 5px; border: 0; margin: 0;\n    background: #fff; border-radius: 3px 3px 14px 14px; cursor: pointer; font: inherit; letter-spacing: 0; text-transform: none; color: inherit;\n    box-shadow: 0 1px 1px rgba(73, 46, 70, .12), 0 6px 14px -6px rgba(73, 46, 70, .35);\n    transition: transform .12s ease, box-shadow .12s ease; -webkit-tap-highlight-color: transparent;\n    /* soloing: a finger sweeping sideways (or held still a moment) plays the bands; an up-or-down swipe still scrolls the page */\n    touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }\n  /* each band overlaps the one above with a slightly uneven top edge, like paint or cut paper */\n  #hc-pp .hc-pp-key span { display: block; flex: var(--share) 1 0; min-height: 9px; margin-top: -4px; clip-path: var(--edge);\n    transition: transform .6s ease, filter .6s ease; }\n  #hc-pp .hc-pp-key span:first-child { margin-top: 0; clip-path: none; border-radius: 1px 1px 0 0; }\n  #hc-pp .hc-pp-key span:last-child { border-radius: 0 0 11px 11px; }\n  #hc-pp .hc-pp-key span.lit { transform: scaleX(1.22); filter: brightness(1.08) saturate(1.25); transition: transform .08s ease-out, filter .08s; }\n  #hc-pp button.hc-pp-key:hover { background: #fff; box-shadow: 0 1px 1px rgba(73, 46, 70, .12), 0 10px 18px -6px rgba(73, 46, 70, .4); }\n  #hc-pp button.hc-pp-key.down { transform: translateY(5px); box-shadow: 0 1px 1px rgba(73, 46, 70, .15), 0 2px 5px -2px rgba(73, 46, 70, .35); }\n  #hc-pp button.hc-pp-key:focus { outline: none; }\n  #hc-pp button.hc-pp-key:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n\n  /* the title only shows on hover, focus, or after a press: the work stands on its own */\n  #hc-pp a.hc-pp-tag { position: absolute; left: 50%; top: calc(100% + 10px); z-index: 2; width: max-content; max-width: 210px;\n    transform: translateX(-50%) rotate(calc(var(--tilt) * -1.4)); padding: 7px 12px 8px; background: #fff !important; color: inherit !important;\n    border-radius: 3px; font-size: 14px; line-height: 1.3; text-decoration: none; text-align: center;\n    box-shadow: 0 6px 14px -6px rgba(73, 46, 70, .4); opacity: 0; pointer-events: none; transition: opacity .15s; }\n  #hc-pp li.hc-pp-k[data-edge=\"l\"] a.hc-pp-tag { left: 0; transform: rotate(calc(var(--tilt) * -1.4)); text-align: left; }\n  #hc-pp li.hc-pp-k[data-edge=\"r\"] a.hc-pp-tag { left: auto; right: 0; transform: rotate(calc(var(--tilt) * -1.4)); text-align: right; }\n  #hc-pp .hc-pp-tag b { display: block; font-weight: bold; }\n  #hc-pp .hc-pp-tag i { font-style: normal; color: rgba(73, 46, 70, .66); text-decoration: underline; text-underline-offset: 3px; }\n  #hc-pp .hc-pp-tag:hover i { color: #492E46; }\n  #hc-pp a.hc-pp-tag:focus { outline: none; }\n  #hc-pp a.hc-pp-tag:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 2px; }\n  #hc-pp li.hc-pp-k:hover a.hc-pp-tag, #hc-pp li.hc-pp-k:focus-within a.hc-pp-tag, #hc-pp li.hc-pp-k.on a.hc-pp-tag { opacity: 1; pointer-events: auto; }\n  #hc-pp li.hc-pp-k:hover, #hc-pp li.hc-pp-k:focus-within, #hc-pp li.hc-pp-k.on { z-index: 3; }\n  #hc-pp ul.hc-pp-keys:has(li.hc-pp-k:hover) li.hc-pp-k.on:not(:hover):not(:focus-within) a.hc-pp-tag { opacity: 0; pointer-events: none; }\n  #hc-pp li.hc-pp-k { scroll-margin: 96px 0 140px; }   /* clear of Cargo's fixed header and the buttons at the bottom */\n  @media (max-width: 1000px) { #hc-pp ul.hc-pp-keys { --cols: 14; } }\n\n  /* sound on/off: bottom left, the blobs' pause button (and 1999 mode's way back) keep the bottom right */\n  button.hc-pp-quiet { display: none; position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 1001;\n    min-height: 44px; margin: 0; padding: 0 18px; border: 0; border-radius: 999px; background: #492E46; color: #F3DCDF;\n    font-family: pacaembu, sans-serif; font-size: 15px; font-weight: normal; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;\n    box-shadow: 0 6px 16px -6px rgba(73, 46, 70, .5); }\n  html.hc-pp-on button.hc-pp-quiet { display: inline-flex; align-items: center; }\n  button.hc-pp-quiet[aria-pressed=\"true\"] { background: #fff; color: #492E46; }\n  button.hc-pp-quiet:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n  html.hc-ns button.hc-pp-quiet { bottom: 40px; background: #c0c0c0 !important; color: #000 !important; border: 2px solid !important;\n    border-color: #fff #404040 #404040 #fff !important; border-radius: 0; box-shadow: none !important; font-family: Arial, Helvetica, sans-serif !important; }\n  html.hc-gc button.hc-pp-quiet { background: #ff00ff !important; color: #ffff00 !important; border: 3px outset #ff99ff !important; box-shadow: none !important; }\n\n  @media (max-width: 760px) {\n    #hc-pp { padding: 22px 0 110px; }\n    #hc-pp a.hc-pp-back { margin-bottom: 10px; font-size: 17px; }\n    #hc-pp h1 { font-size: 34px; margin-bottom: 8px; }\n    #hc-pp p.hc-pp-lede { font-size: 18px; margin-bottom: 30px; }\n  }\n  @media (max-width: 600px) {\n    #hc-pp ul.hc-pp-keys { --cols: 7; gap: 28px 7px; }\n    #hc-pp button.hc-pp-key { height: 150px; padding: 3px 3px 4px; }\n    #hc-pp a.hc-pp-tag { max-width: 170px; }\n  }\n  @media (prefers-reduced-motion: reduce) {\n    #hc-pp button.hc-pp-key, #hc-pp .hc-pp-key span, #hc-pp a.hc-pp-tag { transition: none !important; }\n    #hc-pp button.hc-pp-key.down, #hc-pp .hc-pp-key span.lit { transform: none; }\n  }\n\n  /* the beat maker (from the mockup's drums.js): \"Make a beat\" right of the sound switch (placed by measuring, see place()), the\n     panel above them; both on <body>, only on this page. Everything under its own ids, so Cargo's button, select and input\n     styles stay out (#hc-pp-pd-panel button etc. reset them; the class rules after them win over the reset) */\n  #hc-pp-pd-btn { display: none; position: fixed; left: 200px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 1001;\n    min-height: 44px; margin: 0; padding: 0 18px; border: 0; border-radius: 999px; background: #fff; color: #492E46;\n    font-family: pacaembu, sans-serif; font-size: 15px; font-weight: normal; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;\n    box-shadow: 0 6px 16px -6px rgba(73, 46, 70, .5); -webkit-tap-highlight-color: transparent; }\n  html.hc-pp-on #hc-pp-pd-btn { display: inline-flex; align-items: center; }\n  #hc-pp-pd-btn[aria-expanded=\"true\"] { background: #492E46; color: #F3DCDF; }\n  #hc-pp-pd-btn:focus { outline: none; }\n  #hc-pp-pd-btn:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n  html.hc-ns #hc-pp-pd-btn { background: #c0c0c0 !important; color: #000 !important; border: 2px solid !important;\n    border-color: #fff #404040 #404040 #fff !important; border-radius: 0; box-shadow: none !important; font-family: Arial, Helvetica, sans-serif !important; }\n  html.hc-ns #hc-pp-pd-btn[aria-expanded=\"true\"] { border-color: #404040 #fff #fff #404040 !important; }\n  html.hc-gc #hc-pp-pd-btn { background: #ff00ff !important; color: #ffff00 !important; border: 3px outset #ff99ff !important; box-shadow: none !important; }\n  html.hc-gc #hc-pp-pd-btn[aria-expanded=\"true\"] { border-style: inset !important; }\n\n  #hc-pp-pd-panel { position: fixed; left: 16px; right: 16px; bottom: 72px; z-index: 1001; box-sizing: border-box; max-width: 780px; margin: 0 auto;\n    padding: 12px 14px 14px; border: 0; background: #fff; color: #492E46; border-radius: 6px 6px 16px 16px;\n    font: 15px/1.3 pacaembu, sans-serif; letter-spacing: .04em; text-align: left; text-transform: none;\n    box-shadow: 0 1px 1px rgba(73, 46, 70, .12), 0 14px 30px -10px rgba(73, 46, 70, .45); transform: rotate(-.3deg); transform-origin: 50% 100%;\n    max-height: calc(100vh - 120px); overflow-y: auto; overscroll-behavior: contain; }   /* desktop: only a safety net; the layout is compact enough that nothing scrolls at 1280x680 and up */\n  #hc-pp-pd-panel[hidden], html:not(.hc-pp-on) #hc-pp-pd-panel { display: none !important; }\n  #hc-pp-pd-panel * { box-sizing: border-box; }\n  #hc-pp-pd-panel div, #hc-pp-pd-panel span, #hc-pp-pd-panel label { margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: none; }\n  #hc-pp-pd-panel button, #hc-pp-pd-panel select, #hc-pp-pd-panel input { margin: 0; padding: 1px 6px; border: 0; background: none; box-shadow: none; text-transform: none;\n    font: inherit; letter-spacing: .04em; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }\n  #hc-pp-pd-panel button:focus, #hc-pp-pd-panel select:focus { outline: none; }\n  #hc-pp-pd-panel button:focus-visible, #hc-pp-pd-panel input:focus-visible, #hc-pp-pd-panel select:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 2px; }\n  #hc-pp-pd-panel .hc-pp-pd-top { position: sticky; top: -12px; z-index: 1; display: flex; align-items: center; gap: 10px; margin: -12px -14px 10px; padding: 12px 14px 0; background: #fff; }\n  #hc-pp-pd-panel .hc-pp-pd-go, #hc-pp-pd-panel .hc-pp-pd-shuf, #hc-pp-pd-panel .hc-pp-pd-clear, #hc-pp-pd-panel .hc-pp-pd-x { min-height: 40px; border: 0; border-radius: 999px; padding: 0 16px; }\n  #hc-pp-pd-panel .hc-pp-pd-go { background: #492E46; color: #F3DCDF; min-width: 84px; }\n  #hc-pp-pd-panel .hc-pp-pd-clear, #hc-pp-pd-panel .hc-pp-pd-shuf { background: rgba(73, 46, 70, .09); }\n  #hc-pp-pd-panel .hc-pp-pd-shuf[aria-pressed=\"true\"] { background: #492E46; color: #F3DCDF; }\n  #hc-pp-pd-panel .hc-pp-pd-x { margin-left: auto; background: none; min-width: 40px; padding: 0 10px; color: rgba(73, 46, 70, .66); }\n  #hc-pp-pd-panel .hc-pp-pd-speed { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; max-width: 300px; }\n  #hc-pp-pd-panel .hc-pp-pd-speed label { color: rgba(73, 46, 70, .66); font-size: 14px; }\n  #hc-pp-pd-panel .hc-pp-pd-num { min-width: 2.2em; text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; }\n  #hc-pp-pd-panel .hc-pp-pd-speed input { flex: 1; min-width: 0; width: auto; height: 28px; padding: 0; accent-color: #492E46; margin: 0; }\n  #hc-pp-pd-panel .hc-pp-pd-main { display: block; }\n  #hc-pp-pd-panel .hc-pp-pd-rows { display: grid; gap: 5px; }\n  #hc-pp-pd-panel .hc-pp-pd-row { display: grid; grid-template-columns: 126px 1fr; align-items: center; gap: 6px; }\n  #hc-pp-pd-panel .hc-pp-pd-name { font-size: 14px; color: rgba(73, 46, 70, .66); }\n  #hc-pp-pd-panel .hc-pp-pd-pname { display: flex; align-items: center; gap: 4px; min-width: 0; }\n  #hc-pp-pd-panel .hc-pp-pd-pick { flex: 1; min-width: 0; height: 30px; padding: 0 4px; border: 0; border-radius: 5px; background: rgba(73, 46, 70, .09); color: #492E46; font: inherit; font-size: 13px; letter-spacing: .02em; cursor: pointer; text-overflow: ellipsis; }\n  #hc-pp-pd-panel .hc-pp-pd-steps { display: grid; grid-template-columns: repeat(16, 1fr); gap: 4px; }\n  #hc-pp-pd-panel .hc-pp-pd-step { height: 30px; min-width: 0; padding: 0; border: 0; border-radius: 5px; background: rgba(73, 46, 70, .09); }\n  #hc-pp-pd-panel .hc-pp-pd-step.hc-pp-pd-b { background: rgba(73, 46, 70, .17); }\n  #hc-pp-pd-panel .hc-pp-pd-step[aria-pressed=\"true\"] { background: #492E46; }\n  #hc-pp-pd-panel .hc-pp-pd-step.hc-pp-pd-now { transform: translateY(-2px); background: rgba(73, 46, 70, .4); }\n  #hc-pp-pd-panel .hc-pp-pd-step.hc-pp-pd-now[aria-pressed=\"true\"] { background: #8d6a89; }\n  #hc-pp-pd-panel .hc-pp-pd-left > .hc-pp-pd-grp { margin-top: 12px; }\n  #hc-pp-pd-panel .hc-pp-pd-pads { display: grid; gap: 8px; margin-top: 12px; }\n  #hc-pp-pd-panel .hc-pp-pd-grp { min-width: 0; }\n  #hc-pp-pd-panel .hc-pp-pd-cap { display: block; margin: 0 0 4px; font-size: 13px; color: rgba(73, 46, 70, .66); }\n  #hc-pp-pd-panel .hc-pp-pd-fills { display: flex; gap: 8px; }\n  #hc-pp-pd-panel .hc-pp-pd-fill { flex: 1; min-width: 72px; height: 50px; border: 0; border-radius: 10px; background: #F3DCDF; font-weight: 700; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none; box-shadow: 0 2px 0 rgba(73, 46, 70, .25); }\n  #hc-pp-pd-panel .hc-pp-pd-fill.hc-pp-pd-on { transform: translateY(2px); box-shadow: none; background: #492E46; color: #F3DCDF; }\n  #hc-pp-pd-panel .hc-pp-pd-says { display: flex; flex-wrap: wrap; gap: 6px 5px; }\n  #hc-pp-pd-panel .hc-pp-pd-say { min-width: 0; min-height: 44px; padding: 0 10px; border: 0; border-radius: 10px; background: #F3DCDF; font-size: 14px; user-select: none; -webkit-user-select: none; box-shadow: 0 2px 0 rgba(73, 46, 70, .25); }\n  #hc-pp-pd-panel .hc-pp-pd-say:active, #hc-pp-pd-panel .hc-pp-pd-say.hc-pp-pd-on { transform: translateY(2px); box-shadow: none; }\n  #hc-pp-pd-panel .hc-pp-pd-say.hc-pp-pd-on { background: #492E46; color: #F3DCDF; }\n  #hc-pp-pd-panel .hc-pp-pd-say[aria-disabled=\"true\"] { opacity: .42; cursor: default; box-shadow: none; background: rgba(73, 46, 70, .07); }\n  #hc-pp-pd-panel .hc-pp-pd-say[aria-disabled=\"true\"]:active { transform: none; }\n  @media (min-width: 1000px) {   /* wide screens: the step grid left, fills and pads in a column right, so the panel is short and nothing scrolls */\n    #hc-pp-pd-panel { max-width: 1200px; padding: 10px 16px 12px; }\n    #hc-pp-pd-panel .hc-pp-pd-top { top: -10px; margin: -10px -16px 8px; padding: 10px 16px 0; }\n    #hc-pp-pd-panel .hc-pp-pd-main { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 0 26px; align-items: start; }\n    #hc-pp-pd-panel .hc-pp-pd-rows { gap: 4px; }\n    #hc-pp-pd-panel .hc-pp-pd-step { height: 28px; }\n    #hc-pp-pd-panel .hc-pp-pd-left > .hc-pp-pd-grp { margin-top: 10px; }\n    #hc-pp-pd-panel .hc-pp-pd-pads { margin-top: 0; gap: 6px; }\n    #hc-pp-pd-panel .hc-pp-pd-fill { height: 40px; }\n    #hc-pp-pd-panel .hc-pp-pd-say { min-height: 36px; }\n  }\n  @media (max-width: 640px) {\n    #hc-pp-pd-panel { left: 10px; right: 10px; bottom: 68px; padding: 10px 10px 12px; max-height: 36vh; overflow-y: auto; overscroll-behavior: contain; }\n    #hc-pp-pd-panel .hc-pp-pd-top { position: sticky; top: -10px; z-index: 1; background: #fff; margin: -10px -10px 8px; padding: 10px 10px 6px; gap: 8px; }\n    #hc-pp-pd-panel .hc-pp-pd-go, #hc-pp-pd-panel .hc-pp-pd-shuf, #hc-pp-pd-panel .hc-pp-pd-clear { padding: 0 12px; min-width: 0; }\n    #hc-pp-pd-panel .hc-pp-pd-speed label { display: none; }\n    #hc-pp-pd-panel .hc-pp-pd-top { flex-wrap: wrap; row-gap: 2px; }\n    #hc-pp-pd-panel .hc-pp-pd-speed { order: 9; flex: 1 0 100%; max-width: none; }\n    #hc-pp-pd-panel .hc-pp-pd-row { grid-template-columns: 1fr; gap: 2px; }\n    #hc-pp-pd-panel .hc-pp-pd-pname { gap: 8px; } #hc-pp-pd-panel .hc-pp-pd-pick { flex: none; max-width: 60%; height: 34px; padding: 0 8px; font-size: 14px; }\n    #hc-pp-pd-panel .hc-pp-pd-name { font-size: 13px; line-height: 1; }\n    #hc-pp-pd-panel .hc-pp-pd-steps { grid-template-columns: repeat(8, 1fr); gap: 4px; }\n    #hc-pp-pd-panel .hc-pp-pd-step { height: 30px; }\n    #hc-pp-pd-panel .hc-pp-pd-fill { height: 44px; }\n    #hc-pp-pd-panel .hc-pp-pd-say { padding: 0 12px; }\n  }\n  @media (prefers-reduced-motion: reduce) {\n    #hc-pp-pd-panel *, #hc-pp-pd-btn { transition: none !important; animation: none !important; }\n    #hc-pp-pd-panel .hc-pp-pd-step.hc-pp-pd-now, #hc-pp-pd-panel .hc-pp-pd-fill.hc-pp-pd-on, #hc-pp-pd-panel .hc-pp-pd-say:active, #hc-pp-pd-panel .hc-pp-pd-say.hc-pp-pd-on { transform: none; }\n  }\n"; document.head.appendChild(s); })();
 (function () {
   if (window.__hcPalettePiano) return;
   window.__hcPalettePiano = true;
@@ -240,8 +240,8 @@
   /* ---------- the page ---------- */
   var HTML =
     '<a class="hc-pp-back" href="/playthings">← playthings</a>' +
-    '<h1>Proper palette piano player</h1>' +
-    '<p class="hc-pp-lede">Every project as a strip of its own colors, for you to click\'n play.</p>' +
+    '<h1>Proper palette piano player 2.0 (Voice Enhanced™)</h1>' +
+    '<p class="hc-pp-lede">I took the colours from all my projects and made a grand “piano”. With my voice as an expansion pack. Click ’n’ play &amp; plonk away.</p>' +
     '<p class="hc-pp-sr" id="hc-pp-keyhelp">Use the arrow keys to move between projects. Enter or Space plays the colours, and Tab goes to the link for that project.</p>' +
     '<ul class="hc-pp-keys" id="hc-pp-keys" aria-label="Palette piano, one key for each project" aria-describedby="hc-pp-keyhelp"></ul>';
   var PLANS = {};   // every strip's plan, worked out once (the same every visit)
@@ -909,13 +909,13 @@
   };
 })();
 /* The beat maker: a small drum machine, fill pads and voice pads, for the palette piano page only.
-   Ported from mockups/palette-piano/drums.js (approved by Halli 2026-11-17); the logic is the mockup's, unchanged, except for
+   Ported from mockups/palette-piano/drums.js (approved by Halli 2026-11-17); the logic is the mockup's (as changed 2026-11-17 for "2.0": a perc row instead of the voice row, shuffle, a two-column panel), except for
    the fencing for the live site: every id and class is prefixed hc-pp-pd-, the CSS is in the <style> above under
    #hc-pp-pd-btn / #hc-pp-pd-panel, the pill and panel live on <body> only while the page address contains "palette-piano"
    (taken away again when the visitor leaves: the beat stops, fills and recordings are let go, the panel closes), the pill sits
    right of "Turn the sound off" (measured, see place()), and the owner's recordings come from assets/palette-piano/ on
    GitHub Pages, fetched only once the visitor reaches for the piano or the beat maker. Missing recordings: the pads stay
-   greyed out, the voice row is silent and the piano plays its synths instead.
+   greyed out and the piano plays its synths instead.
    Uses window.PalettePiano.audio() ({ ctx, out }). Provides window.PPClock, window.PPVoices and window.PPDrums. */
 (function () {
   'use strict';
@@ -927,13 +927,16 @@
                    : 'https://hallicivelek.github.io/hallicivelek-site/assets/palette-piano/';
 
   /* ---------------------------------------------------------------- state */
-  var ROWS = ['kick', 'snare', 'hi-hat', 'voice'];
-  var VROW = 3;
+  var ROWS = ['kick', 'snare', 'hi-hat', 'perc'];
+  var PROW = 3;
+  var PERCS = [['rim', 'rim shot'], ['tom', 'tom'], ['cowbell', 'cowbell'], ['clave', 'clave'], ['clap', 'clap']];   // the perc row's sounds (picker)
+  var percRow = 'rim';
+  var shuffleOn = false, SWING = 0.3;   // shuffle: every second sixteenth (steps 2, 4, 6 ...) comes 0.3 of a sixteenth late (a 65/35 swing)
   var DEFAULT = [
     [1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0],   // four on the floor
     [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0],   // snare on 2 and 4
     [0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0],   // offbeat hats
-    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]    // voice: empty until the owner fills it
+    [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]    // perc: empty until the owner fills it
   ];
   var pat = DEFAULT.map(function (r) { return r.map(function (x) { return !!x; }); });
   var bpm = 118, BPM_MIN = 80, BPM_MAX = 150;
@@ -1033,6 +1036,27 @@
     clap: function (c, d, t, v) {
       [0, 0.011, 0.022].forEach(function (o) { hiss(c, d, t + o, 'bandpass', 1300, 1.4, 0.55 * v, 0.02, o * 7); });
       hiss(c, d, t + 0.033, 'bandpass', 1300, 1.2, 0.5 * v, 0.16, 0.3);
+    },
+    rim: function (c, d, t, v) {           // 808 rim shot: a very short high tuned click, a low knock and a little band-passed noise
+      tone(c, d, 'sine', t, 1750, 1550, 0.008, 0.5 * v, 0.03);
+      tone(c, d, 'triangle', t, 480, 440, 0.01, 0.3 * v, 0.03);
+      hiss(c, d, t, 'bandpass', 3400, 1.2, 0.3 * v, 0.018, 0.2);
+    },
+    cowbell: function (c, d, t, v) {       // 808 cowbell: two detuned squares (540 and 800 Hz) through a band-pass, short decay
+      var bp = c.createBiquadFilter(), g = c.createGain();
+      bp.type = 'bandpass'; bp.frequency.value = 800; bp.Q.value = 1.2;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(0.5 * v, t + 0.002);
+      g.gain.exponentialRampToValueAtTime(0.16 * v, t + 0.035);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.26);
+      bp.connect(g); g.connect(d);
+      [540, 800].forEach(function (f) {
+        var o = c.createOscillator(); o.type = 'square'; o.frequency.value = f;
+        o.connect(bp); o.start(t); o.stop(t + 0.3);
+      });
+    },
+    clave: function (c, d, t, v) {         // 808 clave: a short sine around 2.5 kHz
+      tone(c, d, 'sine', t, 2600, 2450, 0.01, 0.6 * v, 0.07);
     }
   };
   var TOM = [210, 165, 128, 98];
@@ -1062,17 +1086,17 @@
     if (pat[0][s]) ev.push({ name: 'kick', at: 0, v: 0.95 });
     if (pat[1][s]) ev.push({ name: 'snare', at: 0, v: 0.85 });
     if (pat[2][s]) ev.push({ name: 'hat', at: 0, v: s % 4 === 2 ? 0.8 : 0.55 });
-    if (pat[VROW][s]) ev.push({ name: 'voice', at: 0, v: 1 });
+    if (pat[PROW][s]) ev.push({ name: percRow, at: 0, v: 0.9 });
     return ev;
   }
   function playEvent(c, d, e, t, sx) {
     var tt = t + e.at * sx;
-    if (e.name === 'voice') { voiceRowHit(tt); return; }
     if (e.name === 'tom') V.tom(c, d, tt, e.v, e.f); else V[e.name](c, d, tt, e.v);
   }
 
   /* ---------------------------------------------------------------- clock and scheduler */
   function sixteenth() { return 60 / bpm / 4; }
+  function swung(n, t) { return shuffleOn && n % 2 === 1 ? t + SWING * sixteenth() : t; }   // the time step n really sounds, given the straight grid time t
   function fillActive(n) {
     if (!fillName) return false;
     if (fillStart < 0) { fillStart = n; fillMin = Math.ceil((n + 2) / 4) * 4; }
@@ -1096,8 +1120,9 @@
     if (!audio) return;
     var c = audio.ctx, now = c.currentTime;
     while (T.next < now + LOOK) {
-      scheduleStep(T.n, T.next);
-      T.queue.push({ t: T.next, s: T.n % 16 });
+      var at = swung(T.n, T.next);
+      scheduleStep(T.n, at);
+      T.queue.push({ t: at, s: T.n % 16 });
       T.n++; T.next += sixteenth();
     }
     while (T.queue.length && T.queue[0].t < now - 1) T.queue.shift();
@@ -1158,7 +1183,8 @@
       var now = audio.ctx.currentTime;
       if (!T.timer || T.paused) return now;
       for (var i = 0; i < T.queue.length; i++) if (T.queue[i].t >= now) return T.queue[i].t;
-      return T.next > now ? T.next : now;
+      var nt = swung(T.n, T.next);
+      return nt > now ? nt : now;
     }
   };
 
@@ -1185,6 +1211,7 @@
     { name: 'oh-yea', file: 'oh-yea.mp3', label: 'oh yea', group: 'voice' },
     { name: 'rastafari', file: 'rastafari.mp3', label: 'rastafari', group: 'voice' },
     { name: 'wiggedy-wah', file: 'wiggedy-wah.mp3', label: 'wiggedy wah', group: 'voice' },
+    { name: 'bombaclat', file: 'bombaclat.mp3', label: 'bombaclat', group: 'voice' },
     { name: 'chord-1', file: 'chord-1.mp3', label: 'chord 1', group: 'chord' },
     { name: 'chord-2a', file: 'chord-2a.mp3', label: 'chord 2a', group: 'chord' },
     { name: 'chord-2b', file: 'chord-2b.mp3', label: 'chord 2b', group: 'chord' },
@@ -1192,7 +1219,6 @@
     { name: 'chord-2d', file: 'chord-2d.mp3', label: 'chord 2d', group: 'chord' }
   ];
   var voices = {};   // key -> { buf, base (seconds of leading silence skipped), dur (playable), lvl (level-matching gain), peak, trimmed }
-  var VOICE_DEFAULT = 'diou';
   var TARGET_PEAK = 0.35, SAY_GAIN = 0.8, SILENCE_MIN = 0.03, EDGE = 0.008;
   function vkey(n) { return String(n).toLowerCase().replace(/['’]/g, '').replace(/\s+/g, '-'); }
 
@@ -1271,14 +1297,6 @@
   };
   window.PPVoices = PPVoices;
 
-  /* the voice row: one recording, each trigger cuts the previous one off */
-  var voiceRow = VOICE_DEFAULT, rowHit = null;
-  function voiceRowHit(t) {
-    if (!PPVoices.has(voiceRow)) return;
-    if (rowHit) rowHit.stop(t);
-    rowHit = PPVoices.say(voiceRow, t);
-  }
-
   /* pads: a hit restarts the recording if it still sounds */
   var padHit = {};
   function padPress(m) {
@@ -1295,6 +1313,12 @@
     clearTimeout(u.timer);
     u.b.classList.toggle('hc-pp-pd-on', ms > 0);
     if (ms > 0) u.timer = setTimeout(function () { lightPad(m, 0); }, ms);
+  }
+
+  /* ---------------------------------------------------------------- shuffle: only changes when a step sounds, never which steps play */
+  function setShuffle(on) {
+    shuffleOn = !!on;
+    if (ui.shuf) { ui.shuf.setAttribute('aria-pressed', String(shuffleOn)); ui.shuf.textContent = shuffleOn ? 'Shuffle: on' : 'Shuffle: off'; }
   }
 
   /* ---------------------------------------------------------------- tempo */
@@ -1335,6 +1359,7 @@
 
     var top = el('div', 'hc-pp-pd-top');
     ui.go = el('button', 'hc-pp-pd-go', 'Play', { type: 'button' });
+    ui.shuf = el('button', 'hc-pp-pd-shuf', 'Shuffle: off', { type: 'button', 'aria-pressed': 'false', 'aria-label': 'Shuffle' });
     ui.clear = el('button', 'hc-pp-pd-clear', 'Clear', { type: 'button' });
     var sp = el('div', 'hc-pp-pd-speed');
     var lab = el('label', null, 'Speed', { for: 'hc-pp-pd-tempo' });
@@ -1342,19 +1367,19 @@
     ui.num = el('span', 'hc-pp-pd-num', String(bpm), { 'aria-hidden': 'true' });
     sp.appendChild(lab); sp.appendChild(ui.tempo); sp.appendChild(ui.num);
     ui.x = el('button', 'hc-pp-pd-x', 'Close', { type: 'button' });
-    top.appendChild(ui.go); top.appendChild(sp); top.appendChild(ui.clear); top.appendChild(ui.x);
+    top.appendChild(ui.go); top.appendChild(ui.shuf); top.appendChild(sp); top.appendChild(ui.clear); top.appendChild(ui.x);
     p.appendChild(top);
 
     var rows = el('div', 'hc-pp-pd-rows');
     ROWS.forEach(function (name, r) {
       var row = el('div', 'hc-pp-pd-row');
-      if (r === VROW) {
-        var vn = el('div', 'hc-pp-pd-name hc-pp-pd-vname');
+      if (r === PROW) {
+        var vn = el('div', 'hc-pp-pd-name hc-pp-pd-pname');
         vn.appendChild(el('span', null, name, { 'aria-hidden': 'true' }));
-        var sel = ui.pick = el('select', 'hc-pp-pd-pick', null, { 'aria-label': 'Recording for the voice row' });
-        MANIFEST.forEach(function (m) { sel.appendChild(el('option', null, m.label, { value: m.name })); });
-        sel.value = voiceRow;
-        sel.addEventListener('change', function () { voiceRow = sel.value; });
+        var sel = ui.pick = el('select', 'hc-pp-pd-pick', null, { 'aria-label': 'Sound for the perc row' });
+        PERCS.forEach(function (x) { sel.appendChild(el('option', null, x[1], { value: x[0] })); });
+        sel.value = percRow;
+        sel.addEventListener('change', function () { percRow = sel.value; });
         vn.appendChild(sel); row.appendChild(vn);
       } else row.appendChild(el('span', 'hc-pp-pd-name', name));
       var steps = el('div', 'hc-pp-pd-steps', null, { role: 'group', 'aria-label': name + ' steps' });
@@ -1380,7 +1405,8 @@
       }
       row.appendChild(steps); rows.appendChild(row);
     });
-    p.appendChild(rows);
+    var main = el('div', 'hc-pp-pd-main'), left = el('div', 'hc-pp-pd-left');
+    left.appendChild(rows);
 
     var pads = el('div', 'hc-pp-pd-pads');
     var g1 = el('div', 'hc-pp-pd-grp'); g1.appendChild(el('span', 'hc-pp-pd-cap', 'Fills: hold one'));
@@ -1421,13 +1447,15 @@
       return g;
     }
     var g2 = padGroup('Voices', 'voice'), g3 = padGroup('Chords', 'chord');
-    pads.appendChild(g1); pads.appendChild(g2); pads.appendChild(g3); p.appendChild(pads);
+    pads.appendChild(g2); pads.appendChild(g3);
+    left.appendChild(g1); main.appendChild(left); main.appendChild(pads); p.appendChild(main);
 
     ui.btn.addEventListener('click', function () { openPanel(p.hidden); });
     ui.x.addEventListener('click', function () { openPanel(false); ui.btn.focus(); });
     // Esc closes the panel and goes no further: Cargo leaves the page on Esc (a document keydown listener)
     p.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.stopPropagation(); openPanel(false); ui.btn.focus(); } });
     ui.go.addEventListener('click', function () { if (T.patOn) stop(); else play(); });
+    ui.shuf.addEventListener('click', function () { setShuffle(!shuffleOn); });
     ui.clear.addEventListener('click', function () {
       for (var r = 0; r < ROWS.length; r++) for (var c = 0; c < 16; c++) setStep(r, c, false);
     });
@@ -1500,7 +1528,6 @@
     T.patOn = false; held = []; fillName = null; fillStart = -1;
     (ui.fillOff || []).forEach(function (off) { off(); });
     stopTimer(); syncUI();
-    if (rowHit) rowHit.stop(); rowHit = null;
     for (var k in padHit) { if (padHit[k]) padHit[k].stop(); lightPad(ui.says[k].m, 0); }
     padHit = {};
     openPanel(false);
@@ -1532,7 +1559,9 @@
     pattern: function () { return pat.map(function (r) { return r.map(function (x) { return x ? 1 : 0; }); }); },
     set: function (row, step, on) { setStep(row, step, on); },
     play: play, stop: stop, fill: fill,
-    voiceRow: function (n) { if (n != null) { voiceRow = vkey(n); if (ui.pick) ui.pick.value = voiceRow; } return voiceRow; },
+    percRow: function (n) { if (n != null && PERCS.some(function (p) { return p[0] === n; })) { percRow = n; if (ui.pick) ui.pick.value = n; } return percRow; },
+    shuffle: function (on) { if (on != null) setShuffle(on); return shuffleOn; },
+    _swing: SWING,
     _voiceInfo: function (n) { var v = voices[vkey(n)]; return v ? { base: v.base, dur: v.dur, lvl: v.lvl, peak: v.peak, lead: v.lead } : null; },
     open: openPanel,
     setBpm: setBpm,
@@ -1547,4 +1576,4 @@
   /* ---------------------------------------------------------------- go: built the first time the piano page is shown; hc-palette-piano's check() calls check() on every change */
   check();
 })();
-window.__hcBuild = "2026-11-17 00:41";
+window.__hcBuild = "2026-11-17 01:23";

@@ -539,9 +539,9 @@ async def main(base):
             await ph.screenshot(path=os.path.join(SHOTS, 'playthings-phone.png')); await ph.close()
         hid = await page.evaluate("[...document.querySelectorAll('.thumbnails, #hc-sort')].every(e => getComputedStyle(e).display === 'none')")
         check("playthings: Cargo's project grid is hidden", hid)
-        check('playthings: six cards in order, intro, Cargo fallback hidden, the pencil loaded', r['cards'] == ['Birth-a-blob', 'Music Kontrapunkt Kontrol', 'Proper palette piano player', 'Shakeskin', 'The Calculater', 'The blob-pond'] and (r['pencil'] or 0) > 0
+        check('playthings: six cards in order, intro, Cargo fallback hidden, the pencil loaded', r['cards'] == ['Birth-a-blob', 'Music Kontrapunkt Kontrol', 'Proper palette piano player 2.0 (Voice Enhanced™)', 'Shakeskin', 'The Calculater', 'The blob-pond'] and (r['pencil'] or 0) > 0
               and r['intro'] == "Things I've built and kept running (some since 2004)." and r['fallbackHidden'] and r['outsideNewTab'], str(r))
-        pp = await page.evaluate("""() => { const a = [...document.querySelectorAll('#hc-pt a.hc-pt-card')].find(a => a.querySelector('h2').firstChild.textContent === 'Proper palette piano player');
+        pp = await page.evaluate("""() => { const a = [...document.querySelectorAll('#hc-pt a.hc-pt-card')].find(a => a.querySelector('h2').firstChild.textContent === 'Proper palette piano player 2.0 (Voice Enhanced™)');
           return a ? { href: a.getAttribute('href'), blank: a.target, keys: a.querySelectorAll('.hc-pt-win svg g[clip-path]').length, media: a.querySelectorAll('audio, iframe, img').length } : null; }""")
         check('playthings: the palette piano card links to /palette-piano on this site, a silent picture of six keys', bool(pp) and pp['href'] == '/palette-piano' and pp['blank'] == '' and pp['keys'] == 6 and pp['media'] == 0, str(pp))
         await page.hover('#hc-pt a.hc-pt-card >> nth=4'); await page.wait_for_timeout(400)
@@ -621,7 +621,7 @@ async def main(base):
         await page.goto(base + '/palette-piano/'); await page.wait_for_timeout(1500)
         r = await page.evaluate(PIANO)
         check('palette piano: built on its page (title, the line, back to playthings, one strip per project, Cargo styles kept out)',
-              r['title'] == 'Proper palette piano player' and r['lede'] == "Every project as a strip of its own colors, for you to click'n play."
+              r['title'] == 'Proper palette piano player 2.0 (Voice Enhanced™)' and r['lede'] == "I took the colours from all my projects and made a grand “piano”. With my voice as an expansion pack. Click ’n’ play & plonk away."
               and r['back'] == '/playthings' and r['keys'] == n_pal and r['bands'] >= n_pal * 3 and r['h1Color'] == 'rgb(73, 46, 70)' and r['keyBg'] == 'rgb(255, 255, 255)', str(r))
         check("palette piano: Cargo's content kept as a hidden fallback, the grid hidden, one Tab stop (strip + its title), titles hidden until asked",
               r['fallbackHidden'] and r['gridHidden'] and r['tabStops'] == 2 and r['titlesHidden'] == '0', str(r))
@@ -730,16 +730,16 @@ async def main(base):
         check('solo: sweeping across the strips with the button held lights their bands one by one, and starts no strip',
               r[0] >= 5 and r[1] == 0 and r[2]['ctx'] and r[2]['waiting'] == 0, str(r))
         await page.click('#hc-pp-pd-btn'); await page.wait_for_timeout(200)
-        await page.wait_for_function('window.__hcPaletteDrums.loaded() === 14', timeout=8000)
+        await page.wait_for_function('window.__hcPaletteDrums.loaded() === 15', timeout=8000)
         r = await page.evaluate("""() => { const p = document.getElementById('hc-pp-pd-panel'), go = p.querySelector('.hc-pp-pd-go'), st = p.querySelector('.hc-pp-pd-step'), sel = p.querySelector('select'), cs = e => getComputedStyle(e);
           return { open: !p.hidden, pill: document.getElementById('hc-pp-pd-btn').textContent, go: [cs(go).backgroundColor, cs(go).textTransform, cs(go).letterSpacing === '4px'],
             step: cs(st).borderTopWidth, select: [cs(sel).borderTopWidth, cs(sel).textTransform], pads: p.querySelectorAll('.hc-pp-pd-say[aria-disabled="false"]').length }; }""")
-        check('beat maker: the pill opens the panel; Cargo\'s button and select styles stay out; the recordings arrive (14 pads ready)',
-              r['open'] and r['pill'] == 'Hide the beat' and r['go'] == ['rgb(73, 46, 70)', 'none', False] and r['step'] == '0px' and r['select'] == ['0px', 'none'] and r['pads'] == 14
-              and len(asked) == 14 and all(u.endswith('.mp3') and '/assets/palette-piano/' in u for u in asked), f'{r} {len(asked)}')
+        check('beat maker: the pill opens the panel; Cargo\'s button and select styles stay out; the recordings arrive (15 pads ready)',
+              r['open'] and r['pill'] == 'Hide the beat' and r['go'] == ['rgb(73, 46, 70)', 'none', False] and r['step'] == '0px' and r['select'] == ['0px', 'none'] and r['pads'] == 15
+              and len(asked) == 15 and all(u.endswith('.mp3') and '/assets/palette-piano/' in u for u in asked), f'{r} {len(asked)}')
         pl = await page.evaluate(PLACE)
-        check('beat maker (1440 wide): the panel sits above the buttons, at most 45% of the screen tall (it scrolls inside), below the header',
-              pl['panel'] and pl['panelAbove'] and pl['panelShare'] <= 0.46 and pl['panelTop'] >= 64, str(pl))
+        check('beat maker (1440 wide): the panel sits above the buttons, under half the screen tall, nothing scrolling inside, below the header',
+              pl['panel'] and pl['panelAbove'] and pl['panelShare'] <= 0.5 and not pl['panelScrolls'] and pl['panelTop'] >= 64, str(pl))
         before = await page.evaluate('window.PPDrums.pattern()[0][1]')
         await page.click('#hc-pp-pd-panel .hc-pp-pd-step >> nth=1')
         after = await page.evaluate("[window.PPDrums.pattern()[0][1], document.querySelectorAll('#hc-pp-pd-panel .hc-pp-pd-step')[1].getAttribute('aria-pressed')]")
@@ -759,6 +759,86 @@ async def main(base):
         await page.click('#hc-pp-pd-panel .hc-pp-pd-go'); await page.wait_for_timeout(300)
         r = await page.evaluate("[window.PPClock.running, window.PPDrums._state().timer, document.querySelector('#hc-pp-pd-panel .hc-pp-pd-go').textContent]")
         check('beat maker: Stop ends the clock', r == [False, False, 'Play'], str(r))
+        # ---- perc row (the fourth row, empty by default, its picker chooses the sound), shuffle
+        r = await page.evaluate("""() => { const p = document.getElementById('hc-pp-pd-panel'), sel = p.querySelector('select'), pat = window.PPDrums.pattern();
+          return { rows: pat.length, percEmpty: pat[3].every(x => x === 0), selects: p.querySelectorAll('select').length, opts: [...sel.options].map(o => o.value + '|' + o.textContent), val: sel.value,
+            label: sel.getAttribute('aria-label'), names: [...p.querySelectorAll('.hc-pp-pd-row')].map(x => x.firstElementChild.textContent.replace(/rim shot.*$/, '').trim()),
+            groups: [...p.querySelectorAll('.hc-pp-pd-steps')].map(x => x.getAttribute('aria-label')), voiceWords: /voice row|Recording for/.test(p.innerHTML) }; }""")
+        check('perc row: four rows (kick, snare, hi-hat, perc), perc empty, one picker (rim shot, tom, cowbell, clave, clap; rim shot first), no voice row',
+              r['rows'] == 4 and r['percEmpty'] and r['selects'] == 1 and r['val'] == 'rim' and r['label'] == 'Sound for the perc row'
+              and r['opts'] == ['rim|rim shot', 'tom|tom', 'cowbell|cowbell', 'clave|clave', 'clap|clap'] and r['names'] == ['kick', 'snare', 'hi-hat', 'perc']
+              and r['groups'] == ['kick steps', 'snare steps', 'hi-hat steps', 'perc steps'] and not r['voiceWords'], str(r))
+        await page.click('#hc-pp-pd-panel .hc-pp-pd-row >> nth=3 >> .hc-pp-pd-step >> nth=4')
+        r = await page.evaluate("""() => { const b = document.querySelectorAll('#hc-pp-pd-panel .hc-pp-pd-row')[3].querySelectorAll('.hc-pp-pd-step')[4];
+          return [window.PPDrums.pattern()[3][4], b.getAttribute('aria-label'), b.getAttribute('aria-pressed')]; }""")
+        check('perc row: a click turns a step on ("perc, step 5, on") and it is in pattern()', r == [1, 'perc, step 5, on', 'true'], str(r))
+        await page.focus('#hc-pp-pd-panel .hc-pp-pd-row >> nth=2 >> .hc-pp-pd-step >> nth=9'); await page.keyboard.press('ArrowDown')
+        r1 = await page.evaluate("document.activeElement.getAttribute('aria-label')")
+        await page.keyboard.press('Space'); await page.keyboard.press('End')
+        r2 = await page.evaluate("[window.PPDrums.pattern()[3][9], document.activeElement.getAttribute('aria-label')]")
+        check('perc row: arrow down from hi-hat lands on perc in the same column, Space toggles, End moves along', r1 == 'perc, step 10, off' and r2 == [1, 'perc, step 16, off'], f'{r1} {r2}')
+        sounds = {}
+        for pick in ['rim', 'tom', 'cowbell', 'clave', 'clap']:
+            await page.select_option('#hc-pp-pd-panel select', pick)
+            sounds[pick] = await page.evaluate("[window.PPDrums.percRow(), window.PPDrums._stepEvents(4, true, null).filter(e => e.v === 0.9).map(e => e.name), window.PPDrums._stepEvents(5, true, null).length]")
+        check("perc row: the picker changes the sound the row plays (the events on step 5 carry the picked sound, nothing on an empty step)",
+              all(v == [k, [k], 0] for k, v in sounds.items()), str(sounds))
+        await page.select_option('#hc-pp-pd-panel select', 'cowbell')
+        await page.evaluate("() => { window.PPDrums.setBpm(150); window.__plog = []; window.PPDrums._log(window.__plog); window.PPDrums.play(); }"); await page.wait_for_timeout(1900)
+        await page.evaluate("window.PPDrums.stop()")
+        plog = await page.evaluate("() => { window.PPDrums._log(null); return window.__plog; }")
+        names = {(e['name'], e['step']) for e in plog if e['fill'] is None}
+        check('perc row: playing schedules the cowbell on its steps (5, 10) and no other sound for it', ('cowbell', 4) in names and ('cowbell', 9) in names and not any(n in ('rim', 'tom', 'clave') for n, _ in names), str(sorted(names)))
+        r = await page.evaluate("""async () => { const sr = 44100, out = {};
+          for (const n of ['rim', 'tom', 'cowbell', 'clave', 'clap', 'hat']) {
+            const oc = new OfflineAudioContext(1, sr, sr), bus = window.PPDrums._bus(oc, oc.destination); window.PPDrums._voices[n](oc, bus, 0.02, 0.9);
+            const d = (await oc.startRendering()).getChannelData(0); let pk = 0; for (const x of d) pk = Math.max(pk, Math.abs(x)); out[n] = +pk.toFixed(3); }
+          return out; }""")
+        check('perc row: every perc sound peaks in line with the hat and clap on the drum bus (0.08 to 0.4; a single hit)', all(0.08 <= r[k] <= 0.4 for k in ('rim', 'tom', 'cowbell', 'clave', 'clap')) and r['hat'] > 0.04, str(r))
+        await page.click('#hc-pp-pd-panel .hc-pp-pd-clear')
+        check('perc row: Clear empties it too', await page.evaluate("window.PPDrums.pattern().every(r => r.every(x => x === 0))"))
+
+        # shuffle: a toggle near play and tempo, off by default, aria-pressed; the off sixteenths come late by 0.3 of a sixteenth
+        r = await page.evaluate("""() => { const p = document.getElementById('hc-pp-pd-panel'), s = p.querySelector('.hc-pp-pd-shuf'), go = p.querySelector('.hc-pp-pd-go').getBoundingClientRect(), t = p.querySelector('#hc-pp-pd-tempo').getBoundingClientRect(), sb = s.getBoundingClientRect();
+          return { text: s.textContent, label: s.getAttribute('aria-label'), pressed: s.getAttribute('aria-pressed'), api: window.PPDrums.shuffle(), swing: window.PPDrums._swing, near: Math.abs(sb.top - go.top) < 10 && sb.left >= go.right && sb.right <= t.left + 1 }; }""")
+        check('shuffle: a button between play and speed, off by default (aria-pressed false), swing 0.3 of a sixteenth',
+              r == {'text': 'Shuffle: off', 'label': 'Shuffle', 'pressed': 'false', 'api': False, 'swing': 0.3, 'near': True}, str(r))
+        await page.evaluate("() => { for (let c = 0; c < 16; c++) window.PPDrums.set(2, c, true); window.PPDrums.setBpm(120); }")
+        async def hats(shuffle, ms=2300):
+            await page.evaluate("(on) => { window.PPDrums.shuffle(on); window.__slog = []; window.PPDrums._log(window.__slog); window.PPDrums.play(); }", shuffle); await page.wait_for_timeout(ms)
+            await page.evaluate("() => { window.PPDrums.stop(); window.PPDrums._log(null); }")
+            return await page.evaluate("window.__slog.filter(e => e.name === 'hat' && e.fill === null)")
+        def lateness(log, s16):   # how late each odd step is against the straight grid laid from the first even step, in sixteenths
+            t0 = log[0]['t'] - log[0]['n'] * s16
+            return [round((e['t'] - (t0 + e['n'] * s16)) / s16, 4) for e in log]
+        s16 = 60 / 120 / 4
+        off_log = await hats(False)
+        on_log = await hats(True)
+        lo, ln = lateness(off_log, s16), lateness(on_log, s16)
+        check('shuffle off: every sixteenth on the straight grid (%d hits)' % len(off_log), len(off_log) > 12 and all(abs(x) < 0.01 for x in lo), str(lo[:8]))
+        check('shuffle on: steps 2, 4, 6 ... (every second sixteenth) are 0.3 of a sixteenth late, the others straight (%d hits)' % len(on_log),
+              len(on_log) > 12 and all(abs(x - (0.3 if e['n'] % 2 == 1 else 0)) < 0.01 for x, e in zip(ln, on_log)) and all(e['step'] % 2 == 1 for e in on_log if abs(lateness([e], s16)[0]) > 5) is True, str(ln[:8]))
+        # nextGrid() names the swung time the scheduler uses, shuffle on and off
+        for sh in (True, False):
+            await page.evaluate("(on) => { window.PPDrums.shuffle(on); window.__slog = []; window.PPDrums._log(window.__slog); window.PPDrums.play(); window.__gs = []; window.__gt = setInterval(() => window.__gs.push(window.PPClock.nextGrid()), 53); }", sh)
+            await page.wait_for_timeout(2200)
+            await page.evaluate("() => { clearInterval(window.__gt); window.PPDrums.stop(); window.PPDrums._log(null); }")
+            r = await page.evaluate("""() => { const ts = window.__slog.map(e => e.t); const miss = window.__gs.filter(g => !ts.some(t => Math.abs(t - g) < 1e-6)).length; return [window.__gs.length, miss]; }""")
+            check('shuffle %s: nextGrid() is always the time a step really sounds (%d samples)' % ('on' if sh else 'off', r[0]), r[0] > 20 and r[1] <= 1, str(r))
+        r = await page.evaluate("[window.PPClock.sixteenth(), 60 / window.PPClock.bpm / 4]")
+        check('shuffle on or off: sixteenth() stays the straight average', abs(r[0] - r[1]) < 1e-12 and abs(r[0] - 0.125) < 1e-9, str(r))
+        # toggling while it plays: no step dropped or doubled
+        await page.evaluate("() => { window.PPDrums.shuffle(false); window.__slog = []; window.PPDrums._log(window.__slog); window.PPDrums.play(); }")
+        for i in range(8):
+            await page.wait_for_timeout(260); await page.click('#hc-pp-pd-panel .hc-pp-pd-shuf')
+        await page.wait_for_timeout(300)
+        pressed = await page.get_attribute('#hc-pp-pd-panel .hc-pp-pd-shuf', 'aria-pressed')
+        await page.evaluate("() => { window.PPDrums.stop(); window.PPDrums._log(null); }")
+        ns = await page.evaluate("window.__slog.filter(e => e.name === 'hat').map(e => e.n)")
+        ts = await page.evaluate("window.__slog.filter(e => e.name === 'hat').map(e => e.t)")
+        check('shuffle: switching it on and off while the beat plays drops and doubles no step, and times keep rising (%d steps)' % len(ns),
+              len(ns) > 14 and ns == list(range(ns[0], ns[0] + len(ns))) and all(b > a for a, b in zip(ts, ts[1:])) and pressed == 'false', f'{ns[:6]}.. {pressed}')
+        await page.evaluate("() => { window.PPDrums.shuffle(false); for (let c = 0; c < 16; c++) window.PPDrums.set(2, c, false); }")
         await page.evaluate(SPY)
         two = next(n for n, x in enumerate(plans) if x['chord'] and x['chord']['kind'] == 'B')
         await page.evaluate(PRESS, two); await page.wait_for_timeout(3000)
@@ -801,8 +881,24 @@ async def main(base):
         r = await page.evaluate("""() => [window.__hcPaletteDrums.loaded(), document.querySelectorAll('#hc-pp-pd-panel .hc-pp-pd-say[aria-disabled="true"]').length,
           window.__says.length, window.__starts.length, window.__hcPalettePiano.sound().lastNote > 0]""")
         check('recordings missing: the "HalliChord 2" strip plays its synth notes instead, the pads stay greyed out, no errors',
-              r[0] == 0 and r[1] == 14 and r[2] == 0 and r[3] > 0 and r[4] and not errs, f'{r} {errs[:1]}')
+              r[0] == 0 and r[1] == 15 and r[2] == 0 and r[3] > 0 and r[4] and not errs, f'{r} {errs[:1]}')
         await ctx.close()
+        # the open panel shows everything without a scrollbar at MacBook Air page sizes (and bigger), under about half the screen, clear of the two pills
+        SCROLL = """() => { const p = document.getElementById('hc-pp-pd-panel'), all = [p, ...p.querySelectorAll('*')];
+          return { panel: [p.scrollHeight, p.clientHeight], scrollers: all.filter(e => e.scrollHeight > e.clientHeight + 0 && getComputedStyle(e).overflowY !== 'visible').map(e => e.className || e.tagName),
+            clipped: all.filter(e => e.scrollHeight > e.clientHeight + 1 && e.clientHeight > 0 && ['auto', 'scroll', 'hidden'].includes(getComputedStyle(e).overflowY)).length,
+            fits: p.getBoundingClientRect().top >= 0 }; }"""
+        for w, h in [(1440, 760), (1280, 680), (1440, 900)]:
+            ctx = await b.new_context(viewport={'width': w, 'height': h})
+            page = await ctx.new_page(); errs = []
+            page.on('pageerror', lambda e: errs.append(str(e)))
+            await page.goto(base + '/palette-piano/'); await page.wait_for_timeout(1500)
+            await page.evaluate("document.getElementById('hc-pp-pd-btn').click()"); await page.wait_for_timeout(400)
+            await page.evaluate("() => { window.PPDrums.set(3, 2, true); window.PPDrums.shuffle(true); }")
+            pl = await page.evaluate(PLACE); sc = await page.evaluate(SCROLL)
+            check(f'beat maker ({w}x{h}): the open panel has no scrollbar (scrollHeight = clientHeight, nothing scrollable inside), is under 50% of the height ({pl["panelShare"]}), above and clear of both pills',
+                  sc['panel'][0] == sc['panel'][1] and not sc['scrollers'] and sc['clipped'] == 0 and sc['fits'] and pl['panelShare'] <= 0.5 and pl['panelAbove'] and pl['apart'] and not errs, f'{sc} {pl} {errs[:1]}')
+            await ctx.close()
         # placement on a phone and in 1999 mode
         for w, h, mobile in [(390, 760, True), (1440, 900, False)]:
             ctx = await b.new_context(viewport={'width': w, 'height': h}, is_mobile=mobile, has_touch=mobile, device_scale_factor=2 if mobile else 1)

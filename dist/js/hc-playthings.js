@@ -19,7 +19,7 @@
       line: 'Draw a blob-face and set it free on the site.' },
     { title: 'Music Kontrapunkt Kontrol', href: 'https://kontrapunkt.hallicivelek.com/', bg: '#f3efe6', show: 'tall',
       line: 'An Italo Disco blog and a producer map (of who made what). Since 2004.' },
-    { title: 'Proper palette piano player', href: '/palette-piano', bg: '#f3efe6', show: 'keys',
+    { title: 'Proper palette piano player 2.0 (Voice Enhanced™)', href: '/palette-piano', bg: '#f3efe6', show: 'keys',
       line: "Every project as a strip of its own colors, for you to click'n play." },
     { title: 'Shakeskin', href: 'https://www.shakeskin.com/', bg: '#086eb2', show: 'faces',   // Shakeskin's own blue
       line: 'A gallery of shaken faces. Since 2004.' },
@@ -114,4 +114,4 @@
   addEventListener('popstate', check);
   check();
 })();
-window.__hcBuild = "2026-11-17 00:41";
+window.__hcBuild = "2026-11-17 01:23";

@@ -32,7 +32,7 @@ Everything reaches the live site through Cargo's **Custom HTML** setting. Two wa
 ## Build and test
 ```
 python3 build.py              # src/ → dist/hc-columns.html, dist/hc-pond.html, dist/custom-html.html; syntax-checks every script
-python3 tests/test_site.py    # 140 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, weather, umbrella, phone)
+python3 tests/test_site.py    # 157 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, weather, umbrella, phone)
 ```
 Tests need `python3 -m pip install --user playwright` (this Mac has no bare `pip`) and `python3 -m playwright install chromium`.
 The build was verified to reproduce the installed files byte-for-byte when this project was set up.
@@ -70,7 +70,7 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   rest of the visit (a tap gives it a wobble). Hides Cargo's content (fallback), grid and sort line; ids/classes `hc-bab-`,
   CSS under `#hc-bab`. Esc is kept from Cargo while the pencil is held or a face is drawn. Not saved anywhere.
   Loaded by hc-pond.js (no paste).
-- `src/hc-palette-piano.html` — **Proper palette piano player** (page address contains `palette-piano`, a Cargo page
+- `src/hc-palette-piano.html` — **Proper palette piano player 2.0 (Voice Enhanced™)** (page address contains `palette-piano`, a Cargo page
   Halli made 2026-11-16; ported from `mockups/palette-piano`, sound approved by Halli): every project as a white key
   painted with its own colours, in Halli's order, tilted like the pinboard prints. Pressing a strip plays its colours
   (instrument, notes, order, pace, trill, held note all from the colours and address; always D hirajoshi (D E F A Bb); all
@@ -81,17 +81,21 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   (now a rubber-band boing), acid, "hopkins" (now a cartoon "yoy"), Italo (about a quarter of the strips, with a running
   octave bass and claps); goofy gestures (boing, whistle, sad trombone, ta-da, quack, pew, clonk, cowbell, hiccup,
   syndrum); shorter rooms. **Solo:** hold the mouse button (8 px move) or a finger (sideways or held 0.25 s) and sweep
-  across the bands; up/down swipes still scroll. **Recordings** (Halli's, `assets/palette-piano/*.mp3`, 14 files,
-  ~410 KB, lowercase hyphenated names): ~1 strip in 11 plays chord-1 alone, ~1 in 8 plays 0.6 s of each chord-2a-2d,
+  across the bands; up/down swipes still scroll. **Recordings** (Halli's, `assets/palette-piano/*.mp3`, 15 files,
+  ~430 KB, lowercase hyphenated names): ~1 strip in 11 plays chord-1 alone, ~1 in 8 plays 0.6 s of each chord-2a-2d,
   a quarter of the rest say something; a recording that isn't there means the strip plays its synths as before.
-  **Beat maker** (second `<script>`, drums.js, logic unchanged): "Make a beat" pill and a panel (16-step kick / snare /
-  hi-hat + a voice row with a picker, tempo 80-150, hold-to-play fills, 9 voice pads, 5 chord pads). Fenced: ids/classes
+  **Beat maker** (second `<script>`, drums.js, same logic as the mockup; changed 2026-11-17 for "2.0"): "Make a beat" pill and a panel (16-step kick / snare /
+  hi-hat / **perc** (empty by default; picker: rim shot, tom, cowbell, clave, clap; 808-style, synthesised), tempo 80-150, **Shuffle** on/off
+  (off by default, `aria-pressed`; steps 2, 4, 6 ... come 0.3 of a sixteenth late, a 65/35 swing, for pattern and fills;
+  `PPClock.nextGrid()` returns the swung time, `sixteenth()` stays straight), hold-to-play fills, 10 voice pads (bombaclat is
+  pad-only; strips still choose from the original nine in `SAYS`), 5 chord pads). The voice row is gone. Fenced: ids/classes
   `hc-pp-pd-`, CSS under `#hc-pp-pd-btn` / `#hc-pp-pd-panel` with a reset for button/select/input (Cargo's styles stay
   out); pill and panel are on `<body>` only while on the page, and taken away when leaving (beat, fills, pads, voice row
   and strips stopped); Esc in the panel closes it without reaching Cargo. `place()` measures: pill right of "Turn the
   sound off" on the same line, or above it when that would hit the pause button / "back to 2026" (so above it on
-  phones); the panel above both, ≤45% of the screen on desktop (scrolls inside, sticky top row), 36% on phones as in the
-  mockup. The recordings are fetched (CORS; GitHub Pages sends `access-control-allow-origin: *`, checked with curl
+  phones); the panel above both. From 1000 px wide it is two columns (step grid + fills left; voice and chord pads right), about 267 px
+  tall (36% at 1440x760, 40% at 1280x680), no scrollbar; `max-height: 100vh - 120px` is only a safety net. Phones: single column, 36% with
+  internal scrolling and a sticky two-line top row. The recordings are fetched (CORS; GitHub Pages sends `access-control-allow-origin: *`, checked with curl
   2026-11-17) from `../../assets/palette-piano/` next to the script (like hc-eyes), only when the visitor first points at,
   touches or focuses the piano or the pill, or opens the panel; a failed file may be fetched again later; pads stay
   greyed out without it. Globals: `window.PPClock` (strips pressed while the beat plays start on its next sixteenth and
@@ -287,6 +291,11 @@ header.css, remove "Other projects" from about me.
 The redesign looks fine on his iPhone and speed is fine. Wanton Boys Club GIF stays out for now.
 
 ## Where we left off (2026-11-04)
+- **2026-11-17 (later):** palette piano 2.0 changes **built and tested, not committed or pushed**: new title and intro (add-on,
+  mockup `jam.html`, playthings card), perc row instead of the voice row, shuffle, compact two-column beat panel without scrollbars,
+  bombaclat pad (`assets/palette-piano/bombaclat.mp3`, new file to commit). Mockup and add-on logic match (same patch applied to
+  both); differences are only the add-on's fencing and the mockup's own page. Screenshots `mockups/palette-piano/beat-{1440,1280,390}.png`.
+  Not checked: by ear (rim, cowbell, clave levels were measured, not listened to), a real iPhone, the live site.
 - **2026-11-17:** the palette piano brought up to the approved jam mockup (`jam.html` + `drums.js`): new sounds,
   gestures, Italo bass, solos, Halli's recordings (`assets/palette-piano/`), the beat maker. **Committed, pushed and live** (build
   `2026-11-17 00:41`, 140/140 tests). Checked on the live site in the desktop browser pane: 94 strips, all 14 recordings
