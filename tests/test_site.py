@@ -690,6 +690,140 @@ async def main(base):
         check('no script errors (palette piano, phone)', not errs, '; '.join(errs)[:300])
         await ctx.close()
 
+        # ---- the beat maker on the piano page, the owner's recordings, solos ----
+        STARTS = """(() => { const log = window.__starts = [];   // every sound source started on the page's own audio clock
+          for (const C of [OscillatorNode, AudioBufferSourceNode]) { const s = C.prototype.start;
+            C.prototype.start = function (t, ...a) { if (this.context instanceof AudioContext) log.push(t || 0); return s.call(this, t, ...a); }; } })();"""
+        SPY = """() => { window.__says = []; const V = window.PPVoices, say = V.say;
+          V.say = function (n, w, g, o, l) { window.__says.push([n, l === undefined ? null : +l.toFixed(3)]); return say.apply(V, arguments); }; }"""
+        PRESS = "i => { document.querySelectorAll('#hc-pp button.hc-pp-key')[i].click(); }"
+        PLACE = """() => { const R = e => e && e.getBoundingClientRect(), q = R(document.getElementById('hc-pp-quiet')), b = R(document.getElementById('hc-pp-pd-btn')),
+            z = R(document.querySelector('button.hc-pause')), k = R(document.querySelector('.hc-back')), bar = R(document.querySelector('.hc-ns-bar')),
+            p = document.getElementById('hc-pp-pd-panel'), pr = R(p), shown = r => !!(r && r.width);
+          const apart = (a, c) => !shown(c) || a.right <= c.left || c.right <= a.left || a.bottom <= c.top || c.bottom <= a.top;
+          return { pill: shown(b), apart: shown(b) && apart(b, q) && apart(b, z) && apart(b, k), onScreen: shown(b) && b.left >= 0 && b.right <= innerWidth,
+            aboveBar: !shown(bar) || (b.bottom <= bar.top + 0.5 && q.bottom <= bar.top + 0.5), sameLine: shown(b) && Math.abs(b.bottom - q.bottom) < 1,
+            panel: shown(pr), panelAbove: !shown(pr) || pr.bottom <= Math.min(b.top, q.top) + 3, panelTop: pr && Math.round(pr.top), panelShare: pr && +(pr.height / innerHeight).toFixed(2),
+            panelScrolls: !!p && p.scrollHeight > p.clientHeight + 2 }; }"""
+        ctx = await b.new_context(viewport={'width': 1440, 'height': 900})
+        await ctx.add_init_script(STARTS)
+        page = await ctx.new_page(); errs = []; asked = []
+        page.on('pageerror', lambda e: errs.append(str(e)))
+        page.on('request', lambda q: asked.append(q.url) if '/assets/palette-piano/' in q.url else None)
+        await page.goto(base + '/palette-piano/'); await page.wait_for_timeout(1500)
+        r = await page.evaluate("""() => { const b = document.getElementById('hc-pp-pd-btn'), p = document.getElementById('hc-pp-pd-panel'), s = b && getComputedStyle(b);
+          return { pill: b && [b.textContent, s.position, s.display, s.textTransform, s.borderTopWidth, b.getAttribute('aria-expanded')], panelHidden: !!p && p.hidden && getComputedStyle(p).display === 'none',
+            loaded: window.__hcPaletteDrums.loaded(), clock: window.PPClock.running }; }""")
+        check('beat maker: "Make a beat" is on the piano page (fixed, Cargo\'s button style kept out), the panel closed, no recording fetched yet',
+              r['pill'] == ['Make a beat', 'fixed', 'flex', 'none', '0px', 'false'] and r['panelHidden'] and r['loaded'] == 0 and not asked and not r['clock'], f'{r} {asked[:2]}')
+        pl = await page.evaluate(PLACE)
+        check('beat maker (1440 wide): the pill sits right of the sound switch on the same line, clear of it and of the pause button',
+              pl['pill'] and pl['apart'] and pl['sameLine'] and pl['onScreen'], str(pl))
+        # a solo: hold the mouse button and sweep sideways across six strips
+        await page.evaluate("""() => { window.__lit = 0; new MutationObserver(ms => ms.forEach(m => { if (m.target.classList.contains('lit') && !(m.oldValue || '').includes('lit')) window.__lit++; }))
+          .observe(document.getElementById('hc-pp'), { attributes: true, attributeFilter: ['class'], attributeOldValue: true, subtree: true }); }""")
+        ks = await page.evaluate("[...document.querySelectorAll('#hc-pp button.hc-pp-key')].slice(0, 7).map(k => { const r = k.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height * 0.55]; })")
+        await page.mouse.move(*ks[0]); await page.mouse.down()
+        for x, y in ks[1:]: await page.mouse.move(x, y, steps=6)
+        await page.mouse.up(); await page.wait_for_timeout(150)
+        r = await page.evaluate("[window.__lit, document.querySelectorAll('#hc-pp li.hc-pp-k.on').length, window.__hcPalettePiano.sound()]")
+        check('solo: sweeping across the strips with the button held lights their bands one by one, and starts no strip',
+              r[0] >= 5 and r[1] == 0 and r[2]['ctx'] and r[2]['waiting'] == 0, str(r))
+        await page.click('#hc-pp-pd-btn'); await page.wait_for_timeout(200)
+        await page.wait_for_function('window.__hcPaletteDrums.loaded() === 14', timeout=8000)
+        r = await page.evaluate("""() => { const p = document.getElementById('hc-pp-pd-panel'), go = p.querySelector('.hc-pp-pd-go'), st = p.querySelector('.hc-pp-pd-step'), sel = p.querySelector('select'), cs = e => getComputedStyle(e);
+          return { open: !p.hidden, pill: document.getElementById('hc-pp-pd-btn').textContent, go: [cs(go).backgroundColor, cs(go).textTransform, cs(go).letterSpacing === '4px'],
+            step: cs(st).borderTopWidth, select: [cs(sel).borderTopWidth, cs(sel).textTransform], pads: p.querySelectorAll('.hc-pp-pd-say[aria-disabled="false"]').length }; }""")
+        check('beat maker: the pill opens the panel; Cargo\'s button and select styles stay out; the recordings arrive (14 pads ready)',
+              r['open'] and r['pill'] == 'Hide the beat' and r['go'] == ['rgb(73, 46, 70)', 'none', False] and r['step'] == '0px' and r['select'] == ['0px', 'none'] and r['pads'] == 14
+              and len(asked) == 14 and all(u.endswith('.mp3') and '/assets/palette-piano/' in u for u in asked), f'{r} {len(asked)}')
+        pl = await page.evaluate(PLACE)
+        check('beat maker (1440 wide): the panel sits above the buttons, at most 45% of the screen tall (it scrolls inside), below the header',
+              pl['panel'] and pl['panelAbove'] and pl['panelShare'] <= 0.46 and pl['panelTop'] >= 64, str(pl))
+        before = await page.evaluate('window.PPDrums.pattern()[0][1]')
+        await page.click('#hc-pp-pd-panel .hc-pp-pd-step >> nth=1')
+        after = await page.evaluate("[window.PPDrums.pattern()[0][1], document.querySelectorAll('#hc-pp-pd-panel .hc-pp-pd-step')[1].getAttribute('aria-pressed')]")
+        check('beat maker: clicking a step turns it on in the pattern', before == 0 and after == [1, 'true'], f'{before} -> {after}')
+        await page.click('#hc-pp-pd-panel .hc-pp-pd-clear')
+        await page.click('#hc-pp-pd-panel .hc-pp-pd-go'); await page.wait_for_timeout(400)
+        r = await page.evaluate("[window.PPClock.running, document.querySelector('#hc-pp-pd-panel .hc-pp-pd-go').textContent, window.PPDrums._state().timer]")
+        check('beat maker: Play starts the clock', r == [True, 'Stop', True], str(r))
+        plans = await page.evaluate('window.PalettePiano.plans()')
+        plain = next(n for n, x in enumerate(plans) if not x['chord'])
+        grid = await page.evaluate("() => { window.__starts.length = 0; return [window.PPClock.sixteenth(), window.PPClock.nextGrid(), window.PalettePiano.audio().ctx.currentTime]; }")
+        await page.evaluate(PRESS, plain); await page.wait_for_timeout(700)
+        st = await page.evaluate('window.__starts.slice()')
+        first = min(st) if st else None
+        off = None if first is None else abs((first - grid[1]) / grid[0] - round((first - grid[1]) / grid[0]))
+        check('beat maker: a strip pressed while the beat plays starts on its grid (a sixteenth)', first is not None and first >= grid[2] and off < 0.01, f'{len(st)} sources, first at {first}, {off} of a sixteenth off the grid')
+        await page.click('#hc-pp-pd-panel .hc-pp-pd-go'); await page.wait_for_timeout(300)
+        r = await page.evaluate("[window.PPClock.running, window.PPDrums._state().timer, document.querySelector('#hc-pp-pd-panel .hc-pp-pd-go').textContent]")
+        check('beat maker: Stop ends the clock', r == [False, False, 'Play'], str(r))
+        await page.evaluate(SPY)
+        two = next(n for n, x in enumerate(plans) if x['chord'] and x['chord']['kind'] == 'B')
+        await page.evaluate(PRESS, two); await page.wait_for_timeout(3000)
+        says2 = await page.evaluate('window.__says.slice()')
+        one = next(n for n, x in enumerate(plans) if x['chord'] and x['chord']['kind'] == 'A')
+        await page.evaluate('window.__says.length = 0'); await page.evaluate(PRESS, one); await page.wait_for_timeout(600)
+        says1 = await page.evaluate('window.__says.slice()')
+        check('recordings: a "HalliChord 2" strip plays 0.6 s of each of 2a-2d in its own order, a "HalliChord 1" strip plays chord-1',
+              says2 == [[nm, 0.6] for nm in plans[two]['chord']['names']] and sorted(nm for nm, _ in says2) == ['chord-2a', 'chord-2b', 'chord-2c', 'chord-2d']
+              and says1 == [['chord-1', None]], f'{says2} / {says1}')
+        # leaving the page (Cargo changes pages without reloading) with the beat playing and the panel open, then coming back
+        await page.click('#hc-pp-pd-panel .hc-pp-pd-go'); await page.wait_for_timeout(300)
+        await page.evaluate("() => { history.pushState({}, '', '/Cheerios/'); document.querySelector('.project_content').innerHTML = '<p>a project</p>'; }")
+        await page.wait_for_timeout(600)
+        r = await page.evaluate("""() => [!!document.getElementById('hc-pp-pd-btn'), !!document.getElementById('hc-pp-pd-panel'), window.PPClock.running, window.PPDrums._state().timer,
+          document.documentElement.classList.contains('hc-pp-on'), window.__hcPalettePiano.sound().waiting, window.__hcPalettePiano.sound().recordings]""")
+        check('beat maker: leaving the piano page stops the beat, the strips and the recordings, and takes the pill and panel away', r == [False, False, False, False, False, 0, 0], str(r))
+        await page.evaluate("() => { history.pushState({}, '', '/palette-piano/?again'); document.querySelector('.project_content').innerHTML = '<p>palette piano</p>'; }")
+        await page.wait_for_timeout(800)
+        r = await page.evaluate("""() => { const b = document.getElementById('hc-pp-pd-btn'), p = document.getElementById('hc-pp-pd-panel');
+          return [!!document.getElementById('hc-pp'), !!b && getComputedStyle(b).display, b && b.textContent, !!p && p.hidden, window.PPClock.running]; }""")
+        check('beat maker: back on the piano page the pill is there again (panel closed, beat stopped)', r == [True, 'flex', 'Make a beat', True, False], str(r))
+        check('no script errors (beat maker)', not errs, '; '.join(errs)[:300])
+        p2 = await ctx.new_page(); p2.on('pageerror', lambda e: errs.append(str(e))); asked.clear()
+        p2.on('request', lambda q: asked.append(q.url) if '/assets/palette-piano/' in q.url else None)
+        await p2.goto(base + '/short/info-contact/'); await p2.wait_for_timeout(1200)
+        r = await p2.evaluate("[!!document.getElementById('hc-pp-pd-btn'), !!document.getElementById('hc-pp-pd-panel'), window.__hcPaletteDrums.loaded(), window.PPClock.running]")
+        check('beat maker: nothing of it on another page (no pill, no panel, no recordings fetched)', r == [False, False, 0, False] and not asked and not errs, f'{r} {asked[:1]} {errs[:1]}')
+        await ctx.close()
+        # the recordings fail to load: the piano plays its synths instead, the pads stay greyed out
+        ctx = await b.new_context(viewport={'width': 1440, 'height': 900})
+        await ctx.add_init_script(STARTS)
+        await ctx.route('**/assets/palette-piano/**', lambda route: route.abort())
+        page = await ctx.new_page(); errs = []
+        page.on('pageerror', lambda e: errs.append(str(e)))
+        await page.goto(base + '/palette-piano/'); await page.wait_for_timeout(1200)
+        await page.click('#hc-pp-pd-btn'); await page.wait_for_timeout(1500)
+        await page.evaluate(SPY); await page.evaluate('window.__starts.length = 0')
+        await page.evaluate(PRESS, two); await page.wait_for_timeout(800)
+        r = await page.evaluate("""() => [window.__hcPaletteDrums.loaded(), document.querySelectorAll('#hc-pp-pd-panel .hc-pp-pd-say[aria-disabled="true"]').length,
+          window.__says.length, window.__starts.length, window.__hcPalettePiano.sound().lastNote > 0]""")
+        check('recordings missing: the "HalliChord 2" strip plays its synth notes instead, the pads stay greyed out, no errors',
+              r[0] == 0 and r[1] == 14 and r[2] == 0 and r[3] > 0 and r[4] and not errs, f'{r} {errs[:1]}')
+        await ctx.close()
+        # placement on a phone and in 1999 mode
+        for w, h, mobile in [(390, 760, True), (1440, 900, False)]:
+            ctx = await b.new_context(viewport={'width': w, 'height': h}, is_mobile=mobile, has_touch=mobile, device_scale_factor=2 if mobile else 1)
+            page = await ctx.new_page(); errs = []
+            page.on('pageerror', lambda e: errs.append(str(e)))
+            await page.goto(base + '/palette-piano/'); await page.wait_for_timeout(1500)
+            normal = await page.evaluate(PLACE)
+            await page.evaluate("document.getElementById('hc-pp-pd-btn').click()"); await page.wait_for_timeout(300)
+            normal_open = await page.evaluate(PLACE)
+            await page.evaluate("window.__hcRetro.set('ns')"); await page.wait_for_timeout(800)
+            ns = await page.evaluate(PLACE)
+            await page.evaluate("window.__hcRetro.set('gc')"); await page.wait_for_timeout(800)
+            gc = await page.evaluate(PLACE)
+            await page.evaluate("window.__hcRetro.set('off')")
+            ok = all(x['pill'] and x['apart'] and x['onScreen'] and x['aboveBar'] and x['panel'] and x['panelAbove'] for x in (normal_open, ns, gc)) and normal['apart']
+            if mobile: ok = ok and normal_open['panelShare'] <= 0.37
+            check(f'beat maker ({w} wide): the pill clear of the sound switch, the pause button and "back to 2026", above the Netscape status bar, the panel above them'
+                  + (' (36% of the screen at most, as in the mockup)' if mobile else ''), ok, f'{normal} | {normal_open} | ns {ns} | gc {gc}')
+            check(f'no script errors (beat maker, {w} wide)', not errs, '; '.join(errs)[:300])
+            await ctx.close()
+
         # ---- Cargo's own stylesheet arriving empty (Cargo's outage 2026-11-09) ----
         page = await b.new_page(viewport={'width': 1300, 'height': 900}); errs = []
         page.on('pageerror', lambda e: errs.append(str(e)))
@@ -755,6 +889,8 @@ if __name__ == '__main__':
     for f in (ROOT / 'dist' / 'js').glob('*.js'): (site / 'js' / f.name).write_text(f.read_text())
     (site / 'assets' / 'portrait').mkdir(parents=True)
     for f in (ROOT / 'assets' / 'portrait').iterdir(): (site / 'assets' / 'portrait' / f.name).write_bytes(f.read_bytes())
+    (site / 'assets' / 'palette-piano').mkdir(parents=True)   # the owner's recordings for the palette piano, where hc-palette-piano.js looks for them
+    for f in (ROOT / 'assets' / 'palette-piano').glob('*.mp3'): (site / 'assets' / 'palette-piano' / f.name).write_bytes(f.read_bytes())
     (site / 'Halli-Civelek-artist-portrait_300.jpg').write_bytes((ROOT / 'assets' / 'portrait' / 'face-no-irises.jpg').read_bytes())   # stand-in for Cargo's photo
     for d, html in [('short/blob-pond', PAGE.replace('ADDONS', tags)), ('the-blob-pond', PAGE.replace('ADDONS', tags)),
                     ('short/info-contact', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', '<div class="project_content"><img src="/Halli-Civelek-artist-portrait_300.jpg" width="300" height="359"></div>')),
@@ -775,6 +911,7 @@ if __name__ == '__main__':
                     ('short/birth-a-blob', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', '<p>Birth-a-blob: draw a face on a blob</p>')
                         .replace('</div></div>\n<script>', '</div>' + GRID + '</div>\n<script>', 1)),
                     ('palette-piano', PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', '<p>palette piano</p>')
+                        .replace('</style>', '  select, input { background: yellow; border: 3px solid red; text-transform: uppercase; letter-spacing: 4px; }\n  section { padding: 60px; }\n</style>', 1)
                         .replace('</div></div>\n<script>', '</div>' + GRID + '</div>\n<script>', 1)),
                     ('short/playthings', PAGE.replace('ADDONS', tags)
                         .replace('</style>', '  .project_content a:hover { background-color: rgb(255, 255, 0); color: rgb(0, 0, 0); }\n</style>', 1)

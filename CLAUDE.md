@@ -32,7 +32,7 @@ Everything reaches the live site through Cargo's **Custom HTML** setting. Two wa
 ## Build and test
 ```
 python3 build.py              # src/ → dist/hc-columns.html, dist/hc-pond.html, dist/custom-html.html; syntax-checks every script
-python3 tests/test_site.py    # 121 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, weather, umbrella, phone)
+python3 tests/test_site.py    # 140 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, weather, umbrella, phone)
 ```
 Tests need `python3 -m pip install --user playwright` (this Mac has no bare `pip`) and `python3 -m playwright install chromium`.
 The build was verified to reproduce the installed files byte-for-byte when this project was set up.
@@ -74,10 +74,29 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   Halli made 2026-11-16; ported from `mockups/palette-piano`, sound approved by Halli): every project as a white key
   painted with its own colours, in Halli's order, tilted like the pinboard prints. Pressing a strip plays its colours
   (instrument, notes, order, pace, trill, held note all from the colours and address; always D hirajoshi (D E F A Bb); all
-  sounds made in the browser). Sound: six analog-synth voices (Kraftwerk, Numan, Boards of Canada, acid, Hopkins,
-  Italo; Kraftwerk, acid and Italo in strict time). Since 2026-11-16 the sound code and colour-to-music mapping are
-  `mockups/palette-piano/synth.html`'s, **unchanged** (copied line for line; the earlier piano/pluck sound was the
-  mockup's `index.html`; `window.PalettePiano` is the checking hook, as used by `check_synth.py`). Title tag only on
+  synth sounds made in the browser). **Source since 2026-11-17: `mockups/palette-piano/jam.html` + `drums.js`** ("Love it.
+  Push it."): the first `<script>` is jam.html's sound, mapping, key-press and solo code, unchanged (brought over by a
+  three-way merge of synth.html → jam.html into the add-on; every line of jam.html's script is in the add-on except
+  19 page-wrapping lines); before that it was `synth.html`'s, before that `index.html`'s. Voices: Kraftwerk, Numan, "boc"
+  (now a rubber-band boing), acid, "hopkins" (now a cartoon "yoy"), Italo (about a quarter of the strips, with a running
+  octave bass and claps); goofy gestures (boing, whistle, sad trombone, ta-da, quack, pew, clonk, cowbell, hiccup,
+  syndrum); shorter rooms. **Solo:** hold the mouse button (8 px move) or a finger (sideways or held 0.25 s) and sweep
+  across the bands; up/down swipes still scroll. **Recordings** (Halli's, `assets/palette-piano/*.mp3`, 14 files,
+  ~410 KB, lowercase hyphenated names): ~1 strip in 11 plays chord-1 alone, ~1 in 8 plays 0.6 s of each chord-2a-2d,
+  a quarter of the rest say something; a recording that isn't there means the strip plays its synths as before.
+  **Beat maker** (second `<script>`, drums.js, logic unchanged): "Make a beat" pill and a panel (16-step kick / snare /
+  hi-hat + a voice row with a picker, tempo 80-150, hold-to-play fills, 9 voice pads, 5 chord pads). Fenced: ids/classes
+  `hc-pp-pd-`, CSS under `#hc-pp-pd-btn` / `#hc-pp-pd-panel` with a reset for button/select/input (Cargo's styles stay
+  out); pill and panel are on `<body>` only while on the page, and taken away when leaving (beat, fills, pads, voice row
+  and strips stopped); Esc in the panel closes it without reaching Cargo. `place()` measures: pill right of "Turn the
+  sound off" on the same line, or above it when that would hit the pause button / "back to 2026" (so above it on
+  phones); the panel above both, ≤45% of the screen on desktop (scrolls inside, sticky top row), 36% on phones as in the
+  mockup. The recordings are fetched (CORS; GitHub Pages sends `access-control-allow-origin: *`, checked with curl
+  2026-11-17) from `../../assets/palette-piano/` next to the script (like hc-eyes), only when the visitor first points at,
+  touches or focuses the piano or the pill, or opens the panel; a failed file may be fetched again later; pads stay
+  greyed out without it. Globals: `window.PPClock` (strips pressed while the beat plays start on its next sixteenth and
+  the machines lock to its grid), `window.PPVoices`, `window.PPDrums` (tests), `window.PalettePiano` (checking hook,
+  `audio()` for drums), `window.__hcPaletteDrums` (`check()`, `loaded()`). Title tag only on
   hover / focus / after a press, linking to `/<project>`. Keyboard: one Tab stop, arrows / Home / End move, Enter or
   Space plays, Tab reaches the title link. Reduced motion: strips don't move or grow. "Turn the sound off" is fixed
   **bottom left** (the pause button and "back to 2026" have the bottom right; lifted above the Netscape bar, styled in
@@ -268,6 +287,13 @@ header.css, remove "Other projects" from about me.
 The redesign looks fine on his iPhone and speed is fine. Wanton Boys Club GIF stays out for now.
 
 ## Where we left off (2026-11-04)
+- **2026-11-17:** the palette piano brought up to the approved jam mockup (`jam.html` + `drums.js`): new sounds,
+  gestures, Italo bass, solos, Halli's recordings (`assets/palette-piano/`), the beat maker. **Built, 140/140 tests pass;
+  not committed or pushed** (the director pushes). Not checked: the live site, a real iPhone, the sound by ear on the
+  live site, the recordings actually loading from GitHub Pages (only a test server; CORS headers checked on an existing
+  asset), Cargo's real Esc handling with the panel open. Small differences from the mockup: site font instead of Nunito,
+  the pill sits right of the sound switch (above it on phones) instead of bottom left, desktop panel capped at 45% with a
+  sticky top row, recordings fetched lazily (so the very first press of a chord strip may still be synth).
 - **2026-11-16:** the palette piano (`src/hc-palette-piano.html`, `src/palettes.json`, `tools/build_palettes.py`), its
   way back in hc-project and its playthings card (sixth, between Music Kontrapunkt Kontrol and Shakeskin) are
   **committed, pushed and live** (build `2026-11-16 03:52`; 121/121 tests). Checked on the live site in the desktop
