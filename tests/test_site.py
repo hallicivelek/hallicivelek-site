@@ -599,9 +599,10 @@ async def main(base):
         # ---- palette piano: every project as a strip of its own colours; the way back from a project page ----
         PIANO = """() => { const pp = document.getElementById('hc-pp'), q = document.getElementById('hc-pp-quiet'), pz = document.querySelector('button.hc-pause');
           const qr = q && q.getBoundingClientRect(), zr = pz && pz.getBoundingClientRect();
-          return { title: pp && pp.querySelector('h1').textContent, kicker: pp && pp.querySelector('.hc-pp-kicker').textContent,
-            acro: pp && pp.querySelector('.hc-pp-acro').textContent, acroBold: pp && [...pp.querySelectorAll('.hc-pp-acro b')].map(b => b.textContent),
-            acroStyle: pp && [getComputedStyle(pp.querySelector('.hc-pp-acro')).fontStyle, getComputedStyle(pp.querySelector('.hc-pp-acro b')).fontWeight],
+          return { title: pp && pp.querySelector('h1').getAttribute('aria-label'), kicker: pp && pp.querySelector('.hc-pp-kicker').textContent,
+            pairs: pp && [...pp.querySelectorAll('h1 .hc-pp-pr')].map(e => [e.querySelector('.hc-pp-lt').textContent, e.querySelector('.hc-pp-lb').textContent]),
+            hiddenVis: pp && pp.querySelector('h1 > span').getAttribute('aria-hidden'), srLine: pp && pp.querySelector('h1').nextElementSibling.textContent, oldAcro: pp && !!pp.querySelector('.hc-pp-acro'),
+            yr: pp && pp.querySelector('h1 .hc-pp-yr').textContent, yrBrackets: pp && pp.querySelector('h1 .hc-pp-yr').querySelectorAll('.hc-pp-br').length,
             intro: pp && [...pp.querySelectorAll('.hc-pp-hr p.hc-pp-intro')].map(p => p.textContent),
             introWeights: pp && [...pp.querySelectorAll('.hc-pp-hr p.hc-pp-intro')].map(p => getComputedStyle(p).fontWeight),
             cols: pp && getComputedStyle(pp.querySelector('header.hc-pp-hd')).gridTemplateColumns.split(' ').length,
@@ -627,12 +628,28 @@ async def main(base):
         await page.goto(base + '/paco-benovo/'); await page.wait_for_timeout(1500)
         r = await page.evaluate(PIANO)
         check('palette piano: built on its page (title, the line, back to playthings, one strip per project, Cargo styles kept out)',
-              r['title'] == 'Paco Benovo 2.0' and r['kicker'] == 'Civelektronique presents:' and r['acro'] == 'PALETTE COLORS · BEATS NOISES VOICES'
-              and r['acroBold'] == ['PA', 'CO', 'BE', 'NO', 'VO'] and r['acroStyle'] == ['normal', '700']
+              r['title'] == 'Paco Benovo 2.0' and r['kicker'] == 'Civelektronique presents:' and r['pairs'] == [['Pa', 'Palette'], ['co', 'Colors'], ['Be', 'Beats'], ['no', 'Noises'], ['vo', 'Voices']]
+              and r['hiddenVis'] == 'true' and r['srLine'] == 'Palette, Colors, Beats, Noises, Voices' and not r['oldAcro'] and r['yr'] == '2.0' and r['yrBrackets'] == 0
               and r['intro'] == ['Who needs crappy AI music when you can produce your very own crappy grooves RIGHT HERE.',
                                  'I took the colours from all my projects and made them into Paco Benovo: a keyboard with my voice as an expansion pack. This includes the beat maker where you can make your own beats with fills and tomtoms and trigger samples.',
                                  'Please click’n play & plonk away.'] and r['introWeights'][0] == '700' and r['introWeights'][1] == '400' and r['cols'] == 2
               and r['back'] == '/playthings' and r['backText'] == '← playthings' and r['keys'] == n_pal and r['bands'] >= n_pal * 3 and r['h1Color'] == 'rgb(73, 46, 70)' and r['keyBg'] == 'rgb(255, 255, 255)', str(r))
+        BRK = """() => { const R = e => e.getBoundingClientRect(), out = [];
+          for (const pr of document.querySelectorAll('#hc-pp h1 .hc-pp-pr')) {
+            const l = R(pr.querySelector('.hc-pp-lt')), br = R(pr.querySelector('.hc-pp-br')), lb = R(pr.querySelector('.hc-pp-lb'));
+            out.push({ dl: Math.abs(br.left - l.left), dr: Math.abs(br.right - l.right), dc: Math.abs((lb.left + lb.right) / 2 - (br.left + br.right) / 2),
+              lb: [lb.left, lb.right, lb.top, lb.bottom], below: br.top >= l.top && lb.top >= br.bottom - 1, ink: getComputedStyle(pr.querySelector('.hc-pp-br')).borderBottomColor == getComputedStyle(pr.querySelector('.hc-pp-lt')).color }); }
+          const h = document.querySelector('#hc-pp h1'), ks = document.querySelector('#hc-pp ul.hc-pp-keys');
+          const lowest = Math.max(...out.map(o => o.lb[3]));
+          return { out, clear: ks.getBoundingClientRect().top >= lowest, wide: Math.max(...out.map(o => o.lb[1])) <= innerWidth && Math.max(...[...document.querySelectorAll('#hc-pp h1 .hc-pp-yr, #hc-pp h1 .hc-pp-w')].map(e => R(e).right)) <= innerWidth,
+            wraps: [...document.querySelectorAll('#hc-pp h1 .hc-pp-w, #hc-pp h1 .hc-pp-yr')].map(e => Math.round(R(e).top)) }; }"""
+        for vw, vh in ((1440, 900), (390, 844)):
+            await page.set_viewport_size({'width': vw, 'height': vh}); await page.wait_for_timeout(400)
+            g = await page.evaluate(BRK); o = g['out']
+            overlap = any(o[i]['lb'][1] > o[j]['lb'][0] and o[j]['lb'][1] > o[i]['lb'][0] and o[i]['lb'][3] > o[j]['lb'][2] and o[j]['lb'][3] > o[i]['lb'][2] for i in range(5) for j in range(i + 1, 5))
+            check(f'palette piano heading at {vw}: brackets match their letter pairs within 1px, labels centred on them, no label overlap, content clear below, heading inside the screen',
+                  len(o) == 5 and all(x['dl'] <= 1 and x['dr'] <= 1 and x['dc'] <= 1 and x['below'] and x['ink'] for x in o) and not overlap and g['clear'] and g['wide'], str(g))
+        await page.set_viewport_size({'width': 1300, 'height': 900})
         check("palette piano: Cargo's content kept as a hidden fallback, the grid hidden, one Tab stop (strip + its title), titles hidden until asked",
               r['fallbackHidden'] and r['gridHidden'] and r['tabStops'] == 2 and r['titlesHidden'] == '0', str(r))
         check('palette piano: the sound switch is fixed, shown, and clear of the blobs\' pause button', r['quiet'] == ['Turn the sound off', 'fixed', 'flex'] and r['apart'], str(r))
@@ -737,7 +754,7 @@ async def main(base):
         await page.set_viewport_size({'width': 1440, 'height': 900}); await page.wait_for_timeout(300)
         pctx = await b.new_context(viewport={'width': 1440, 'height': 900}); po = await pctx.new_page()
         await po.goto(base + '/palette-piano/'); await po.wait_for_timeout(1500)
-        r = await po.evaluate("[document.querySelector('#hc-pp h1') && document.querySelector('#hc-pp h1').textContent, document.querySelectorAll('#hc-pp li.hc-pp-k').length, !!document.querySelector('#hc-pp-beatslot #hc-pp-pd-btn')]")
+        r = await po.evaluate("[document.querySelector('#hc-pp h1') && document.querySelector('#hc-pp h1').getAttribute('aria-label'), document.querySelectorAll('#hc-pp li.hc-pp-k').length, !!document.querySelector('#hc-pp-beatslot #hc-pp-pd-btn')]")
         check('palette piano: the old address /palette-piano still builds the same page, pill in the header', r == ['Paco Benovo 2.0', n_pal, True], str(r))
         await pctx.close()
         # a solo: hold the mouse button and sweep sideways across six strips
