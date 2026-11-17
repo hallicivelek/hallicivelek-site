@@ -288,10 +288,12 @@ The redesign looks fine on his iPhone and speed is fine. Wanton Boys Club GIF st
 
 ## Where we left off (2026-11-04)
 - **2026-11-17:** the palette piano brought up to the approved jam mockup (`jam.html` + `drums.js`): new sounds,
-  gestures, Italo bass, solos, Halli's recordings (`assets/palette-piano/`), the beat maker. **Built, 140/140 tests pass;
-  not committed or pushed** (the director pushes). Not checked: the live site, a real iPhone, the sound by ear on the
-  live site, the recordings actually loading from GitHub Pages (only a test server; CORS headers checked on an existing
-  asset), Cargo's real Esc handling with the panel open. Small differences from the mockup: site font instead of Nunito,
+  gestures, Italo bass, solos, Halli's recordings (`assets/palette-piano/`), the beat maker. **Committed, pushed and live** (build
+  `2026-11-17 00:41`, 140/140 tests). Checked on the live site in the desktop browser pane: 94 strips, all 14 recordings
+  load from GitHub Pages, a chord-1 strip asks for chord-1, a chord-2 strip asks for its four slices snapped to the
+  running beat, the beat starts and stops, the pill sits right of the sound button, no page errors, and the pill is gone
+  on the playthings page. Not checked: a real iPhone, the sound by ear on the live site, Cargo's real Esc handling with
+  the panel open, leaving the page through Cargo's in-page navigation while the beat runs (the test click reloaded). Small differences from the mockup: site font instead of Nunito,
   the pill sits right of the sound switch (above it on phones) instead of bottom left, desktop panel capped at 45% with a
   sticky top row, recordings fetched lazily (so the very first press of a chord strip may still be synth).
 - **2026-11-16:** the palette piano (`src/hc-palette-piano.html`, `src/palettes.json`, `tools/build_palettes.py`), its
