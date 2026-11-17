@@ -158,10 +158,14 @@
   #hc-pp-pd-panel button:focus-visible, #hc-pp-pd-panel input:focus-visible, #hc-pp-pd-panel select:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 2px; }
   #hc-pp-pd-panel .hc-pp-pd-top { position: sticky; top: -12px; z-index: 1; display: flex; align-items: center; gap: 10px; margin: -12px -14px 10px; padding: 12px 14px 0; background: #fff; }
   #hc-pp-pd-panel .hc-pp-pd-go, #hc-pp-pd-panel .hc-pp-pd-shuf, #hc-pp-pd-panel .hc-pp-pd-clear, #hc-pp-pd-panel .hc-pp-pd-x { min-height: 40px; border: 0; border-radius: 999px; padding: 0 16px; }
-  #hc-pp-pd-panel .hc-pp-pd-go { background: #492E46; color: #F3DCDF; min-width: 84px; }
-  #hc-pp-pd-panel .hc-pp-pd-clear, #hc-pp-pd-panel .hc-pp-pd-shuf { background: rgba(73, 46, 70, .09); }
-  #hc-pp-pd-panel .hc-pp-pd-shuf[aria-pressed="true"] { background: #492E46; color: #F3DCDF; }
-  #hc-pp-pd-panel .hc-pp-pd-x { margin-left: auto; background: none; min-width: 40px; padding: 0 10px; color: rgba(73, 46, 70, .66); }
+  /* one rule for the toggles (Play, Shuffle, Sound): filled dark = on, light with an outline = off; one-shot actions (Clear, Done) are plain underlined text, never filled */
+  #hc-pp-pd-panel .hc-pp-pd-go, #hc-pp-pd-panel .hc-pp-pd-shuf, #hc-pp-pd-panel .hc-pp-pd-snd { background: #fff; color: #492E46; box-shadow: inset 0 0 0 2px #492E46; }
+  #hc-pp-pd-panel .hc-pp-pd-go[aria-pressed="true"], #hc-pp-pd-panel .hc-pp-pd-shuf[aria-pressed="true"], #hc-pp-pd-panel .hc-pp-pd-snd[aria-pressed="true"] { background: #492E46; color: #F3DCDF; }
+  #hc-pp-pd-panel .hc-pp-pd-go { min-width: 84px; }
+  #hc-pp-pd-panel .hc-pp-pd-go::before { content: "▶ "; font-size: .8em; }
+  #hc-pp-pd-panel .hc-pp-pd-go[aria-pressed="true"]::before { content: "■ "; }
+  #hc-pp-pd-panel .hc-pp-pd-clear, #hc-pp-pd-panel .hc-pp-pd-x { background: none; box-shadow: none; color: rgba(73, 46, 70, .8); text-decoration: underline; text-underline-offset: 3px; }
+  #hc-pp-pd-panel .hc-pp-pd-x { margin-left: auto; min-width: 40px; padding: 0 10px; }
   #hc-pp-pd-panel .hc-pp-pd-speed { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; max-width: 300px; }
   #hc-pp-pd-panel .hc-pp-pd-speed label { color: rgba(73, 46, 70, .66); font-size: 14px; }
   #hc-pp-pd-panel .hc-pp-pd-num { min-width: 2.2em; text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; }
@@ -213,12 +217,11 @@
     #hc-pp-pd-panel .hc-pp-pd-top { position: static; flex: none; flex-wrap: wrap; margin: 0 0 4px; padding: 0; gap: 6px; row-gap: 2px; }
     #hc-pp-pd-panel .hc-pp-pd-go, #hc-pp-pd-panel .hc-pp-pd-shuf, #hc-pp-pd-panel .hc-pp-pd-clear, #hc-pp-pd-panel .hc-pp-pd-x { min-height: 44px; min-width: 44px; padding: 0 12px; font-size: 14px; }
     #hc-pp-pd-panel .hc-pp-pd-go { min-width: 68px; }
-    #hc-pp-pd-panel .hc-pp-pd-x { background: #F3DCDF; color: #492E46; font-weight: bold; padding: 0 18px; }
+    #hc-pp-pd-panel .hc-pp-pd-x { font-weight: bold; padding: 0 18px; }
     #hc-pp-pd-panel .hc-pp-pd-speed label { display: none; }
     #hc-pp-pd-panel .hc-pp-pd-speed { order: 9; flex: 1 0 100%; max-width: none; gap: 8px; }
     #hc-pp-pd-panel .hc-pp-pd-speed input { height: 44px; }
-    #hc-pp-pd-panel .hc-pp-pd-snd { display: inline-flex; align-items: center; justify-content: center; flex: none; min-height: 44px; padding: 0 12px; border-radius: 999px; background: rgba(73, 46, 70, .09); font-size: 14px; white-space: nowrap; }
-    #hc-pp-pd-panel .hc-pp-pd-snd[aria-pressed="true"] { background: #492E46; color: #F3DCDF; }
+    #hc-pp-pd-panel .hc-pp-pd-snd { display: inline-flex; align-items: center; justify-content: center; flex: none; min-height: 44px; padding: 0 12px; border-radius: 999px; font-size: 14px; white-space: nowrap; }
     #hc-pp-pd-panel .hc-pp-pd-main { display: flex; flex-direction: column; flex: 1 0 auto; justify-content: space-between; gap: 8px; }
     #hc-pp-pd-panel .hc-pp-pd-rows { gap: 5px; }
     #hc-pp-pd-panel .hc-pp-pd-row { grid-template-columns: 1fr; gap: 1px; }
@@ -233,6 +236,13 @@
     #hc-pp-pd-panel .hc-pp-pd-fill { height: 44px; min-width: 0; }
     #hc-pp-pd-panel .hc-pp-pd-says { gap: 5px; }
     #hc-pp-pd-panel .hc-pp-pd-say { min-height: 36px; min-height: clamp(36px, calc(36px + (100dvh - 667px) * .045), 44px); padding: 0 10px; font-size: 13px; }
+  }
+  @media (max-width: 999.98px) and (max-height: 700px) {   /* short phones (375 x 667): the five pads need a little room, so the chips and fills are a little lower and tighter */
+    #hc-pp-pd-panel .hc-pp-pd-say { min-height: 32px; padding: 0 8px; }
+    #hc-pp-pd-panel .hc-pp-pd-says { gap: 4px; }
+    #hc-pp-pd-panel .hc-pp-pd-fill { height: 40px; }
+    #hc-pp-pd-panel .hc-pp-pd-left > .hc-pp-pd-grp { margin-top: 6px; }
+    #hc-pp-pd-panel .hc-pp-pd-cap { margin-bottom: 2px; }
   }
   html.hc-pp-pd-full button.hc-pp-quiet, html.hc-pp-pd-full .hc-pause, html.hc-pp-pd-full .hc-back, html.hc-pp-pd-full .hc-ns-bar { visibility: hidden !important; }
   @media (prefers-reduced-motion: reduce) {
@@ -1475,7 +1485,12 @@
     { name: 'chord-2a', file: 'chord-2a.mp3', label: 'chord 2a', group: 'chord' },
     { name: 'chord-2b', file: 'chord-2b.mp3', label: 'chord 2b', group: 'chord' },
     { name: 'chord-2c', file: 'chord-2c.mp3', label: 'chord 2c', group: 'chord' },
-    { name: 'chord-2d', file: 'chord-2d.mp3', label: 'chord 2d', group: 'chord' }
+    { name: 'chord-2d', file: 'chord-2d.mp3', label: 'chord 2d', group: 'chord' },
+    { name: 'houseychord-1', file: 'houseychord-1.mp3', label: 'housey 1', group: 'chord' },
+    { name: 'houseychord-2', file: 'houseychord-2.mp3', label: 'housey 2', group: 'chord' },
+    { name: 'pad-1', file: 'pad-1.mp3', label: 'pad 1', group: 'pad' },
+    { name: 'pad-2', file: 'pad-2.mp3', label: 'pad 2', group: 'pad' },
+    { name: 'pad-3', file: 'pad-3.mp3', label: 'pad 3', group: 'pad' }
   ];
   var voices = {};   // key -> { buf, base (seconds of leading silence skipped), dur (playable), lvl (level-matching gain), peak, trimmed }
   var TARGET_PEAK = 0.35, SAY_GAIN = 0.8, SILENCE_MIN = 0.03, EDGE = 0.008;
@@ -1617,7 +1632,7 @@
     var p = ui.panel = el('section', 'hc-pp-pd-panel', null, { id: 'hc-pp-pd-panel', 'aria-label': 'Beat maker', hidden: '' });
 
     var top = el('div', 'hc-pp-pd-top');
-    ui.go = el('button', 'hc-pp-pd-go', 'Play', { type: 'button' });
+    ui.go = el('button', 'hc-pp-pd-go', 'Play', { type: 'button', 'aria-pressed': 'false', 'aria-label': 'Play the beat' });
     ui.shuf = el('button', 'hc-pp-pd-shuf', 'Shuffle: off', { type: 'button', 'aria-pressed': 'false', 'aria-label': 'Shuffle' });
     ui.clear = el('button', 'hc-pp-pd-clear', 'Clear', { type: 'button' });
     var sp = el('div', 'hc-pp-pd-speed');
@@ -1625,7 +1640,7 @@
     ui.tempo = el('input', null, null, { id: 'hc-pp-pd-tempo', type: 'range', min: BPM_MIN, max: BPM_MAX, step: 1, value: bpm, 'aria-label': 'Speed, beats a minute', 'aria-valuetext': bpm + ' beats a minute' });
     ui.num = el('span', 'hc-pp-pd-num', String(bpm), { 'aria-hidden': 'true' });
     sp.appendChild(lab); sp.appendChild(ui.tempo); sp.appendChild(ui.num);
-    ui.snd = el('button', 'hc-pp-pd-snd', 'Sound on', { type: 'button', 'aria-pressed': 'false', 'aria-label': 'Sound' });   // phones only: the page's own sound switch, reached from here
+    ui.snd = el('button', 'hc-pp-pd-snd', 'Sound on', { type: 'button', 'aria-pressed': 'true', 'aria-label': 'Sound' });   // phones only: the page's own sound switch, reached from here
     sp.appendChild(ui.snd);
     ui.x = el('button', 'hc-pp-pd-x', 'Close', { type: 'button' });
     top.appendChild(ui.go); top.appendChild(ui.shuf); top.appendChild(sp); top.appendChild(ui.clear); top.appendChild(ui.x);
@@ -1713,8 +1728,8 @@
       g.appendChild(box);
       return g;
     }
-    var g2 = padGroup('Voices', 'voice'), g3 = padGroup('Chords', 'chord');
-    pads.appendChild(g2); pads.appendChild(g3);
+    var g2 = padGroup('Voices', 'voice'), g3 = padGroup('Chords', 'chord'), g4 = padGroup('Pads', 'pad');
+    pads.appendChild(g2); pads.appendChild(g3); pads.appendChild(g4);
     left.appendChild(g1); main.appendChild(left); main.appendChild(pads); p.appendChild(main);
 
     ui.btn.addEventListener('click', function () { openPanel(p.hidden); });
@@ -1749,8 +1764,7 @@
   function syncSnd() {
     var q = document.getElementById('hc-pp-quiet'); if (!q || !ui.snd) return;
     var m = q.getAttribute('aria-pressed') === 'true';
-    ui.snd.setAttribute('aria-pressed', String(m)); ui.snd.textContent = m ? 'Sound off' : 'Sound on';
-    ui.snd.setAttribute('aria-label', m ? 'Turn the sound on' : 'Turn the sound off');
+    ui.snd.setAttribute('aria-pressed', String(!m)); ui.snd.textContent = m ? 'Sound off' : 'Sound on';   // pressed = the sound is on
   }
   function lock() {
     if (locked) return;
@@ -1796,7 +1810,7 @@
   function syncUI() {
     if (!ui.go) return;
     ui.go.textContent = T.patOn ? 'Stop' : 'Play';
-    ui.go.setAttribute('aria-label', T.patOn ? 'Stop the beat' : 'Play the beat');
+    ui.go.setAttribute('aria-pressed', String(!!T.patOn));
   }
   function syncPads() {
     MANIFEST.forEach(function (m) {

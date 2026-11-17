@@ -770,13 +770,13 @@ async def main(base):
         check('solo: sweeping across the strips with the button held lights their bands one by one, and starts no strip',
               r[0] >= 5 and r[1] == 0 and r[2]['ctx'] and r[2]['waiting'] == 0, str(r))
         await page.click('#hc-pp-pd-btn'); await page.wait_for_timeout(200)
-        await page.wait_for_function('window.__hcPaletteDrums.loaded() === 15', timeout=8000)
+        await page.wait_for_function('window.__hcPaletteDrums.loaded() === 20', timeout=8000)
         r = await page.evaluate("""() => { const p = document.getElementById('hc-pp-pd-panel'), go = p.querySelector('.hc-pp-pd-go'), st = p.querySelector('.hc-pp-pd-step'), sel = p.querySelector('select'), cs = e => getComputedStyle(e);
           return { open: !p.hidden, pill: document.getElementById('hc-pp-pd-btn').textContent, go: [cs(go).backgroundColor, cs(go).textTransform, cs(go).letterSpacing === '4px'],
             step: cs(st).borderTopWidth, select: [cs(sel).borderTopWidth, cs(sel).textTransform], pads: p.querySelectorAll('.hc-pp-pd-say[aria-disabled="false"]').length }; }""")
-        check('beat maker: the pill opens the panel; Cargo\'s button and select styles stay out; the recordings arrive (15 pads ready)',
-              r['open'] and r['pill'] == 'Hide the beat' and r['go'] == ['rgb(73, 46, 70)', 'none', False] and r['step'] == '0px' and r['select'] == ['0px', 'none'] and r['pads'] == 15
-              and len(asked) == 15 and all(u.endswith('.mp3') and '/assets/palette-piano/' in u for u in asked), f'{r} {len(asked)}')
+        check('beat maker: the pill opens the panel; Cargo\'s button and select styles stay out; the recordings arrive (20 pads ready)',
+              r['open'] and r['pill'] == 'Hide the beat' and r['go'] == ['rgb(255, 255, 255)', 'none', False] and r['step'] == '0px' and r['select'] == ['0px', 'none'] and r['pads'] == 20
+              and len(asked) == 20 and all(u.endswith('.mp3') and '/assets/palette-piano/' in u for u in asked), f'{r} {len(asked)}')
         pl = await page.evaluate(PLACE)
         check('beat maker (1440 wide): the panel sits above the buttons, under half the screen tall, nothing scrolling inside, below the header',
               pl['panel'] and pl['panelAbove'] and pl['panelShare'] <= 0.5 and not pl['panelScrolls'] and pl['panelTop'] >= 64, str(pl))
@@ -921,14 +921,14 @@ async def main(base):
         r = await page.evaluate("""() => [window.__hcPaletteDrums.loaded(), document.querySelectorAll('#hc-pp-pd-panel .hc-pp-pd-say[aria-disabled="true"]').length,
           window.__says.length, window.__starts.length, window.__hcPalettePiano.sound().lastNote > 0]""")
         check('recordings missing: the "HalliChord 2" strip plays its synth notes instead, the pads stay greyed out, no errors',
-              r[0] == 0 and r[1] == 15 and r[2] == 0 and r[3] > 0 and r[4] and not errs, f'{r} {errs[:1]}')
+              r[0] == 0 and r[1] == 20 and r[2] == 0 and r[3] > 0 and r[4] and not errs, f'{r} {errs[:1]}')
         await ctx.close()
         # the open panel shows everything without a scrollbar at MacBook Air page sizes (and bigger), under about half the screen, clear of the two pills
         SCROLL = """() => { const p = document.getElementById('hc-pp-pd-panel'), all = [p, ...p.querySelectorAll('*')];
           return { panel: [p.scrollHeight, p.clientHeight], scrollers: all.filter(e => e.scrollHeight > e.clientHeight + 0 && getComputedStyle(e).overflowY !== 'visible').map(e => e.className || e.tagName),
             clipped: all.filter(e => e.scrollHeight > e.clientHeight + 1 && e.clientHeight > 0 && ['auto', 'scroll', 'hidden'].includes(getComputedStyle(e).overflowY)).length,
             fits: p.getBoundingClientRect().top >= 0 }; }"""
-        for w, h in [(1440, 760), (1280, 680), (1440, 900)]:
+        for w, h in [(1440, 760), (1280, 680), (1280, 800), (1440, 900)]:
             ctx = await b.new_context(viewport={'width': w, 'height': h})
             page = await ctx.new_page(); errs = []
             page.on('pageerror', lambda e: errs.append(str(e)))
@@ -936,6 +936,7 @@ async def main(base):
             await page.evaluate("document.getElementById('hc-pp-pd-btn').click()"); await page.wait_for_timeout(400)
             await page.evaluate("() => { window.PPDrums.set(3, 2, true); window.PPDrums.shuffle(true); }")
             pl = await page.evaluate(PLACE); sc = await page.evaluate(SCROLL)
+            if SHOTS_PP: await page.screenshot(path=os.path.join(SHOTS_PP, f'beat-desk-{w}x{h}.png'))
             check(f'beat maker ({w}x{h}): the open panel has no scrollbar (scrollHeight = clientHeight, nothing scrollable inside), is under 50% of the height ({pl["panelShare"]}), above and clear of both pills',
                   sc['panel'][0] == sc['panel'][1] and not sc['scrollers'] and sc['clipped'] == 0 and sc['fits'] and pl['panelShare'] <= 0.5 and pl['panelAbove'] and pl['apart'] and not errs, f'{sc} {pl} {errs[:1]}')
             await ctx.close()
@@ -988,12 +989,7 @@ async def main(base):
             check(f'beat maker ({w}x{h}): the open panel covers the whole screen, one row of 16 steps for each of the four instruments, Done at the top right, fills in one row',
                   r['open'] and cover and [x[0] for x in r['rows']] == [16] * 4 and len({x[1] for x in r['rows']}) == 4 and all(x[2] >= 18 for x in r['rows'])
                   and r['done'] == 'Done' and r['doneSize'][0] >= 44 and r['doneSize'][1] >= 44 and r['doneRight'] <= 20 and len(set(r['fills'])) == 1 and r['wide'] and not errs, f'{r} {errs[:1]}')
-            if h == 844:
-                check(f'beat maker ({w}x{h}): everything fits without scrolling (nothing scrolls inside the panel)', r['panelScroll'][0] <= r['panelScroll'][1] + 1 and r['scrollers'] == 0, str(r['panelScroll']))
-            else:
-                print(f'   note (375x667): panel scrollHeight {r["panelScroll"][0]} in {r["panelScroll"][1]}')
-                check(f'beat maker ({w}x{h}): fits too, or at most the pads area scrolls (scrollHeight {r["panelScroll"][0]} in {r["panelScroll"][1]})',
-                      r['panelScroll'][0] <= r['panelScroll'][1] + 1 or r['rows'][3][1] + 40 < r['panelScroll'][1], str(r))
+            check(f'beat maker ({w}x{h}): everything fits without scrolling, pads included (nothing scrolls inside the panel)', r['panelScroll'][0] <= r['panelScroll'][1] + 1 and r['scrollers'] == 0, str(r['panelScroll']))
             check(f'beat maker ({w}x{h}): the page behind is locked while open (body fixed, no page scroll) and the bottom buttons are not visible, the sound switch is in the panel',
                   r['bodyPos'] == 'fixed' and r['scrollY'] == 0 and r['bottomInPanel'] and r['hidden']['quiet'] and r['hidden']['pause'] and r['hidden']['pill'] and r['sound'] and r['sound'][2] >= 44, str(r))
             # the panel's sound switch is the page's own: muting here flips the sound switch and the audio state, and back
@@ -1003,6 +999,21 @@ async def main(base):
               return [window.__hcPalettePiano.sound().muted, document.getElementById('hc-pp-quiet').getAttribute('aria-pressed'), document.querySelector('#hc-pp-pd-panel .hc-pp-pd-snd').textContent]; }""")
             check(f'beat maker ({w}x{h}): the sound switch inside the panel uses the page\'s mute (muted, shown in both, and back)',
                   m1 == [True, 'true', 'Turn the sound on', 'Sound off'] and m2 == [False, 'false', 'Sound on'], f'{m1} {m2}')
+            # one rule for the toggles: dark = on, light = off (Play, Shuffle, Sound); Clear and Done are plain text, never filled
+            TOG = """() => { const p = document.getElementById('hc-pp-pd-panel'), q = s => p.querySelector(s), dark = e => getComputedStyle(e).backgroundColor === 'rgb(73, 46, 70)', f = s => ({ p: q(s).getAttribute('aria-pressed'), dark: dark(q(s)) });
+              return { play: f('.hc-pp-pd-go'), shuf: f('.hc-pp-pd-shuf'), snd: f('.hc-pp-pd-snd'), clear: getComputedStyle(q('.hc-pp-pd-clear')).backgroundColor, done: getComputedStyle(q('.hc-pp-pd-x')).backgroundColor }; }"""
+            if SHOTS_PP and h == 844: await page.screenshot(path=os.path.join(SHOTS_PP, 'btn-idle.png'))
+            t0 = await page.evaluate(TOG)
+            await page.click('#hc-pp-pd-panel .hc-pp-pd-go'); await page.click('#hc-pp-pd-panel .hc-pp-pd-shuf'); await page.click('#hc-pp-pd-panel .hc-pp-pd-snd'); await page.wait_for_timeout(200)
+            t1 = await page.evaluate(TOG)
+            if SHOTS_PP and h == 844: await page.screenshot(path=os.path.join(SHOTS_PP, 'btn-on.png'))
+            await page.click('#hc-pp-pd-panel .hc-pp-pd-go'); await page.click('#hc-pp-pd-panel .hc-pp-pd-shuf'); await page.click('#hc-pp-pd-panel .hc-pp-pd-snd'); await page.wait_for_timeout(200)
+            t2 = await page.evaluate(TOG)
+            plain = 'rgba(0, 0, 0, 0)'
+            check(f'beat maker ({w}x{h}): Play, Shuffle and Sound are filled and aria-pressed true only while on (Sound on at first), light when off; Clear and Done are never filled',
+                  t0['play'] == {'p': 'false', 'dark': False} and t0['shuf'] == {'p': 'false', 'dark': False} and t0['snd'] == {'p': 'true', 'dark': True}
+                  and t1['play'] == {'p': 'true', 'dark': True} and t1['shuf'] == {'p': 'true', 'dark': True} and t1['snd'] == {'p': 'false', 'dark': False}
+                  and t2 == t0 and t0['clear'] == plain and t0['done'] == plain, f'{t0} {t1} {t2}')
             # a tap in the gap between two squares picks the square under the finger
             g = await page.evaluate("""() => { const st = document.querySelector('#hc-pp-pd-panel .hc-pp-pd-steps'), a = st.children[5].getBoundingClientRect(), c = st.children[6].getBoundingClientRect();
               return [(a.right + c.left) / 2, a.top + a.height / 2]; }""")
