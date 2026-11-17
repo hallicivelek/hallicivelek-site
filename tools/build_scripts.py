@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 BASE = 'https://hallicivelek.github.io/hallicivelek-site/dist/js/'
-ADDONS = [ROOT / 'dist' / 'hc-columns.html', ROOT / 'src' / 'hc-nav-active.html', ROOT / 'src' / 'hc-blobs.html', ROOT / 'dist' / 'hc-pond.html',
+ADDONS = [ROOT / 'src' / 'hc-allo.html', ROOT / 'dist' / 'hc-columns.html', ROOT / 'src' / 'hc-nav-active.html', ROOT / 'src' / 'hc-blobs.html', ROOT / 'dist' / 'hc-pond.html',
           ROOT / 'src' / 'hc-stylecheck.html', ROOT / 'src' / 'hc-eyes.html', ROOT / 'src' / 'hc-playthings.html', ROOT / 'src' / 'hc-retro.html', ROOT / 'src' / 'hc-music.html', ROOT / 'src' / 'hc-fold.html', ROOT / 'src' / 'hc-project.html', ROOT / 'src' / 'hc-strata.html', ROOT / 'dist' / 'hc-weather-free.html', ROOT / 'src' / 'hc-birth-a-blob.html', ROOT / 'dist' / 'hc-palette-piano.html', ROOT / 'src' / 'hc-debug.html']
 # The files the loader in Cargo's Custom HTML names (pasted 2026-11-03). Add-ons added later are loaded by the last
 # of these, so a new add-on never needs a new paste. A newer loader may name them too: each add-on runs only once.
@@ -29,6 +29,7 @@ HEADER = """<!-- ===============================================================
     11. Stylesheet check    if Cargo's own stylesheet arrives empty, fetches it again and puts it in place
     12. Birth-a-blob        draw a face on a blank blob and let it go to drift with the others
     13. Palette piano       every project as a strip of its own colours, to click and play
+    14. Allo                the site typeface Allo (replaces Pacaembu): font face + one global font-family rule
      Each is its own script file, so if one ever breaks (or GitHub is down) the others and the site keep working.
      ================================================================ -->
 """

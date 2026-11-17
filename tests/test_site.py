@@ -1120,6 +1120,36 @@ async def main(base):
         check('phone: birth a blob fits the screen and lets its blob go', r[0] <= r[1] and r[2] == n0 + 1, f'page {r[0]}px wide on {r[1]}, blobs {n0} -> {r[2]}')
         if SHOTS: await p4.screenshot(path=os.path.join(SHOTS, 'phone.png'))
         check('no script errors (phone)', not errs, '; '.join(errs)[:200])
+        # ---- Allo, the site typeface ----
+        ALLO_SHOTS = os.environ.get('ALLO_SHOTS')
+        ALLO_JS = """() => { const q = s => document.querySelector(s), f = e => e ? getComputedStyle(e).fontFamily : null;
+          return { loaded: document.fonts.check('16px Allo') && document.fonts.check('700 16px Allo'),
+            face: [...document.fonts].some(x => x.family.replace(/"/g, '') === 'Allo' && x.status === 'loaded'),
+            body: f(document.body), nav: f(q('.navigation a')), logo: f(q('.header_text a')), cap: f(q('.caption')),
+            h1: f(q('h1')), btn: f(q('button')), thumb: f(q('.thumb_title')), ptag: f(q('p')),
+            rond: getComputedStyle(document.body).fontVariationSettings, over: document.documentElement.scrollWidth <= innerWidth + 1 } }"""
+        for url, name, w, h in [('/', 'home', 1440, 900), ('/', 'home', 390, 844), ('/short/Cheerios/', 'project', 1440, 900), ('/short/Cheerios/', 'project', 390, 844),
+                                ('/short/playthings/', 'playthings', 1440, 900), ('/short/playthings/', 'playthings', 390, 844),
+                                ('/paco-benovo', 'paco-benovo', 1440, 900), ('/paco-benovo', 'paco-benovo', 390, 844),
+                                ('/short/info-contact/', 'info', 1440, 900), ('/music-mixes', 'music', 1440, 900)]:
+            ap = await b.new_page(viewport={'width': w, 'height': h}); aerrs = []
+            ap.on('pageerror', lambda e: aerrs.append(str(e)))
+            await ap.goto(base + url); await ap.wait_for_timeout(2500)
+            r = await ap.evaluate(ALLO_JS)
+            starts = lambda v: v is None or v.replace('"', '').startswith('Allo')
+            check(f'allo ({name} {w}): font file loads', r['loaded'] and r['face'], str(r['loaded']) + ' ' + str(r['face']))
+            check(f'allo ({name} {w}): body, nav, headings, buttons, captions and cards all start with Allo, not Georgia / sans-serif',
+                  all(starts(r[k]) for k in ['body', 'nav', 'logo', 'cap', 'h1', 'btn', 'thumb', 'ptag']), str({k: r[k] for k in ['body', 'nav', 'h1', 'btn', 'thumb']}))
+            check(f'allo ({name} {w}): ROND 65 on the body, no script errors, no sideways scroll (except the stand-in grid pages: its button clash is wider than real Cargo)', 'ROND' in r['rond'] and '65' in r['rond'] and (r['over'] or name in ('home', 'project')) and not aerrs, r['rond'] + ' ' + '; '.join(aerrs)[:150])
+            if name == 'home' and w == 1440:   # the "pause blobs" button keeps its look: spaced capitals
+                pb = await ap.evaluate("""() => { const e = [...document.querySelectorAll('button')].find(x => /pause blobs/i.test(x.textContent)); if (!e) return null; const s = getComputedStyle(e);
+                  return [s.fontFamily, s.letterSpacing, s.textTransform, s.fontWeight, s.fontSize, e.textContent] }""")
+                check('allo: "pause blobs" keeps its spaced capitals, in Allo', bool(pb) and pb[0].startswith('Allo') and pb[1] != 'normal' and pb[2] == 'uppercase', str(pb))
+            if ALLO_SHOTS:
+                os.makedirs(ALLO_SHOTS, exist_ok=True)
+                await ap.screenshot(path=os.path.join(ALLO_SHOTS, f'{name}-{w}x{h}.png'))
+            await ap.close()
+
         await b.close()
 
 
@@ -1177,6 +1207,8 @@ if __name__ == '__main__':
         (site / 'paste' / str(i) / 'Cheerios').mkdir(parents=True); (site / 'paste' / str(i) / 'Cheerios' / 'index.html').write_text(html)
     (site / 'index.html').write_text(PAGE.replace('ADDONS', tags).replace('<p>PAGE CONTENT</p>', GRID))   # the front page (strata)
     (site / 'px.png').write_bytes(png(120, 90))
+    (site / 'assets' / 'fonts').mkdir(parents=True)   # Allo, where hc-allo.js looks for it (two folders up from js/)
+    for f in (ROOT / 'assets' / 'fonts').iterdir(): (site / 'assets' / 'fonts' / f.name).write_bytes(f.read_bytes())
     (site / 'halli_apparat_fold_stort.jpg').write_bytes(png(45, 94))
     (site / 'assets' / 'apparat').mkdir(parents=True)
     for f in (ROOT / 'assets' / 'apparat').iterdir(): (site / 'assets' / 'apparat' / f.name).write_bytes(f.read_bytes())

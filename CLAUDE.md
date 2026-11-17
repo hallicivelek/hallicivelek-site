@@ -32,7 +32,7 @@ Everything reaches the live site through Cargo's **Custom HTML** setting. Two wa
 ## Build and test
 ```
 python3 build.py              # src/ → dist/hc-columns.html, dist/hc-pond.html, dist/custom-html.html; syntax-checks every script
-python3 tests/test_site.py    # 187 checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, weather, umbrella, phone)
+python3 tests/test_site.py    # 187 checks plus the Allo checks in a stand-in for Cargo's page (desktop, ordinary page, project grid, script files, eyes, weather, umbrella, phone)
 ```
 Tests need `python3 -m pip install --user playwright` (this Mac has no bare `pip`) and `python3 -m playwright install chromium`.
 The build was verified to reproduce the installed files byte-for-byte when this project was set up.
@@ -190,6 +190,15 @@ The build was verified to reproduce the installed files byte-for-byte when this 
   Years: Cargo's `date`, a year in the title, or a dated year in the text ("…, 1999."). `tools/build_weather.py`
   puts the table into `dist/hc-weather.html` (run by build.py; refuses a line it can't read). A project missing from
   the table gets a gentle default sky. Screenshots: `~/Documents/hallicivelek.com/mockups/weather/build/` (its `shot.py`).
+- `src/hc-allo.html` — **the site typeface Allo** (built 2026-11-17, not pushed). The font is `assets/fonts/allo-variable.woff2`
+  (subset of AlloVariable.ttf by fontTools: Basic Latin, Latin-1, Latin Extended-A, general punctuation, arrows, euro; axes wght 100-900,
+  opsz 9-32, ROND 0-100, all features kept; ~355 KB; `OFL.txt` beside it). The add-on is first in the script list (loaded by hc-pond's
+  later-loader, so no paste needed), injects a preload link, the `@font-face` (URL taken from its own script address, two folders up
+  from `dist/js/`; falls back to the GitHub Pages address) and ONE rule: `font-family: Allo` + `font-variation-settings: "ROND" 65` +
+  optical sizing on html, body and every element (except svg, code/pre, `.hc-keep-font`) with `!important`, so Cargo's own Pacaembu rules lose. Nothing
+  else (weight, size, letter-spacing, capitals) is touched. The 1999 modes (hc-retro) keep their joke fonts (their rules are more specific).
+  The other add-ons' own stacks are now `Allo, sans-serif`. Same file: on phones (max-width 600px) body text on Halli's Cargo pages
+  is 2px larger (plain `.project_content p` 16 to 18px; inline 15px to 17px, inline 16px to 18px); add-on containers (ID rules) and desktop unchanged.
 - `src/hc-debug.html` — screen measurements overlay, **only with `?hc-debug`** in the address (for diagnosing phones).
 - `src/parts/before.html`, `src/parts/after.html` — **Halli's own** Custom HTML (Cargo filter script, StatCounter,
   Typekit link that loads the site font Pacaembu; mobile menu fixes). Keep as he gives them.
@@ -262,7 +271,8 @@ a mode is on. The mode lasts for the visit (sessionStorage `hc-1999`). `window._
 - iOS Safari's floating toolbar: the pond uses `100lvh` so it covers the strip behind it.
 - Cargo's own CSS to know about: `.link_link.link_active a` has a cream background (we override it), `.column` has
   `width: calc(50% - 20px) !important`, `.thumbnails.clear` sets the 40px gap.
-- The site font (Pacaembu, via Typekit) is licensed to the domain: the standalone `src/pond.html` falls back to Nunito.
+- The site font is now **Allo** (OFL, self-hosted, see `src/hc-allo.html`); Pacaembu/Typekit is being retired (Halli removes the Typekit
+  link from `src/parts/before.html` / Cargo once Allo is live). The standalone `src/pond.html` declares Allo itself (Nunito is gone).
 - In headless tests, navigating to the same URL with only a different `#hash` does not reload the page; add a
   `?query` to force real reloads. Background browser tabs pause `requestAnimationFrame`.
 - Koto (Karplus–Strong): the loop is **N − 0.5 samples** long; getting this wrong made high notes up to 41 cents sharp.

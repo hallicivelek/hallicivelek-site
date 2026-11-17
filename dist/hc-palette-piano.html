@@ -20,7 +20,7 @@
 <style>
   html.hc-pp-on .thumbnails, html.hc-pp-on #hc-sort { display: none !important; }
   #hc-pp { box-sizing: border-box; width: min(1180px, 92vw); position: relative; left: 50%; transform: translateX(-50%);
-    text-align: left; font-family: pacaembu, sans-serif; color: #492E46; letter-spacing: .02em; line-height: 1.5;
+    text-align: left; font-family: Allo, sans-serif; color: #492E46; letter-spacing: .02em; line-height: 1.5;
     padding: 8px 0 120px; }
   #hc-pp *, #hc-pp *::before, #hc-pp *::after { box-sizing: border-box; }
   #hc-pp a { color: inherit; }
@@ -90,7 +90,7 @@
   /* sound on/off: bottom left, the blobs' pause button (and 1999 mode's way back) keep the bottom right */
   button.hc-pp-quiet { display: none; position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 1001;
     min-height: 44px; margin: 0; padding: 0 18px; border: 0; border-radius: 999px; background: #492E46; color: #F3DCDF;
-    font-family: pacaembu, sans-serif; font-size: 15px; font-weight: normal; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;
+    font-family: Allo, sans-serif; font-size: 15px; font-weight: normal; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;
     box-shadow: 0 6px 16px -6px rgba(73, 46, 70, .5); }
   html.hc-pp-on button.hc-pp-quiet { display: inline-flex; align-items: center; }
   button.hc-pp-quiet[aria-pressed="true"] { background: #fff; color: #492E46; }
@@ -130,7 +130,7 @@
      page), the panel docks at the bottom above "Turn the sound off" (placed by measuring, see place()), on <body>. Everything under its own ids, so Cargo's button, select and input
      styles stay out (#hc-pp-pd-panel button etc. reset them; the class rules after them win over the reset) */
   #hc-pp-pd-btn { display: inline-flex; align-items: center; gap: 10px; position: static; min-height: 52px; margin: 0; padding: 0 28px; border: 0; border-radius: 999px;
-    background: #492E46; color: #F3DCDF; font-family: pacaembu, sans-serif; font-size: 18px; font-weight: bold; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;
+    background: #492E46; color: #F3DCDF; font-family: Allo, sans-serif; font-size: 18px; font-weight: bold; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;
     box-shadow: 0 8px 18px -8px rgba(73, 46, 70, .6); transition: transform .12s ease; -webkit-tap-highlight-color: transparent; }
   #hc-pp-pd-btn::before { content: "▶"; font-size: 12px; }
   #hc-pp-pd-btn:hover { transform: translateY(-1px); }
@@ -146,7 +146,7 @@
 
   #hc-pp-pd-panel { position: fixed; left: 16px; right: 16px; bottom: 72px; z-index: 1001; box-sizing: border-box; max-width: 780px; margin: 0 auto;
     padding: 12px 14px 14px; border: 0; background: #fff; color: #492E46; border-radius: 6px 6px 16px 16px;
-    font: 15px/1.3 pacaembu, sans-serif; letter-spacing: .04em; text-align: left; text-transform: none;
+    font: 15px/1.3 Allo, sans-serif; letter-spacing: .04em; text-align: left; text-transform: none;
     box-shadow: 0 1px 1px rgba(73, 46, 70, .12), 0 14px 30px -10px rgba(73, 46, 70, .45); transform: rotate(-.3deg); transform-origin: 50% 100%;
     max-height: calc(100vh - 120px); overflow-y: auto; overscroll-behavior: contain; }   /* desktop: only a safety net; the layout is compact enough that nothing scrolls at 1280x680 and up */
   #hc-pp-pd-panel[hidden], html:not(.hc-pp-on) #hc-pp-pd-panel { display: none !important; }
@@ -190,7 +190,7 @@
   #hc-pp-pd-panel .hc-pp-pd-fill { flex: 1; min-width: 72px; height: 50px; border: 0; border-radius: 10px; background: #F3DCDF; font-weight: 700; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none; box-shadow: 0 2px 0 rgba(73, 46, 70, .25); }
   #hc-pp-pd-panel .hc-pp-pd-fill.hc-pp-pd-on { transform: translateY(2px); box-shadow: none; background: #492E46; color: #F3DCDF; }
   #hc-pp-pd-panel .hc-pp-pd-says { display: flex; flex-wrap: wrap; gap: 6px 5px; }
-  #hc-pp-pd-panel .hc-pp-pd-say { min-width: 0; min-height: 44px; padding: 0 10px; border: 0; border-radius: 10px; background: #F3DCDF; font-size: 14px; user-select: none; -webkit-user-select: none; box-shadow: 0 2px 0 rgba(73, 46, 70, .25); }
+  #hc-pp-pd-panel .hc-pp-pd-say { min-width: 0; min-height: 44px; padding: 0 8px; border: 0; border-radius: 10px; background: #F3DCDF; font-size: 14px; letter-spacing: .005em; user-select: none; -webkit-user-select: none; box-shadow: 0 2px 0 rgba(73, 46, 70, .25); }
   #hc-pp-pd-panel .hc-pp-pd-say:active, #hc-pp-pd-panel .hc-pp-pd-say.hc-pp-pd-on { transform: translateY(2px); box-shadow: none; }
   #hc-pp-pd-panel .hc-pp-pd-say.hc-pp-pd-on { background: #492E46; color: #F3DCDF; }
   #hc-pp-pd-panel .hc-pp-pd-say[aria-disabled="true"] { opacity: .42; cursor: default; box-shadow: none; background: rgba(73, 46, 70, .07); }
@@ -1571,6 +1571,10 @@
   };
   window.PPVoices = PPVoices;
 
+  /* Pad levels. Every recording is normalised to the same peak (about -9 dBFS), 6 dB above the kick (-15.4 dBFS through the drum bus,
+     measured offline 2026-11-17) and much louder in RMS. Voices now sit about level with the snare (-14.4 dBFS), chords 5 dB and pads 6 dB
+     under the kick peak. Only the beat maker's pads use these; the strips' own samples pass their own gain and are unchanged. */
+  var PAD_GAIN = { voice: 0.43, chord: 0.22, pad: 0.19 };   // was 0.8 for all (SAY_GAIN)
   /* pads: a hit restarts the recording if it still sounds */
   var padHit = {};
   function padPress(m) {
@@ -1578,7 +1582,7 @@
     var live = h && !h.stopped && h.end > now + 0.01;
     var when = window.PPClock.running ? window.PPClock.nextGrid() : undefined;
     if (live) h.stop(when);
-    h = padHit[m.name] = PPVoices.say(m.name, when);
+    h = padHit[m.name] = PPVoices.say(m.name, when, PAD_GAIN[m.group]);
     lightPad(m, Math.max(0, (h.end - now) * 1000));
   }
   function lightPad(m, ms) {
