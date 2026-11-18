@@ -199,6 +199,17 @@
     var th = document.querySelector('.thumbnails[data-columnize]');
     if (!th) return;
     var cols = [].slice.call(th.children).filter(function (c) { return c.classList.contains('column'); });
+    // Cargo deals the cards into columns by the grid's width at that moment. On the playthings / about-me pages the
+    // grid sits hidden (width 0), so Cargo made ONE column (or none): coming home showed one huge first picture
+    // until a refresh or resize. Once the grid is visible and wide, ask Cargo to deal again (a resize, which is
+    // what fixes it by hand); look again a second later and retry (up to 4 times) if it did not take.
+    var gw = th.clientWidth, tries = +th.getAttribute('data-hc-redeal') || 0;
+    if (!gw || cols.length >= 2 || innerWidth < MIN_WIDTH) { if (tries) th.removeAttribute('data-hc-redeal'); }
+    else if (tries < 4) {
+      th.setAttribute('data-hc-redeal', String(tries + 1));
+      dispatchEvent(new Event('resize'));
+      setTimeout(fix, 1000);
+    }
     if (!cols.length) return;
     var three = innerWidth >= THREE && cols.length >= 3;
     var use = three ? cols.slice(0, 3) : innerWidth >= MIN_WIDTH ? cols.slice(0, 2) : cols;

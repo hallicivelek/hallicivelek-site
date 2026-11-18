@@ -41,6 +41,15 @@ The build was verified to reproduce the installed files byte-for-byte when this 
 - `src/pond.html` — **the blob-pond**, a standalone page (open it in a browser to try it). Source of truth for the pond.
 - `src/hc-blobs.html` — background blobs on every page except the pond page (behaviours, faces, pause button).
 - `src/hc-columns.html` — re-deals Cargo's thumbnail columns (three into two on desktop) and applies the **random sort**.
+  **Home-grid bug (found 2026-11-18, fixed in the build, not pushed):** the home grid also exists, hidden, on playthings /
+  about-me etc. Cargo deals its columns by the grid's width at that moment (0 when hidden), so it made ONE column (or none);
+  clicking the logo to go home showed one huge first picture until a refresh or resize (live repro: every time from
+  playthings, about-me, a project). `fix()` now dispatches a `resize` (what fixes it by hand) (retried up to 4 times, a second apart) when the grid
+  is visible, >= 768px wide and has fewer than two columns (`data-hc-redeal`). Test: 'one-column grid ... dealt again'.
+  **Blobs after the pond (2026-11-18):** `hc-blobs.js` used to `return` on a pond address, so if the pond was the first page
+  loaded, Cargo's in-page jump home never started the blobs (plain beige, no blobs). It now polls (300 ms) for the address
+  to leave the pond and then boots (`boot()`); nothing is set on the pond that needs undoing, and 'hc-blobs-paused' is
+  untouched. Test: 'blobs start when you leave the blob-pond page'.
 - `src/facts.txt` — **Halli's facts** for the random sort (hands, stripes, food, …), keyed by project address. The format
   is explained at the top of the file. `tools/build_facts.py` puts them into `dist/hc-columns.html` and refuses to build
   on a line it can't read.

@@ -74,7 +74,7 @@
   .panel .close svg { width: 14px; height: 14px; }
   .panel .scale { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; }
   .pick { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 8px 0 16px; border-radius: 999px; font-size: 14px; }
-  .pick select { font: inherit; letter-spacing: inherit; color: var(--ink); background: transparent; border: 0; padding: 8px 4px; cursor: pointer; }
+  .pick select { font: inherit; letter-spacing: inherit; color: var(--ink); background: transparent; border: 0; padding: 8px 4px; cursor: pointer; max-width: none; }
   .panel .chip, .panel .tool, .panel .pick { background: var(--bg); }   /* inside the white panel, controls take the pond's colour so they still read as buttons */
   #blobsToggle svg { transition: transform .2s ease; }
   #blobsToggle[aria-expanded="true"] svg { transform: rotate(180deg); }
@@ -620,7 +620,19 @@
     var opts = [['time', 'follows the time of day']].concat(Object.keys(SCALES).filter(function (k) { return !SCALES[k].secret || chosen === k; })
       .map(function (k) { return [k, k === 'bp' && strange ? 'something strange' : SCALES[k].name]; }));
     pick.innerHTML = opts.map(function (o) { return '<option value="' + o[0] + '"' + (o[0] === chosen ? ' selected' : '') + '>' + o[1] + '</option>'; }).join('');
+    sizePicker();
   }
+  function sizePicker() {           // an explicit width: the longest option as measured in the font that is in use now, plus room for the native chevron
+    var cs = getComputedStyle(pick), c = document.createElement('canvas').getContext('2d'), w = 0;
+    c.font = cs.fontStyle + ' ' + cs.fontWeight + ' ' + cs.fontSize + ' ' + cs.fontFamily;
+    if ('letterSpacing' in c) c.letterSpacing = cs.letterSpacing;
+    [].forEach.call(pick.options, function (o) { w = Math.max(w, c.measureText(o.text).width); });
+    pick.style.width = Math.ceil(w + parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight) + 30) + 'px';
+  }
+  // the menu sizes itself to its longest option in whatever font is there when it is filled; Allo is wider than the
+  // fallback, so once Allo arrives, fill it again so the label isn't cut off (Firefox keeps the old width otherwise)
+  if (document.fonts && document.fonts.load) document.fonts.load('14px Allo').then(function () { fillPicker(); }, function () {});
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fillPicker(); });
   function setScale(id, how) {
     chosen = id; strange = false; fillPicker(); drawCaption();
     document.getElementById('scaleSr').textContent = 'now playing the ' + scaleLabel() + ' scale';

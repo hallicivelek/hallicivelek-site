@@ -1306,6 +1306,32 @@ async def main(base):
             if w == 390: check('playthings (390): no card title wraps past two lines', all(x <= 2 for x in r['tall']), str(r['tall']))
             await ap.close()
 
+        # ---- coming home from a page where the grid was hidden: Cargo had dealt ONE column (live bug, 2026-11-18) ----
+        ap = await b.new_page(viewport={'width': 1200, 'height': 800}); await ap.goto(base + '/short/filter/artdirection/'); await ap.wait_for_timeout(1500)
+        await ap.evaluate("""() => {
+          window.__rs = 0;   // stand-in for Cargo: on resize it deals the cards again into two columns
+          addEventListener('resize', () => { window.__rs++; const th = document.querySelector('.thumbnails'), cols = [...th.children].filter(c => c.classList.contains('column'));
+            if (cols.length < 2 && th.clientWidth) { const cards = [...cols[0].children]; const b = cols[0].cloneNode(false); cards.forEach((c, i) => (i % 2 ? b : cols[0]).appendChild(c)); th.appendChild(b); } });
+          const th = document.querySelector('.thumbnails'), cols = [...th.children].filter(c => c.classList.contains('column'));
+          cols.slice(1).forEach(c => { [...c.children].forEach(k => cols[0].appendChild(k)); c.remove(); });   // one column, as Cargo makes it at width 0
+        }""")
+        await ap.wait_for_timeout(1500)
+        r = await ap.evaluate("""() => { const th = document.querySelector('.thumbnails'), w = th.clientWidth;
+          const im = [...th.querySelectorAll('.thumb_image')].map(e => e.getBoundingClientRect());
+          return { rs: window.__rs, cols: [...th.children].filter(c => c.classList.contains('column') && c.children.length).length, w,
+                   inView: im.filter(r => r.top < innerHeight && r.width > 0).length, widest: Math.max(...im.map(r => r.width)) } }""")
+        check('one-column grid on a visible desktop page is dealt again (resize sent, 2+ columns, 3+ pictures in the first screen, none wider than 60%)',
+              r['rs'] >= 1 and r['cols'] >= 2 and r['inView'] >= 3 and r['widest'] <= r['w'] * 0.6, str(r))
+        await ap.close()
+
+        # ---- leaving the blob-pond page in-page (Cargo does not reload): the background blobs must start (live bug, 2026-11-18) ----
+        ap = await b.new_page(viewport={'width': 1200, 'height': 800}); await ap.goto(base + '/short/blob-pond/'); await ap.wait_for_timeout(1500)
+        before = await ap.evaluate("() => !!document.querySelector('.hc-blobs')")
+        await ap.evaluate("() => history.pushState({}, '', '/short/info-contact/')"); await ap.wait_for_timeout(1500)
+        r = await ap.evaluate("() => ({ blobs: !!document.querySelector('.hc-blobs'), n: document.querySelectorAll('.hc-blobs *').length, bg: getComputedStyle(document.body).backgroundColor })")
+        check('blobs start when you leave the blob-pond page without a reload (none on the pond itself)', not before and r['blobs'] and r['n'] > 5 and r['bg'] == 'rgb(243, 220, 223)', str((before, r)))
+        await ap.close()
+
         await b.close()
 
 

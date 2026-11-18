@@ -1,7 +1,15 @@
 /* hc-blobs for hallicivelek.com: built from src/hc-blobs.html by build.py, do not edit here */
 (function () {
   if (window.__hcBlobs) return;
-  if (/blob-?pond/i.test(location.pathname)) return;   // the blob-pond page has its own blobs
+  var POND = /blob-?pond/i;
+  if (POND.test(location.pathname)) {   // the blob-pond page has its own blobs. Cargo changes page without reloading, so
+    // when you leave the pond (logo, nav) start the blobs then; before, they never started until a refresh
+    var wait = setInterval(function () { if (!POND.test(location.pathname)) { clearInterval(wait); boot(); } }, 300);
+    return;
+  }
+  boot();
+  function boot() {
+  if (window.__hcBlobs) return;
   window.__hcBlobs = true;
 
   /* ---------- settings to play with ---------- */
@@ -826,5 +834,6 @@
     },
     spots: function () { return blobs.filter(function (b) { return b.state === 'float'; }).map(function (b) { return [b.x, viewY(b), b.d]; }); }
   };
+  }
 })();
-window.__hcBuild = "2026-11-18 01:01";
+window.__hcBuild = "2026-11-18 12:03";
