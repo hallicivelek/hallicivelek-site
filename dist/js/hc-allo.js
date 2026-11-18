@@ -31,4 +31,4 @@
   document.head.appendChild(st);
   if (document.fonts && document.fonts.load) { try { document.fonts.load('400 16px Allo'); document.fonts.load('700 16px Allo'); } catch (e) {} }
 })();
-window.__hcBuild = "2026-11-18 12:03";
+window.__hcBuild = "2026-11-18 16:51";

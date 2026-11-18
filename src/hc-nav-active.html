@@ -14,6 +14,9 @@
   .site_header .navigation li a:hover, .site_header .navigation li a:focus-visible, .site_header .navigation li.link_active a,
   .site_header .navigation li a[aria-current="page"] { color: rgb(73, 46, 70) !important; font-weight: 800 !important; }
   @media (prefers-reduced-motion: reduce) { .site_header .navigation li a { transition: none; } }
+  /* The "Halli Civelek" logo (a 565x110 PNG set in Cargo's header): 36px tall on desktop by Cargo's default, now 44px, still sharp on
+     2x screens and clear of the header's 64px line. Phones already show it at about 47px and are left alone. */
+  @media (min-width: 769px) { .site_header .header_image, .site_header .header_image img { height: 44px !important; width: auto !important; max-height: none !important; max-width: none !important; } }
   /* The back link on every page that has one (← things I've made on projects and tag pages, ← Paco Benovo, ← playthings): the
      nav's language, plum, 700 at rest and 800 on hover / focus, no underline, no teal. Each carries data-text (its own words) so the
      800 weight is reserved and nothing moves. 44px to tap; the negative top margin keeps the words where a 15px link used to sit. */

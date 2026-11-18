@@ -1913,4 +1913,4 @@
   /* ---------------------------------------------------------------- go: built the first time the piano page is shown; hc-palette-piano's check() calls check() on every change */
   check();
 })();
-window.__hcBuild = "2026-11-18 12:03";
+window.__hcBuild = "2026-11-18 16:51";
