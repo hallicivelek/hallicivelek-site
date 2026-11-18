@@ -11,14 +11,7 @@
   #hc-pj { width: min(940px, 92vw); position: relative; left: 50%; transform: translateX(-50%); padding-bottom: 40px;
     font-family: Allo, sans-serif; color: rgb(73, 46, 70); text-align: left; }
   #hc-pj * { text-align: left; }
-  #hc-pj a.hc-pj-back { display: inline-block; font-size: 15px; font-weight: bold; color: rgb(14, 118, 128); text-decoration: none; margin: 0 0 28px; }
-  #hc-pj a.hc-pj-back:hover { background: none !important; color: rgb(14, 118, 128) !important; text-decoration: underline; }
-  /* the way back to the palette piano (only when the visit came from there): the same slot, in the quiet ink, 44px to tap */
-  #hc-pj a.hc-pj-back.hc-pj-piano { display: inline-flex; align-items: center; min-height: 44px; margin: -8px 0 20px; padding: 0 16px 0 0;
-    color: rgba(73, 46, 70, .66); border-radius: 6px; }
-  #hc-pj a.hc-pj-back.hc-pj-piano:hover { color: rgb(73, 46, 70) !important; text-underline-offset: 3px; }
-  #hc-pj a.hc-pj-back.hc-pj-piano:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 0; color: rgb(73, 46, 70); }
-  @media (max-width: 600px) { #hc-pj a.hc-pj-back.hc-pj-piano { font-size: 16px; } }
+  /* the back link (← things I've made, ← Paco Benovo) is styled once, as a.hc-bk, in hc-nav-active */
   #hc-pj h1 { font-family: inherit; font-size: 44px; line-height: 1.1; margin: 0 0 14px; font-weight: bold; color: inherit; text-transform: none; }
   #hc-pj .hc-pj-lede { font-size: 22px; line-height: 1.35; margin: 0 0 88px; max-width: 640px; }
   #hc-pj .hc-pj-text { max-width: 600px; margin: 0 0 80px; }   /* room to breathe: Halli controls the pace */
@@ -189,8 +182,8 @@
     var seq = SEQUENCE.indexOf(slug) >= 0, extra = PROJECTS[slug] || {}, ms = models(), m = idx >= 0 ? (ms[idx].attributes || {}) : { title: titleHere() };
     var list = tokens(box);
     var root = el('div'); root.id = 'hc-pj';
-    var piano = fromPiano(slug), back = el('a', 'hc-pj-back' + (piano ? ' hc-pj-piano' : ''), piano ? '← Paco Benovo' : "← things I've made");
-    back.href = piano ? '/paco-benovo' : '/'; root.appendChild(back);
+    var piano = fromPiano(slug), back = el('a', 'hc-bk hc-pj-back' + (piano ? ' hc-pj-piano' : ''), piano ? '← Paco Benovo' : "← things I've made");
+    back.setAttribute('data-text', back.textContent); back.href = piano ? '/paco-benovo' : '/'; root.appendChild(back);
     root.appendChild(el('h1', '', String(m.title || slug).replace(/ - /g, ' – ')));
 
     // the first paragraph (Halli's "what and for whom") becomes the opening line, above the first picture

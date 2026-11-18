@@ -25,8 +25,7 @@
   #hc-pp *, #hc-pp *::before, #hc-pp *::after { box-sizing: border-box; }
   #hc-pp a { color: inherit; }
   #hc-pp .hc-pp-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; padding: 0; }
-  #hc-pp a.hc-pp-back { display: inline-block; font-size: 18px; text-decoration: none; margin-bottom: 0; background: none !important; color: inherit !important; }
-  #hc-pp a.hc-pp-back:hover { text-decoration: underline; }
+  #hc-pp a.hc-pp-back { margin-bottom: 0; }   /* the look is the shared a.hc-bk (hc-nav-active); the header below brings its own space */
   /* the header (Paco Benovo 2.0), one centred lockup: ruled spaced-caps kicker, the name with its bracketed pairs and a tilted teal "2.0" badge,
      then the words and the "Make a beat" pill centred below in a narrow column; the back link stays alone top left */
   #hc-pp header.hc-pp-hd { display: block; text-align: center; margin: 64px 0 60px; padding: 0; border: 0; background: none; }
@@ -114,7 +113,6 @@
   @media (max-width: 800px) { #hc-pp header.hc-pp-hd { margin-top: 44px; margin-bottom: 40px; } #hc-pp h1 { font-size: 72px; } }
   @media (max-width: 760px) {
     #hc-pp { padding: 18px 0 110px; }
-    #hc-pp a.hc-pp-back { margin-bottom: 0; font-size: 17px; }
   }
   @media (max-width: 600px) {
     #hc-pp header.hc-pp-hd { margin-top: 36px; }
@@ -512,7 +510,7 @@
     '<span class="hc-pp-w">' + pair('Be', 'Beats') + pair('no', 'Noises') + pair('vo', 'Voices') + '</span>' +
     '<span class="hc-pp-yr">2.0</span></span>';
   var HTML =
-    '<a class="hc-pp-back" href="/playthings">← playthings</a>' +
+    '<a class="hc-bk hc-pp-back" data-text="← playthings" href="/playthings">← playthings</a>' +
     '<header class="hc-pp-hd">' +
       '<div class="hc-pp-hl">' +
         '<p class="hc-pp-kicker">Civelektronique presents:</p>' +

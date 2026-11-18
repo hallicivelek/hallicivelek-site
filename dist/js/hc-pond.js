@@ -693,7 +693,7 @@
   addEventListener('popstate', check);
   check();
 })();
-window.__hcBuild = "2026-11-17 23:22";
+window.__hcBuild = "2026-11-17 23:56";
 /* add-ons added after the Custom HTML was pasted, loaded from the same folder */
 (function () { var me = document.currentScript; if (!me || !me.src) return;
   ["hc-allo", "hc-stylecheck", "hc-eyes", "hc-playthings", "hc-retro", "hc-music", "hc-fold", "hc-project", "hc-strata", "hc-weather-free", "hc-birth-a-blob", "hc-palette-piano", "hc-debug"].forEach(function (name) {

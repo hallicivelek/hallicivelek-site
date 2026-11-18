@@ -1,10 +1,21 @@
 /* hc-nav-active for hallicivelek.com: built from src/hc-nav-active.html by build.py, do not edit here */
-(function () { var s = document.createElement("style"); s.textContent = "\n  .site_header .navigation li a, .site_header .navigation li.link_active a { color: rgb(73, 46, 70) !important; font-weight: 500 !important;\n    display: inline-block; transition: font-weight .15s ease; }\n  .site_header .navigation li a::after { content: attr(data-text); display: block; height: 0; overflow: hidden; visibility: hidden; pointer-events: none;\n    font-weight: 800 !important; }\n  .site_header .navigation li a:hover, .site_header .navigation li a:focus-visible, .site_header .navigation li.link_active a,\n  .site_header .navigation li a[aria-current=\"page\"] { color: rgb(73, 46, 70) !important; font-weight: 800 !important; }\n  @media (prefers-reduced-motion: reduce) { .site_header .navigation li a { transition: none; } }\n\n\n  html:not(.hc-pj-ready) .project_content { opacity: 0 !important; }\n  .project_content { transition: opacity .25s ease; }\n"; document.head.appendChild(s); })();
+(function () { var s = document.createElement("style"); s.textContent = "\n  .site_header .navigation li a, .site_header .navigation li.link_active a { color: rgb(73, 46, 70) !important; font-weight: 500 !important;\n    display: inline-block; transition: font-weight .15s ease; }\n  .site_header .navigation li a::after { content: attr(data-text); display: block; height: 0; overflow: hidden; visibility: hidden; pointer-events: none;\n    font-weight: 800 !important; }\n  .site_header .navigation li a:hover, .site_header .navigation li a:focus-visible, .site_header .navigation li.link_active a,\n  .site_header .navigation li a[aria-current=\"page\"] { color: rgb(73, 46, 70) !important; font-weight: 800 !important; }\n  @media (prefers-reduced-motion: reduce) { .site_header .navigation li a { transition: none; } }\n  /* The back link on every page that has one (← things I've made on projects and tag pages, ← Paco Benovo, ← playthings): the\n     nav's language, plum, 700 at rest and 800 on hover / focus, no underline, no teal. Each carries data-text (its own words) so the\n     800 weight is reserved and nothing moves. 44px to tap; the negative top margin keeps the words where a 15px link used to sit. */\n  a.hc-bk, a.hc-bk:visited { display: inline-flex; flex-direction: column; align-items: flex-start; justify-content: center; min-height: 44px; margin: -8px 0 20px;\n    padding: 0 16px 0 0; font-size: 16px; font-weight: 700 !important; line-height: 1.3; color: rgb(73, 46, 70) !important; text-decoration: none !important;\n    background: none !important; border-radius: 6px; transition: font-weight .15s ease; }\n  a.hc-bk::after { content: attr(data-text); display: block; height: 0; overflow: hidden; visibility: hidden; pointer-events: none; font-weight: 800; }\n  a.hc-bk:hover, a.hc-bk:focus-visible { font-weight: 800 !important; color: rgb(73, 46, 70) !important; text-decoration: none !important; background: none !important; }\n  a.hc-bk:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 0; }\n  @media (prefers-reduced-motion: reduce) { a.hc-bk { transition: none; } }\n\n\n  html:not(.hc-pj-ready) .project_content { opacity: 0 !important; }\n  .project_content { transition: opacity .25s ease; }\n"; document.head.appendChild(s); })();
 (function () {
   if (window.__hcNav) return;
   window.__hcNav = true;
 
   function clean(path) { return path.replace(/\/+$/, '') || '/'; }
+
+  // The playthings' own pages (the local ones on the cards in hc-playthings; the others live on other sites), lower case.
+  // One list, used here for the nav and for the project-wait script below. A test checks it against hc-playthings.
+  var PLAY = ['birth-a-blob', 'paco-benovo', 'palette-piano', 'the-blob-pond', 'blob-pond'];
+  function isPlaything(path) { return PLAY.indexOf(clean(path).replace(/^\//, '').toLowerCase()) >= 0; }
+  // A project page: hc-project has laid it out (#hc-pj, with its back link), or Cargo's own mark on <body> says so
+  function isProject() {
+    var b = document.body;
+    return !!(document.getElementById('hc-pj') || document.querySelector('a.hc-pj-back') || (b && b.getAttribute('data-pagetype') === 'project'));
+  }
+  function linkPath(a) { try { return clean(new URL(a.href, location.href).pathname); } catch (e) { return null; } }
 
   function mark() {
     var links = [].slice.call(document.querySelectorAll('.site_header .navigation a'));
@@ -21,14 +32,17 @@
       a.removeAttribute('aria-current');
     });
 
+    function to(p) { return links.filter(function (a) { return linkPath(a) === p; })[0]; }
     var active = links.filter(function (a) { return a.parentElement.classList.contains('link_active'); })[0];
     if (!active) {
       // Cargo didn't mark anything: find the link for this page (or a page inside it)
       active = links.filter(function (a) {
-        var p;
-        try { p = clean(new URL(a.href, location.href).pathname); } catch (e) { return false; }
-        return p !== '/' && (here === p || here.indexOf(p + '/') === 0);
+        var p = linkPath(a);
+        return p && p !== '/' && (here === p || here.indexOf(p + '/') === 0);
       })[0];
+      // a plaything's page belongs to "playthings"; the front page and every project belong to "things I've made"
+      if (!active && isPlaything(here)) active = to('/playthings');
+      if (!active && (here === '/' || isProject())) active = to('/');
       if (active) {
         active.parentElement.classList.add('link_active');
         active.parentElement.setAttribute('data-hc-active', '');
@@ -38,17 +52,20 @@
   }
 
   // Cargo changes pages without reloading, so check again whenever the page changes
-  var lastPath = null, pending = null;
+  // (a project is only known once Cargo has marked <body> or hc-project has built #hc-pj, a moment after the address changes,
+  // so the page's kind is part of what we compare, not just its address)
+  var lastKey = null, pending = null;
   function check() {
     clearTimeout(pending);
     pending = setTimeout(function () {
-      if (location.pathname !== lastPath || !document.querySelector('.site_header [aria-current]')) {
-        lastPath = location.pathname;
+      var key = location.pathname + '|' + isProject();
+      if (key !== lastKey || !document.querySelector('.site_header [aria-current]')) {
+        lastKey = key;
         mark();
       }
     }, 80);
   }
-  new MutationObserver(check).observe(document.body, { childList: true, subtree: true });
+  new MutationObserver(check).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-pagetype'] });
   addEventListener('popstate', check);
   document.addEventListener('DOMContentLoaded', check);
   check();
@@ -75,4 +92,4 @@
   }, true);
   addEventListener('popstate', function () { wait(location.pathname); });
 })();
-window.__hcBuild = "2026-11-17 23:22";
+window.__hcBuild = "2026-11-17 23:56";

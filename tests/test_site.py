@@ -1168,6 +1168,78 @@ async def main(base):
                 await ap.screenshot(path=os.path.join(ALLO_SHOTS, f'{name}-{w}x{h}.png'))
             await ap.close()
 
+        # ---- nav: the current link on project pages, plaything pages, home, about, music (nav as on the live site) ----
+        NAV = ('<div class="site_header"><div class="navigation"><ul>'
+               '<li class="link_link"><a href="https://www.hallicivelek.com">things I\'ve made</a></li>'
+               '<li class="link_link"><a href="https://www.hallicivelek.com/playthings">playthings</a></li>'
+               '<li class="link_link"><a href="https://www.hallicivelek.com/music-mixes">music</a></li>'
+               '<li class="link_link"><a href="https://www.hallicivelek.com/about-me">about me</a></li></ul></div></div>')
+        NAVJS = (ROOT / 'dist' / 'js' / 'hc-nav-active.js').read_text()
+        def navpage(body_attr='', inner=''):
+            return '<!doctype html><html><body' + body_attr + '>' + NAV + inner + '</body></html>'
+        async def active_of(pg):
+            return await pg.evaluate("[...document.querySelectorAll('.site_header .navigation li.link_active a')].map(a => a.textContent)")
+        navcases = [('/Cheerios', ' data-pagetype="project"', '', ["things I've made"]),              # Cargo's mark alone
+                    ('/Cheerios', ' data-pagetype="page"', '<div id="hc-pj"><a class="hc-pj-back">x</a></div>', ["things I've made"]),   # the add-on alone
+                    ('/Paco-Benovo/', ' data-pagetype="page"', '', ['playthings']), ('/palette-piano', ' data-pagetype="page"', '', ['playthings']),
+                    ('/birth-a-blob', ' data-pagetype="page"', '', ['playthings']), ('/the-blob-pond', ' data-pagetype="page"', '', ['playthings']),
+                    ('/playthings', ' data-pagetype="page"', '', ['playthings']), ('/about-me', ' data-pagetype="page"', '', ['about me']),
+                    ('/music-mixes', ' data-pagetype="page"', '', ['music']), ('/', ' data-pagetype="page"', '', ["things I've made"]),
+                    ('/some-other-page', ' data-pagetype="page"', '', [])]
+        for path, battr, inner, want in navcases:
+            pg = await b.new_page(); errs = []
+            pg.on('pageerror', lambda e: errs.append(str(e)))
+            html = navpage(battr, inner)
+            await pg.route('**/navcase/**', lambda route, request, html=html: route.fulfill(content_type='text/html', body=html))
+            await pg.goto(base + '/navcase/')
+            await pg.evaluate("p => history.replaceState({}, '', p)", path)   # the page lives under /navcase/: move the address to the real one, then run the script
+            await pg.add_script_tag(content=NAVJS); await pg.wait_for_timeout(400)
+            got = await active_of(pg)
+            cur = await pg.evaluate("[...document.querySelectorAll('[aria-current]')].map(a => a.textContent)")
+            check(f'nav active on {path} ({battr.strip() or "no pagetype"}{", add-on" if inner else ""})', got == want and cur == want, f'{got} {cur}')
+            check(f'nav {path}: no script errors', not errs, '; '.join(errs)[:200])
+            await pg.close()
+        # in-page navigation: Cargo changes the address and body mark, then the add-on builds #hc-pj
+        pg = await b.new_page()
+        await pg.route('**/navcase/**', lambda route, request: route.fulfill(content_type='text/html', body=navpage(' data-pagetype="page"')))
+        await pg.goto(base + '/navcase/'); await pg.evaluate("history.replaceState({}, '', '/')")
+        await pg.add_script_tag(content=NAVJS); await pg.wait_for_timeout(300)
+        seq = [await active_of(pg)]
+        await pg.evaluate("history.pushState({}, '', '/Cheerios'); document.body.setAttribute('data-pagetype', 'project')"); await pg.wait_for_timeout(400)
+        seq.append(await active_of(pg))
+        await pg.evaluate("document.body.insertAdjacentHTML('beforeend', '<div id=\"hc-pj\"><a class=\"hc-pj-back\">x</a></div>')"); await pg.wait_for_timeout(300)
+        seq.append(await active_of(pg))
+        await pg.evaluate("history.pushState({}, '', '/paco-benovo'); document.body.setAttribute('data-pagetype', 'page'); document.getElementById('hc-pj').remove()"); await pg.wait_for_timeout(400)
+        seq.append(await active_of(pg))
+        await pg.evaluate("history.pushState({}, '', '/about-me'); document.body.insertAdjacentHTML('beforeend', '<p>about</p>')"); await pg.wait_for_timeout(400)   # Cargo swaps the content, which is what the script notices
+        seq.append(await active_of(pg))
+        await pg.evaluate("history.pushState({}, '', '/Cheerios'); document.body.setAttribute('data-pagetype', 'project')"); await pg.wait_for_timeout(400)
+        seq.append(await active_of(pg))
+        check('nav follows in-page navigation: home, project, project add-on, plaything, about, project again',
+              seq == [["things I've made"], ["things I've made"], ["things I've made"], ['playthings'], ['about me'], ["things I've made"]], str(seq))
+        await pg.close()
+        # the list of plaything pages matches the local pages on the playthings cards
+        ph = (ROOT / 'src' / 'hc-playthings.html').read_text(); na = (ROOT / 'src' / 'hc-nav-active.html').read_text()
+        local = [h.strip('/').lower() for h in re.findall(r"href: '(/[^']+)'", ph)]
+        plist = re.search(r"var PLAY = \[([^\]]*)\]", na).group(1)
+        check('nav: every local playthings card is in the nav list of plaything pages', bool(local) and all(f"'{x}'" in plist for x in local), f'{local} vs {plist}')
+
+        # ---- one back-link style everywhere: plum, 700 -> 800 on hover without moving, no underline, no teal ----
+        for path, label in [('/short/Cheerios/', "\u2190 things I've made"), ('/paco-benovo/', '\u2190 playthings'), ('/short/birth-a-blob/', '\u2190 playthings'),
+                            ('/palette-piano/', '\u2190 playthings'), ('/short/filter/artdirection/', None)]:
+            pg = await b.new_page(viewport={'width': 1300, 'height': 760}); await pg.goto(base + path); await pg.wait_for_timeout(2200)
+            if label is None:   # the tag page: only on /filter/<tag> in Cargo; the stand-in's grid page has no back link, skip
+                await pg.close(); continue
+            probe = """() => { const a = document.querySelector('a.hc-bk'); if (!a) return null; const c = getComputedStyle(a), r = a.getBoundingClientRect();
+              return { text: a.textContent, dt: a.getAttribute('data-text'), color: c.color, weight: c.fontWeight, size: c.fontSize, deco: c.textDecorationLine, w: Math.round(r.width * 10) / 10, h: Math.round(r.height) } }"""
+            r0 = await pg.evaluate(probe)
+            if r0: await pg.hover('a.hc-bk'); await pg.wait_for_timeout(350)
+            r1 = await pg.evaluate(probe) if r0 else None
+            ok = bool(r0) and r0['text'] == label and r0['dt'] == label and r0['color'] == 'rgb(73, 46, 70)' and r0['weight'] == '700' and r0['size'] == '16px' and r0['deco'] == 'none' and r0['h'] == 44 \
+                 and r1['weight'] == '800' and r1['w'] == r0['w'] and r1['color'] == 'rgb(73, 46, 70)' and r1['deco'] == 'none'
+            check(f'back link on {path}: shared style (plum, 700, 800 on hover, same width, no underline, 44px)', ok, f'{r0} {r1}')
+            await pg.close()
+
         # ---- About: name 900, "more" rows 800, plain paragraphs 18px; playthings intro 800 and titles 900 ----
         for w, h in [(1440, 900), (390, 844)]:
             ap = await b.new_page(viewport={'width': w, 'height': h}); aerrs = []

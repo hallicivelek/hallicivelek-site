@@ -19,9 +19,6 @@
     text-decoration-thickness: 1.5px; margin-left: .6em; white-space: nowrap; }   /* dark teal: about 4:1 on the pink */
   /* a tag page (/filter/music): a title instead of a filter to clear */
   .hc-tag { text-align: left; margin: 0 0 22px; color: rgb(73, 46, 70); font-family: Allo, sans-serif; }
-  .hc-tag a { display: inline-block; font-size: 15px; font-weight: bold; color: rgb(14, 118, 128); text-decoration: none; margin: 0 0 22px; }
-  .hc-tag a:hover { background: none !important; color: rgb(14, 118, 128) !important; text-decoration: underline; }
-  .hc-tag a:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }
   .hc-tag h1 { font-family: inherit; font-size: 44px; line-height: 1.1; margin: 0 0 6px; font-weight: bold; color: inherit; text-transform: none; }
   .hc-tag p { font-size: 15px; opacity: .8; margin: 0; }
   @media (max-width: 600px) { .hc-tag h1 { font-size: 32px; } }
@@ -174,7 +171,7 @@
     if (m) {
       if (!tag) {
         tag = document.createElement('div'); tag.id = 'hc-tag'; tag.className = 'hc-tag';
-        var back = document.createElement('a'); back.href = '/'; back.textContent = "← things I've made";
+        var back = document.createElement('a'); back.href = '/'; back.className = 'hc-bk'; back.textContent = "← things I've made"; back.setAttribute('data-text', back.textContent);
         tag.appendChild(back); tag.appendChild(document.createElement('h1')); tag.appendChild(document.createElement('p'));
       }
       var slug = decodeURIComponent(m[1]).toLowerCase(), name = TAG_NAMES[slug] || slug.replace(/-/g, ' ');
