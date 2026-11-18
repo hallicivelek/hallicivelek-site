@@ -1,5 +1,5 @@
 /* hc-palette-piano for hallicivelek.com: built from dist/hc-palette-piano.html by build.py, do not edit here */
-(function () { var s = document.createElement("style"); s.textContent = "\n  html.hc-pp-on .thumbnails, html.hc-pp-on #hc-sort { display: none !important; }\n  #hc-pp { box-sizing: border-box; width: min(1180px, 92vw); position: relative; left: 50%; transform: translateX(-50%);\n    text-align: left; font-family: Allo, sans-serif; color: #492E46; letter-spacing: .02em; line-height: 1.5;\n    padding: 8px 0 120px; }\n  #hc-pp *, #hc-pp *::before, #hc-pp *::after { box-sizing: border-box; }\n  #hc-pp a { color: inherit; }\n  #hc-pp .hc-pp-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; padding: 0; }\n  #hc-pp a.hc-pp-back { margin-bottom: 0; }   /* the look is the shared a.hc-bk (hc-nav-active); the header below brings its own space */\n  /* the header (Paco Benovo 2.0), one centred lockup: ruled spaced-caps kicker, the name with its bracketed pairs and a tilted teal \"2.0\" badge,\n     then the words and the \"Make a beat\" pill centred below in a narrow column; the back link stays alone top left */\n  #hc-pp header.hc-pp-hd { display: block; text-align: center; margin: 64px 0 60px; padding: 0; border: 0; background: none; }\n  #hc-pp .hc-pp-hd p { font-family: inherit; text-transform: none; color: inherit; max-width: none; }\n  #hc-pp { --hc-pp-lede: 16px; }   /* the size of the \"Who needs\" line; the kicker above the name uses the same variable, so they always match */\n  #hc-pp .hc-pp-hd p.hc-pp-kicker { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 0 0 18px; font-size: 13px; font-weight: 400; line-height: 1.45;\n    letter-spacing: .32em; text-indent: .32em; text-transform: uppercase; color: inherit; }\n  #hc-pp .hc-pp-hd p.hc-pp-kicker::before, #hc-pp .hc-pp-hd p.hc-pp-kicker::after { content: \"\"; flex: 0 1 64px; height: 2px; background: currentColor; opacity: .55; }\n  #hc-pp h1 { font-family: inherit; font-size: 96px; line-height: 1; margin: 0 0 8px; text-align: center; font-weight: 900; letter-spacing: .03em; color: inherit; text-transform: none; white-space: nowrap;\n    display: table; position: relative; margin-left: auto; margin-right: auto; }   /* shrink-wrapped to the name, so the 2.0 badge can hang off its right edge and the name itself is what sits centred */\n  /* the name as five bracketed pairs: Pa co Be no vo, each with a thin U bracket under its letters and its word centred below; 2.0 follows plain.\n     Every unit is an inline block, so a wrapping heading only breaks between Paco and Benovo or before 2.0; the margin underneath holds the labels. */\n  #hc-pp h1 .hc-pp-w, #hc-pp h1 .hc-pp-yr { display: inline-block; white-space: nowrap; vertical-align: baseline; margin: 0 0 40px; padding: 0; }\n  #hc-pp h1 .hc-pp-w { margin-right: .16em; }\n  #hc-pp h1 .hc-pp-w:nth-last-child(2) { margin-right: 0; }\n  #hc-pp h1 .hc-pp-pr { display: inline-block; position: relative; margin: 0; padding: 0; vertical-align: baseline; white-space: nowrap; }\n  #hc-pp h1 .hc-pp-pr:last-child { margin-right: 0; }\n  #hc-pp h1 .hc-pp-lt { display: inline-block; margin: 0; padding: 0; }   /* pairs touch, so the gap between pairs is the same letter gap as inside them */\n  /* 2.0: a small tilted teal pill after the name (still one inline unit, so it can never wrap alone on a phone: the title is one line there) */\n  #hc-pp h1 .hc-pp-yr { margin: 0 0 0 .25em; font-size: .3em; font-weight: 900; letter-spacing: .04em; position: absolute; left: 100%; top: .32em;\n    background: #3BBFC9; color: #492E46; padding: .22em .55em .26em; border-radius: 999px; transform: rotate(7deg); line-height: 1.1; }\n  #hc-pp h1 .hc-pp-br { position: absolute; left: .06em; right: .06em; top: calc(100% - 2px); height: 8px; border: 2px solid currentColor; border-top: 0; border-radius: 0; background: none; }\n  #hc-pp h1 .hc-pp-lb { position: absolute; left: 50%; top: calc(100% + 11px); transform: translateX(-50%); font-size: 13px; line-height: 1.2; font-weight: normal;\n    letter-spacing: .16em; text-indent: .16em; white-space: nowrap; }\n  #hc-pp .hc-pp-hr { max-width: 600px; margin: 8px auto 0; }\n  #hc-pp .hc-pp-hd p.hc-pp-intro { margin: 0 0 10px; font-size: var(--hc-pp-lede); line-height: 1.45; text-align: center; text-wrap: pretty; }\n  #hc-pp .hc-pp-hd p.hc-pp-lead, #hc-pp .hc-pp-hd p.hc-pp-go { text-wrap: balance; }\n  #hc-pp .hc-pp-hd p.hc-pp-lead { font-weight: bold; }\n  #hc-pp .hc-pp-hd p.hc-pp-go { margin: 12px 0 12px; font-size: 18px; }\n  #hc-pp .hc-pp-hd p.hc-pp-beatslot { margin: 0; line-height: 1; }\n\n  /* the keys: each project a strip of its own colours, painted in bands on a white key, tilted a little like the prints on the pinboard */\n  #hc-pp ul.hc-pp-keys { display: grid; grid-template-columns: repeat(var(--cols), 1fr); --cols: 24; gap: 34px 8px; padding: 0; margin: 0; list-style: none; }\n  #hc-pp li.hc-pp-k { position: relative; margin: 0; padding: 0; list-style: none; line-height: 1.5; transform: translateY(var(--dy)) rotate(var(--tilt)); }\n  #hc-pp li.hc-pp-k::before, #hc-pp li.hc-pp-k::marker { content: none; }\n  #hc-pp button.hc-pp-key { display: flex; flex-direction: column; width: 100%; min-width: 0; height: 214px; padding: 4px 4px 5px; border: 0; margin: 0;\n    background: #fff; border-radius: 3px 3px 14px 14px; cursor: pointer; font: inherit; letter-spacing: 0; text-transform: none; color: inherit;\n    box-shadow: 0 1px 1px rgba(73, 46, 70, .12), 0 6px 14px -6px rgba(73, 46, 70, .35);\n    transition: transform .12s ease, box-shadow .12s ease; -webkit-tap-highlight-color: transparent;\n    /* soloing: a finger sweeping sideways (or held still a moment) plays the bands; an up-or-down swipe still scrolls the page */\n    touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }\n  /* each band overlaps the one above with a slightly uneven top edge, like paint or cut paper */\n  #hc-pp .hc-pp-key span { display: block; flex: var(--share) 1 0; min-height: 9px; margin-top: -4px; clip-path: var(--edge);\n    transition: transform .6s ease, filter .6s ease; }\n  #hc-pp .hc-pp-key span:first-child { margin-top: 0; clip-path: none; border-radius: 1px 1px 0 0; }\n  #hc-pp .hc-pp-key span:last-child { border-radius: 0 0 11px 11px; }\n  #hc-pp .hc-pp-key span.lit { transform: scaleX(1.22); filter: brightness(1.08) saturate(1.25); transition: transform .08s ease-out, filter .08s; }\n  #hc-pp button.hc-pp-key:hover { background: #fff; box-shadow: 0 1px 1px rgba(73, 46, 70, .12), 0 10px 18px -6px rgba(73, 46, 70, .4); }\n  #hc-pp button.hc-pp-key.down { transform: translateY(5px); box-shadow: 0 1px 1px rgba(73, 46, 70, .15), 0 2px 5px -2px rgba(73, 46, 70, .35); }\n  #hc-pp button.hc-pp-key:focus { outline: none; }\n  #hc-pp button.hc-pp-key:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n\n  /* the title only shows on hover, focus, or after a press: the work stands on its own */\n  #hc-pp a.hc-pp-tag { position: absolute; left: 50%; top: calc(100% + 10px); z-index: 2; width: max-content; max-width: 210px;\n    transform: translateX(-50%) rotate(calc(var(--tilt) * -1.4)); padding: 7px 12px 8px; background: #fff !important; color: inherit !important;\n    border-radius: 6px; font-size: 14px; line-height: 1.3; text-decoration: none; text-align: center;\n    box-shadow: 0 6px 14px -6px rgba(73, 46, 70, .4); opacity: 0; pointer-events: none; transition: opacity .15s; }\n  #hc-pp li.hc-pp-k[data-edge=\"l\"] a.hc-pp-tag { left: 0; transform: rotate(calc(var(--tilt) * -1.4)); text-align: left; }\n  #hc-pp li.hc-pp-k[data-edge=\"r\"] a.hc-pp-tag { left: auto; right: 0; transform: rotate(calc(var(--tilt) * -1.4)); text-align: right; }\n  #hc-pp .hc-pp-tag b { display: block; font-weight: bold; }\n  #hc-pp .hc-pp-tag i { font-style: normal; color: rgba(73, 46, 70, .66); text-decoration: underline; text-underline-offset: 3px; }\n  #hc-pp .hc-pp-tag:hover i { color: #492E46; }\n  #hc-pp a.hc-pp-tag:focus { outline: none; }\n  #hc-pp a.hc-pp-tag:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 2px; }\n  #hc-pp li.hc-pp-k:hover a.hc-pp-tag, #hc-pp li.hc-pp-k:focus-within a.hc-pp-tag, #hc-pp li.hc-pp-k.on a.hc-pp-tag { opacity: 1; pointer-events: auto; }\n  #hc-pp li.hc-pp-k:hover, #hc-pp li.hc-pp-k:focus-within, #hc-pp li.hc-pp-k.on { z-index: 3; }\n  #hc-pp ul.hc-pp-keys:has(li.hc-pp-k:hover) li.hc-pp-k.on:not(:hover):not(:focus-within) a.hc-pp-tag { opacity: 0; pointer-events: none; }\n  #hc-pp li.hc-pp-k { scroll-margin: 96px 0 140px; }   /* clear of Cargo's fixed header and the buttons at the bottom */\n  @media (max-width: 1000px) { #hc-pp ul.hc-pp-keys { --cols: 14; } }\n\n  /* sound on/off: bottom left, the blobs' pause button (and 1999 mode's way back) keep the bottom right */\n  button.hc-pp-quiet { display: none; position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 1001;\n    min-height: 44px; margin: 0; padding: 0 18px; border: 0; border-radius: 999px; background: #492E46; color: #F3DCDF;\n    font-family: Allo, sans-serif; font-size: 15px; font-weight: normal; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;\n    box-shadow: 0 6px 16px -6px rgba(73, 46, 70, .5); }\n  html.hc-pp-on button.hc-pp-quiet { display: inline-flex; align-items: center; }\n  button.hc-pp-quiet[aria-pressed=\"true\"] { background: #fff; color: #492E46; }\n  button.hc-pp-quiet:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n  html.hc-ns button.hc-pp-quiet { bottom: 40px; background: #c0c0c0 !important; color: #000 !important; border: 2px solid !important;\n    border-color: #fff #404040 #404040 #fff !important; border-radius: 0; box-shadow: none !important; font-family: Arial, Helvetica, sans-serif !important; }\n  html.hc-gc button.hc-pp-quiet { background: #ff00ff !important; color: #ffff00 !important; border: 3px outset #ff99ff !important; box-shadow: none !important; }\n\n  @media (max-width: 420px) { button.hc-pp-quiet { padding: 0 12px; font-size: 14px; }  html.hc-gc button.hc-pp-quiet { bottom: calc(70px + env(safe-area-inset-bottom, 0px)); } html.hc-ns button.hc-pp-quiet { bottom: 96px; } }   /* so it clears the pause button beside it on a 390 px phone */\n  @media (max-width: 1100px) { #hc-pp h1 { font-size: 84px; } }\n  @media (max-width: 800px) { #hc-pp header.hc-pp-hd { margin-top: 44px; margin-bottom: 40px; } #hc-pp h1 { font-size: 72px; } }\n  @media (max-width: 760px) {\n    #hc-pp { padding: 18px 0 110px; }\n  }\n  @media (max-width: 600px) {\n    #hc-pp header.hc-pp-hd { margin-top: 36px; }\n    #hc-pp .hc-pp-hd p.hc-pp-kicker { font-size: 11px; letter-spacing: .24em; text-indent: .24em; gap: 10px; }\n    #hc-pp .hc-pp-hd p.hc-pp-kicker::before, #hc-pp .hc-pp-hd p.hc-pp-kicker::after { flex-basis: 28px; }\n    #hc-pp h1 { font-size: 9.6vw; margin: 0 auto; white-space: nowrap; }   /* one line, so 2.0 never wraps alone */\n    #hc-pp h1 .hc-pp-w { margin-right: .12em; }\n    #hc-pp h1 .hc-pp-w:nth-last-child(2) { margin-right: 0; }\n    #hc-pp h1 .hc-pp-lb { font-size: 11px; letter-spacing: .08em; text-indent: .08em; top: calc(100% + 10px); }\n    #hc-pp h1 .hc-pp-br { border-width: 1.5px; border-top-width: 0; height: 7px; }\n    #hc-pp h1 .hc-pp-w, #hc-pp h1 .hc-pp-yr { margin-bottom: 36px; }\n    #hc-pp h1 .hc-pp-yr { font-size: .34em; margin-left: .2em; }\n    #hc-pp .hc-pp-hr { margin-top: 12px; }\n    #hc-pp { --hc-pp-lede: 15px; }\n    #hc-pp .hc-pp-hd p.hc-pp-intro { line-height: 1.4; margin-bottom: 7px; }\n    #hc-pp .hc-pp-hd p.hc-pp-go { margin: 8px 0 10px; font-size: 16px; }\n    #hc-pp header.hc-pp-hd { margin-bottom: 30px; }\n    #hc-pp #hc-pp-pd-btn { min-height: 46px; width: 100%; justify-content: center; }\n    #hc-pp ul.hc-pp-keys { --cols: 7; gap: 28px 7px; }\n    #hc-pp button.hc-pp-key { height: 150px; padding: 3px 3px 4px; }\n    #hc-pp a.hc-pp-tag { max-width: 170px; }\n  }\n  @media (prefers-reduced-motion: reduce) {\n    #hc-pp button.hc-pp-key, #hc-pp .hc-pp-key span, #hc-pp a.hc-pp-tag { transition: none !important; }\n    #hc-pp button.hc-pp-key.down, #hc-pp .hc-pp-key span.lit { transform: none; }\n  }\n\n  /* the beat maker (from the mockup's drums.js): \"Make a beat\" is a pill in the page's header (built there by the add-on, only on this\n     page), the panel docks at the bottom above \"Turn the sound off\" (placed by measuring, see place()), on <body>. Everything under its own ids, so Cargo's button, select and input\n     styles stay out (#hc-pp-pd-panel button etc. reset them; the class rules after them win over the reset) */\n  #hc-pp-pd-btn { display: inline-flex; align-items: center; gap: 10px; position: static; min-height: 52px; margin: 0; padding: 0 28px; border: 0; border-radius: 999px;\n    background: #492E46; color: #F3DCDF; font-family: Allo, sans-serif; font-size: 18px; font-weight: bold; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;\n    box-shadow: 0 8px 18px -8px rgba(73, 46, 70, .6); transition: transform .12s ease; -webkit-tap-highlight-color: transparent; }\n  #hc-pp-pd-btn::before { content: \"▶\"; font-size: 12px; }\n  #hc-pp-pd-btn:hover { transform: translateY(-1px); }\n  #hc-pp-pd-btn[aria-expanded=\"true\"] { background: #fff; color: #492E46; }\n  #hc-pp-pd-btn[aria-expanded=\"true\"]::before { content: \"▼\"; }\n  #hc-pp-pd-btn:focus { outline: none; }\n  #hc-pp-pd-btn:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n  html.hc-ns #hc-pp-pd-btn { font-size: 16px !important; background: #c0c0c0 !important; color: #000 !important; border: 2px solid !important;\n    border-color: #fff #404040 #404040 #fff !important; border-radius: 0; box-shadow: none !important; font-family: Arial, Helvetica, sans-serif !important; }\n  html.hc-ns #hc-pp-pd-btn[aria-expanded=\"true\"] { border-color: #404040 #fff #fff #404040 !important; }\n  html.hc-gc #hc-pp-pd-btn { background: #ff00ff !important; color: #ffff00 !important; border: 3px outset #ff99ff !important; box-shadow: none !important; }\n  html.hc-gc #hc-pp-pd-btn[aria-expanded=\"true\"] { border-style: inset !important; }\n\n  #hc-pp-pd-panel { position: fixed; left: 16px; right: 16px; bottom: 72px; z-index: 1001; box-sizing: border-box; max-width: 780px; margin: 0 auto;\n    padding: 12px 14px 14px; border: 0; background: #fff; color: #492E46; border-radius: 6px 6px 16px 16px;\n    font: 15px/1.3 Allo, sans-serif; letter-spacing: .04em; text-align: left; text-transform: none;\n    box-shadow: 0 1px 1px rgba(73, 46, 70, .12), 0 14px 30px -10px rgba(73, 46, 70, .45); transform: rotate(-.3deg); transform-origin: 50% 100%;\n    max-height: calc(100vh - 120px); overflow-y: auto; overscroll-behavior: contain; }   /* desktop: only a safety net; the layout is compact enough that nothing scrolls at 1280x680 and up */\n  #hc-pp-pd-panel[hidden], html:not(.hc-pp-on) #hc-pp-pd-panel { display: none !important; }\n  #hc-pp-pd-panel * { box-sizing: border-box; }\n  #hc-pp-pd-panel div, #hc-pp-pd-panel span, #hc-pp-pd-panel label { margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: none; }\n  #hc-pp-pd-panel button, #hc-pp-pd-panel select, #hc-pp-pd-panel input { margin: 0; padding: 1px 6px; border: 0; background: none; box-shadow: none; text-transform: none;\n    font: inherit; letter-spacing: .04em; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }\n  #hc-pp-pd-panel button:focus, #hc-pp-pd-panel select:focus { outline: none; }\n  #hc-pp-pd-panel button:focus-visible, #hc-pp-pd-panel input:focus-visible, #hc-pp-pd-panel select:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 2px; }\n  #hc-pp-pd-panel .hc-pp-pd-top { position: sticky; top: -12px; z-index: 1; display: flex; align-items: center; gap: 10px; margin: -12px -14px 10px; padding: 12px 14px 0; background: #fff; }\n  #hc-pp-pd-panel .hc-pp-pd-go, #hc-pp-pd-panel .hc-pp-pd-shuf, #hc-pp-pd-panel .hc-pp-pd-clear, #hc-pp-pd-panel .hc-pp-pd-x { min-height: 40px; border: 0; border-radius: 999px; padding: 0 16px; }\n  /* one rule for the toggles (Play, Shuffle, Sound): filled dark = on, light with an outline = off; one-shot actions (Clear, Done) are plain underlined text, never filled */\n  #hc-pp-pd-panel .hc-pp-pd-go, #hc-pp-pd-panel .hc-pp-pd-shuf, #hc-pp-pd-panel .hc-pp-pd-snd { background: #fff; color: #492E46; box-shadow: inset 0 0 0 2px #492E46; }\n  #hc-pp-pd-panel .hc-pp-pd-go[aria-pressed=\"true\"], #hc-pp-pd-panel .hc-pp-pd-shuf[aria-pressed=\"true\"], #hc-pp-pd-panel .hc-pp-pd-snd[aria-pressed=\"true\"] { background: #492E46; color: #F3DCDF; }\n  #hc-pp-pd-panel .hc-pp-pd-go { min-width: 84px; }\n  #hc-pp-pd-panel .hc-pp-pd-go::before { content: \"▶ \"; font-size: .8em; }\n  #hc-pp-pd-panel .hc-pp-pd-go[aria-pressed=\"true\"]::before { content: \"■ \"; }\n  #hc-pp-pd-panel .hc-pp-pd-clear, #hc-pp-pd-panel .hc-pp-pd-x { background: none; box-shadow: none; color: rgba(73, 46, 70, .8); text-decoration: underline; text-underline-offset: 3px; }\n  #hc-pp-pd-panel .hc-pp-pd-x { margin-left: auto; min-width: 40px; padding: 0 10px; }\n  #hc-pp-pd-panel .hc-pp-pd-speed { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; max-width: 300px; }\n  #hc-pp-pd-panel .hc-pp-pd-speed label { color: rgba(73, 46, 70, .66); font-size: 14px; }\n  #hc-pp-pd-panel .hc-pp-pd-num { min-width: 2.2em; text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; }\n  #hc-pp-pd-panel .hc-pp-pd-speed input { flex: 1; min-width: 0; width: auto; height: 28px; padding: 0; accent-color: #492E46; margin: 0; }\n  #hc-pp-pd-panel .hc-pp-pd-main { display: block; }\n  #hc-pp-pd-panel .hc-pp-pd-rows { display: grid; gap: 5px; }\n  #hc-pp-pd-panel .hc-pp-pd-row { display: grid; grid-template-columns: 126px 1fr; align-items: center; gap: 6px; }\n  #hc-pp-pd-panel .hc-pp-pd-name { font-size: 14px; color: rgba(73, 46, 70, .66); }\n  #hc-pp-pd-panel .hc-pp-pd-pname { display: flex; align-items: center; gap: 4px; min-width: 0; }\n  #hc-pp-pd-panel .hc-pp-pd-pick { flex: 1; min-width: 0; height: 30px; padding: 0 4px; border: 0; border-radius: 5px; background: rgba(73, 46, 70, .09); color: #492E46; font: inherit; font-size: 13px; letter-spacing: .02em; cursor: pointer; text-overflow: ellipsis; }\n  #hc-pp-pd-panel .hc-pp-pd-steps { display: grid; grid-template-columns: repeat(16, 1fr); gap: 4px; }\n  #hc-pp-pd-panel .hc-pp-pd-step { height: 30px; min-width: 0; padding: 0; border: 0; border-radius: 5px; background: rgba(73, 46, 70, .09); }\n  #hc-pp-pd-panel .hc-pp-pd-step.hc-pp-pd-b { background: rgba(73, 46, 70, .17); }\n  #hc-pp-pd-panel .hc-pp-pd-step[aria-pressed=\"true\"] { background: #492E46; }\n  #hc-pp-pd-panel .hc-pp-pd-step.hc-pp-pd-now { transform: translateY(-2px); background: rgba(73, 46, 70, .4); }\n  #hc-pp-pd-panel .hc-pp-pd-step.hc-pp-pd-now[aria-pressed=\"true\"] { background: #8d6a89; }\n  #hc-pp-pd-panel .hc-pp-pd-left > .hc-pp-pd-grp { margin-top: 12px; }\n  #hc-pp-pd-panel .hc-pp-pd-pads { display: grid; gap: 8px; margin-top: 12px; }\n  #hc-pp-pd-panel .hc-pp-pd-grp { min-width: 0; }\n  #hc-pp-pd-panel .hc-pp-pd-cap { display: block; margin: 0 0 4px; font-size: 13px; color: rgba(73, 46, 70, .66); }\n  #hc-pp-pd-panel .hc-pp-pd-fills { display: flex; gap: 8px; }\n  #hc-pp-pd-panel .hc-pp-pd-fill { flex: 1; min-width: 72px; height: 50px; border: 0; border-radius: 10px; background: #F3DCDF; font-weight: 700; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none; box-shadow: 0 2px 0 rgba(73, 46, 70, .25); }\n  #hc-pp-pd-panel .hc-pp-pd-fill.hc-pp-pd-on { transform: translateY(2px); box-shadow: none; background: #492E46; color: #F3DCDF; }\n  #hc-pp-pd-panel .hc-pp-pd-says { display: flex; flex-wrap: wrap; gap: 6px 5px; }\n  #hc-pp-pd-panel .hc-pp-pd-say { min-width: 0; min-height: 44px; padding: 0 8px; border: 0; border-radius: 10px; background: #F3DCDF; font-size: 14px; letter-spacing: .005em; user-select: none; -webkit-user-select: none; box-shadow: 0 2px 0 rgba(73, 46, 70, .25); }\n  #hc-pp-pd-panel .hc-pp-pd-say:active, #hc-pp-pd-panel .hc-pp-pd-say.hc-pp-pd-on { transform: translateY(2px); box-shadow: none; }\n  #hc-pp-pd-panel .hc-pp-pd-say.hc-pp-pd-on { background: #492E46; color: #F3DCDF; }\n  #hc-pp-pd-panel .hc-pp-pd-say[aria-disabled=\"true\"] { opacity: .42; cursor: default; box-shadow: none; background: rgba(73, 46, 70, .07); }\n  #hc-pp-pd-panel .hc-pp-pd-say[aria-disabled=\"true\"]:active { transform: none; }\n  @media (min-width: 1000px) {   /* wide screens: the step grid left, fills and pads in a column right, so the panel is short and nothing scrolls */\n    #hc-pp-pd-panel { max-width: 1200px; padding: 10px 16px 12px; }\n    #hc-pp-pd-panel .hc-pp-pd-top { top: -10px; margin: -10px -16px 8px; padding: 10px 16px 0; }\n    #hc-pp-pd-panel .hc-pp-pd-main { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 0 26px; align-items: start; }\n    #hc-pp-pd-panel .hc-pp-pd-rows { gap: 4px; }\n    #hc-pp-pd-panel .hc-pp-pd-step { height: 28px; }\n    #hc-pp-pd-panel .hc-pp-pd-left > .hc-pp-pd-grp { margin-top: 10px; }\n    #hc-pp-pd-panel .hc-pp-pd-pads { margin-top: 0; gap: 6px; }\n    #hc-pp-pd-panel .hc-pp-pd-fill { height: 40px; }\n    #hc-pp-pd-panel .hc-pp-pd-say { min-height: 36px; }\n  }\n  #hc-pp-pd-panel .hc-pp-pd-snd { display: none; }\n  /* below 1000 px (phones, tablets, narrow windows): the beat maker fills the whole visible screen; the height is measured and set by fitFull() (100dvh until then);\n     one row of 16 steps per instrument, a compact top bar, chips for the pads; the page behind is locked (see lock()) */\n  @media (max-width: 999.98px) {\n    #hc-pp-pd-panel { top: 0; left: 0; right: 0; bottom: auto; width: auto; height: 100vh; height: 100dvh; max-width: none; max-height: none; margin: 0; transform: none; border-radius: 0; z-index: 100000;\n      padding: 8px 12px calc(10px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior: contain; box-shadow: none; }\n    #hc-pp-pd-panel[hidden], html:not(.hc-pp-on) #hc-pp-pd-panel { display: none !important; }\n    #hc-pp-pd-panel:focus { outline: none; }\n    #hc-pp-pd-panel .hc-pp-pd-top { position: static; flex: none; flex-wrap: wrap; margin: 0 0 4px; padding: 0; gap: 6px; row-gap: 2px; }\n    #hc-pp-pd-panel .hc-pp-pd-go, #hc-pp-pd-panel .hc-pp-pd-shuf, #hc-pp-pd-panel .hc-pp-pd-clear, #hc-pp-pd-panel .hc-pp-pd-x { min-height: 44px; min-width: 44px; padding: 0 12px; font-size: 14px; }\n    #hc-pp-pd-panel .hc-pp-pd-go { min-width: 68px; }\n    #hc-pp-pd-panel .hc-pp-pd-x { font-weight: bold; padding: 0 18px; }\n    #hc-pp-pd-panel .hc-pp-pd-speed label { display: none; }\n    #hc-pp-pd-panel .hc-pp-pd-speed { order: 9; flex: 1 0 100%; max-width: none; gap: 8px; }\n    #hc-pp-pd-panel .hc-pp-pd-speed input { height: 44px; }\n    #hc-pp-pd-panel .hc-pp-pd-snd { display: inline-flex; align-items: center; justify-content: center; flex: none; min-height: 44px; padding: 0 12px; border-radius: 999px; font-size: 14px; white-space: nowrap; }\n    #hc-pp-pd-panel .hc-pp-pd-main { display: flex; flex-direction: column; flex: 1 0 auto; justify-content: space-between; gap: 8px; }\n    #hc-pp-pd-panel .hc-pp-pd-rows { gap: 5px; }\n    #hc-pp-pd-panel .hc-pp-pd-row { grid-template-columns: 1fr; gap: 1px; }\n    #hc-pp-pd-panel .hc-pp-pd-name { font-size: 13px; line-height: 1.1; }\n    #hc-pp-pd-panel .hc-pp-pd-pname { gap: 8px; }\n    #hc-pp-pd-panel .hc-pp-pd-pick { flex: none; max-width: 60%; height: 24px; padding: 0 8px; font-size: 13px; }\n    #hc-pp-pd-panel .hc-pp-pd-steps { grid-template-columns: repeat(16, 1fr); gap: 2px; }\n    #hc-pp-pd-panel .hc-pp-pd-step { height: 30px; height: clamp(30px, calc(30px + (100dvh - 667px) * .124), 56px); border-radius: 3px; }\n    #hc-pp-pd-panel .hc-pp-pd-left > .hc-pp-pd-grp { margin-top: 8px; }\n    #hc-pp-pd-panel .hc-pp-pd-pads { margin-top: 0; gap: 6px; }\n    #hc-pp-pd-panel .hc-pp-pd-cap { margin-bottom: 3px; font-size: 12px; }\n    #hc-pp-pd-panel .hc-pp-pd-fill { height: 44px; min-width: 0; }\n    #hc-pp-pd-panel .hc-pp-pd-says { gap: 5px; }\n    #hc-pp-pd-panel .hc-pp-pd-say { min-height: 36px; min-height: clamp(36px, calc(36px + (100dvh - 667px) * .045), 44px); padding: 0 10px; font-size: 13px; }\n  }\n  @media (max-width: 999.98px) and (max-height: 700px) {   /* short phones (375 x 667): the five pads need a little room, so the chips and fills are a little lower and tighter */\n    #hc-pp-pd-panel .hc-pp-pd-say { min-height: 32px; padding: 0 8px; }\n    #hc-pp-pd-panel .hc-pp-pd-says { gap: 4px; }\n    #hc-pp-pd-panel .hc-pp-pd-fill { height: 40px; }\n    #hc-pp-pd-panel .hc-pp-pd-left > .hc-pp-pd-grp { margin-top: 6px; }\n    #hc-pp-pd-panel .hc-pp-pd-cap { margin-bottom: 2px; }\n  }\n  html.hc-pp-pd-full button.hc-pp-quiet, html.hc-pp-pd-full .hc-pause, html.hc-pp-pd-full .hc-back, html.hc-pp-pd-full .hc-ns-bar { visibility: hidden !important; }\n  @media (prefers-reduced-motion: reduce) {\n    #hc-pp-pd-panel *, #hc-pp-pd-btn { transition: none !important; animation: none !important; }\n    #hc-pp-pd-panel .hc-pp-pd-step.hc-pp-pd-now, #hc-pp-pd-panel .hc-pp-pd-fill.hc-pp-pd-on, #hc-pp-pd-panel .hc-pp-pd-say:active, #hc-pp-pd-panel .hc-pp-pd-say.hc-pp-pd-on { transform: none; }\n  }\n"; document.head.appendChild(s); })();
+(function () { var s = document.createElement("style"); s.textContent = "\n  html.hc-pp-on .thumbnails, html.hc-pp-on #hc-sort { display: none !important; }\n  #hc-pp { box-sizing: border-box; width: min(1180px, 92vw); position: relative; left: 50%; transform: translateX(-50%);\n    text-align: left; font-family: Allo, sans-serif; color: #492E46; letter-spacing: .02em; line-height: 1.5;\n    padding: 8px 0 120px; }\n  #hc-pp *, #hc-pp *::before, #hc-pp *::after { box-sizing: border-box; }\n  #hc-pp a { color: inherit; }\n  #hc-pp .hc-pp-sr { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; margin: 0; padding: 0; }\n  #hc-pp a.hc-pp-back { margin-bottom: 0; }   /* the look is the shared a.hc-bk (hc-nav-active); the header below brings its own space */\n  /* the header (Paco Benovo 2.0), one centred lockup: ruled spaced-caps kicker, the name with its bracketed pairs and a tilted teal \"2.0\" badge,\n     then the words and the \"Make a beat\" pill centred below in a narrow column; the back link stays alone top left */\n  #hc-pp header.hc-pp-hd { display: block; text-align: center; margin: 64px 0 60px; padding: 0; border: 0; background: none; }\n  #hc-pp .hc-pp-hd p { font-family: inherit; text-transform: none; color: inherit; max-width: none; }\n  #hc-pp { --hc-pp-lede: 16px; }   /* the size of the \"Who needs\" line; the kicker above the name uses the same variable, so they always match */\n  #hc-pp .hc-pp-hd p.hc-pp-kicker { display: flex; align-items: center; justify-content: center; gap: 18px; margin: 0 0 18px; font-size: 13px; font-weight: 400; line-height: 1.45;\n    letter-spacing: .32em; text-indent: .32em; text-transform: uppercase; color: inherit; }\n  #hc-pp .hc-pp-hd p.hc-pp-kicker::before, #hc-pp .hc-pp-hd p.hc-pp-kicker::after { content: \"\"; flex: 0 1 64px; height: 2px; background: currentColor; opacity: .55; }\n  #hc-pp h1 { font-family: inherit; font-size: 96px; line-height: 1; margin: 0 0 8px; text-align: center; font-weight: 900; letter-spacing: .03em; color: inherit; text-transform: none; white-space: nowrap;\n    display: table; position: relative; margin-left: auto; margin-right: auto; }   /* shrink-wrapped to the name, so the 2.0 badge can hang off its right edge and the name itself is what sits centred */\n  /* the name as five bracketed pairs: Pa co Be no vo, each with a thin U bracket under its letters and its word centred below; 2.0 follows plain.\n     Every unit is an inline block, so a wrapping heading only breaks between Paco and Benovo or before 2.0; the margin underneath holds the labels. */\n  #hc-pp h1 .hc-pp-w, #hc-pp h1 .hc-pp-yr { display: inline-block; white-space: nowrap; vertical-align: baseline; margin: 0 0 40px; padding: 0; }\n  #hc-pp h1 .hc-pp-w { margin-right: .16em; }\n  #hc-pp h1 .hc-pp-w:nth-last-child(2) { margin-right: 0; }\n  #hc-pp h1 .hc-pp-pr { display: inline-block; position: relative; margin: 0; padding: 0; vertical-align: baseline; white-space: nowrap; }\n  #hc-pp h1 .hc-pp-pr:last-child { margin-right: 0; }\n  #hc-pp h1 .hc-pp-lt { display: inline-block; margin: 0; padding: 0; }   /* pairs touch, so the gap between pairs is the same letter gap as inside them */\n  /* 2.0: a small tilted teal pill after the name (still one inline unit, so it can never wrap alone on a phone: the title is one line there) */\n  #hc-pp h1 .hc-pp-yr { margin: 0 0 0 .25em; font-size: .3em; font-weight: 900; letter-spacing: .04em; position: absolute; left: 100%; top: .32em;\n    background: #3BBFC9; color: #492E46; padding: .22em .55em .26em; border-radius: 999px; transform: rotate(7deg); line-height: 1.1; }\n  #hc-pp h1 .hc-pp-br { position: absolute; left: .06em; right: .06em; top: calc(100% - 2px); height: 8px; border: 2px solid currentColor; border-top: 0; border-radius: 0; background: none; }\n  #hc-pp h1 .hc-pp-lb { position: absolute; left: 50%; top: calc(100% + 11px); transform: translateX(-50%); font-size: 13px; line-height: 1.2; font-weight: normal;\n    letter-spacing: .16em; text-indent: .16em; white-space: nowrap; }\n  #hc-pp .hc-pp-hr { max-width: 600px; margin: 8px auto 0; }\n  #hc-pp .hc-pp-hd p.hc-pp-intro { margin: 0 0 10px; font-size: var(--hc-pp-lede); line-height: 1.45; text-align: center; text-wrap: pretty; }\n  #hc-pp .hc-pp-hd p.hc-pp-lead, #hc-pp .hc-pp-hd p.hc-pp-go { text-wrap: balance; }\n  #hc-pp .hc-pp-hd p.hc-pp-lead { font-weight: bold; }\n  #hc-pp .hc-pp-hd p.hc-pp-go { margin: 12px 0 12px; font-size: 18px; }\n  #hc-pp .hc-pp-hd p.hc-pp-beatslot { margin: 0; line-height: 1; }\n\n  /* the keys: each project a strip of its own colours, painted in bands on a white key, tilted a little like the prints on the pinboard */\n  #hc-pp ul.hc-pp-keys { display: grid; grid-template-columns: repeat(var(--cols), 1fr); --cols: 24; gap: 34px 8px; padding: 0; margin: 0; list-style: none; }\n  #hc-pp li.hc-pp-k { position: relative; margin: 0; padding: 0; list-style: none; line-height: 1.5; transform: translateY(var(--dy)) rotate(var(--tilt)); }\n  #hc-pp li.hc-pp-k::before, #hc-pp li.hc-pp-k::marker { content: none; }\n  #hc-pp button.hc-pp-key { display: flex; flex-direction: column; width: 100%; min-width: 0; height: 214px; padding: 4px 4px 5px; border: 0; margin: 0;\n    background: #fff; border-radius: 3px 3px 14px 14px; cursor: pointer; font: inherit; letter-spacing: 0; text-transform: none; color: inherit;\n    box-shadow: 0 1px 1px rgba(73, 46, 70, .12), 0 6px 14px -6px rgba(73, 46, 70, .35);\n    transition: transform .12s ease, box-shadow .12s ease; -webkit-tap-highlight-color: transparent;\n    /* soloing: a finger sweeping sideways (or held still a moment) plays the bands; an up-or-down swipe still scrolls the page */\n    touch-action: pan-y pinch-zoom; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }\n  /* each band overlaps the one above with a slightly uneven top edge, like paint or cut paper */\n  #hc-pp .hc-pp-key span { display: block; flex: var(--share) 1 0; min-height: 9px; margin-top: -4px; clip-path: var(--edge);\n    transition: transform .6s ease, filter .6s ease; }\n  #hc-pp .hc-pp-key span:first-child { margin-top: 0; clip-path: none; border-radius: 1px 1px 0 0; }\n  #hc-pp .hc-pp-key span:last-child { border-radius: 0 0 11px 11px; }\n  #hc-pp .hc-pp-key span.lit { transform: scaleX(1.22); filter: brightness(1.08) saturate(1.25); transition: transform .08s ease-out, filter .08s; }\n  #hc-pp button.hc-pp-key:hover { background: #fff; box-shadow: 0 1px 1px rgba(73, 46, 70, .12), 0 10px 18px -6px rgba(73, 46, 70, .4); }\n  #hc-pp button.hc-pp-key.down { transform: translateY(5px); box-shadow: 0 1px 1px rgba(73, 46, 70, .15), 0 2px 5px -2px rgba(73, 46, 70, .35); }\n  #hc-pp button.hc-pp-key:focus { outline: none; }\n  #hc-pp button.hc-pp-key:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n\n  /* the title only shows on hover, focus, or after a press: the work stands on its own */\n  #hc-pp a.hc-pp-tag { position: absolute; left: 50%; top: calc(100% + 10px); z-index: 2; width: max-content; max-width: 210px;\n    transform: translateX(-50%) rotate(calc(var(--tilt) * -1.4)); padding: 7px 12px 8px; background: #fff !important; color: inherit !important;\n    border-radius: 6px; font-size: 14px; line-height: 1.3; text-decoration: none; text-align: center;\n    box-shadow: 0 6px 14px -6px rgba(73, 46, 70, .4); opacity: 0; pointer-events: none; transition: opacity .15s; }\n  #hc-pp li.hc-pp-k[data-edge=\"l\"] a.hc-pp-tag { left: 0; transform: rotate(calc(var(--tilt) * -1.4)); text-align: left; }\n  #hc-pp li.hc-pp-k[data-edge=\"r\"] a.hc-pp-tag { left: auto; right: 0; transform: rotate(calc(var(--tilt) * -1.4)); text-align: right; }\n  #hc-pp .hc-pp-tag b { display: block; font-weight: bold; }\n  #hc-pp .hc-pp-tag i { font-style: normal; color: rgba(73, 46, 70, .66); text-decoration: underline; text-underline-offset: 3px; }\n  #hc-pp .hc-pp-tag:hover i { color: #492E46; }\n  #hc-pp a.hc-pp-tag:focus { outline: none; }\n  #hc-pp a.hc-pp-tag:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 2px; }\n  #hc-pp li.hc-pp-k:hover a.hc-pp-tag, #hc-pp li.hc-pp-k:focus-within a.hc-pp-tag, #hc-pp li.hc-pp-k.on a.hc-pp-tag { opacity: 1; pointer-events: auto; }\n  #hc-pp li.hc-pp-k:hover, #hc-pp li.hc-pp-k:focus-within, #hc-pp li.hc-pp-k.on { z-index: 3; }\n  #hc-pp ul.hc-pp-keys:has(li.hc-pp-k:hover) li.hc-pp-k.on:not(:hover):not(:focus-within) a.hc-pp-tag { opacity: 0; pointer-events: none; }\n  #hc-pp li.hc-pp-k { scroll-margin: 96px 0 140px; }   /* clear of Cargo's fixed header and the buttons at the bottom */\n  @media (max-width: 1000px) { #hc-pp ul.hc-pp-keys { --cols: 14; } }\n\n  /* sound on/off: bottom left, the blobs' pause button (and 1999 mode's way back) keep the bottom right */\n  button.hc-pp-quiet { display: none; position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 1001;\n    min-height: 44px; margin: 0; padding: 0 18px; border: 0; border-radius: 999px; background: #492E46; color: #F3DCDF;\n    font-family: Allo, sans-serif; font-size: 15px; font-weight: normal; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;\n    box-shadow: 0 6px 16px -6px rgba(73, 46, 70, .5); }\n  html.hc-pp-on button.hc-pp-quiet { display: inline-flex; align-items: center; }\n  button.hc-pp-quiet[aria-pressed=\"true\"] { background: #fff; color: #492E46; }\n  button.hc-pp-quiet:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n  html.hc-ns button.hc-pp-quiet { bottom: 40px; background: #c0c0c0 !important; color: #000 !important; border: 2px solid !important;\n    border-color: #fff #404040 #404040 #fff !important; border-radius: 0; box-shadow: none !important; font-family: Arial, Helvetica, sans-serif !important; }\n  html.hc-gc button.hc-pp-quiet { background: #ff00ff !important; color: #ffff00 !important; border: 3px outset #ff99ff !important; box-shadow: none !important; }\n\n  @media (max-width: 420px) { button.hc-pp-quiet { padding: 0 12px; font-size: 14px; }  html.hc-gc button.hc-pp-quiet { bottom: calc(70px + env(safe-area-inset-bottom, 0px)); } html.hc-ns button.hc-pp-quiet { bottom: 96px; } }   /* so it clears the pause button beside it on a 390 px phone */\n  @media (max-width: 1100px) { #hc-pp h1 { font-size: 84px; } }\n  @media (max-width: 800px) { #hc-pp header.hc-pp-hd { margin-top: 44px; margin-bottom: 40px; } #hc-pp h1 { font-size: 72px; } }\n  @media (max-width: 760px) {\n    #hc-pp { padding: 18px 0 110px; }\n  }\n  @media (max-width: 600px) {\n    #hc-pp header.hc-pp-hd { margin-top: 36px; }\n    #hc-pp .hc-pp-hd p.hc-pp-kicker { font-size: 11px; letter-spacing: .24em; text-indent: .24em; gap: 10px; }\n    #hc-pp .hc-pp-hd p.hc-pp-kicker::before, #hc-pp .hc-pp-hd p.hc-pp-kicker::after { flex-basis: 28px; }\n    #hc-pp h1 { font-size: 9.6vw; margin: 0 auto; white-space: nowrap; }   /* one line, so 2.0 never wraps alone */\n    #hc-pp h1 .hc-pp-w { margin-right: .12em; }\n    #hc-pp h1 .hc-pp-w:nth-last-child(2) { margin-right: 0; }\n    #hc-pp h1 .hc-pp-lb { font-size: 11px; letter-spacing: .08em; text-indent: .08em; top: calc(100% + 10px); }\n    #hc-pp h1 .hc-pp-br { border-width: 1.5px; border-top-width: 0; height: 7px; }\n    #hc-pp h1 .hc-pp-w, #hc-pp h1 .hc-pp-yr { margin-bottom: 36px; }\n    #hc-pp h1 .hc-pp-yr { font-size: .34em; margin-left: .2em; }\n    #hc-pp .hc-pp-hr { margin-top: 12px; }\n    #hc-pp { --hc-pp-lede: 15px; }\n    #hc-pp .hc-pp-hd p.hc-pp-intro { line-height: 1.4; margin-bottom: 7px; }\n    #hc-pp .hc-pp-hd p.hc-pp-go { margin: 8px 0 10px; font-size: 16px; }\n    #hc-pp header.hc-pp-hd { margin-bottom: 30px; }\n    #hc-pp #hc-pp-pd-btn { min-height: 46px; width: 100%; justify-content: center; }\n    #hc-pp ul.hc-pp-keys { --cols: 7; gap: 28px 7px; }\n    #hc-pp button.hc-pp-key { height: 150px; padding: 3px 3px 4px; }\n    #hc-pp a.hc-pp-tag { max-width: 170px; }\n  }\n  @media (prefers-reduced-motion: reduce) {\n    #hc-pp button.hc-pp-key, #hc-pp .hc-pp-key span, #hc-pp a.hc-pp-tag { transition: none !important; }\n    #hc-pp button.hc-pp-key.down, #hc-pp .hc-pp-key span.lit { transform: none; }\n  }\n\n  /* the beat maker (from the mockup's drums.js): \"Make a beat\" is a pill in the page's header (built there by the add-on, only on this\n     page), the panel docks at the bottom above \"Turn the sound off\" (placed by measuring, see place()), on <body>. Everything under its own ids, so Cargo's button, select and input\n     styles stay out (#hc-pp-pd-panel button etc. reset them; the class rules after them win over the reset) */\n  #hc-pp-pd-btn { display: inline-flex; align-items: center; gap: 10px; position: static; min-height: 52px; margin: 0; padding: 0 28px; border: 0; border-radius: 999px;\n    background: #492E46; color: #F3DCDF; font-family: Allo, sans-serif; font-size: 18px; font-weight: bold; line-height: 1; letter-spacing: .02em; text-transform: none; cursor: pointer;\n    box-shadow: 0 8px 18px -8px rgba(73, 46, 70, .6); transition: transform .12s ease; -webkit-tap-highlight-color: transparent; }\n  #hc-pp-pd-btn::before { content: \"▶\"; font-size: 12px; }\n  #hc-pp-pd-btn:hover { transform: translateY(-1px); }\n  #hc-pp-pd-btn[aria-expanded=\"true\"] { background: #fff; color: #492E46; }\n  #hc-pp-pd-btn[aria-expanded=\"true\"]::before { content: \"▼\"; }\n  #hc-pp-pd-btn:focus { outline: none; }\n  #hc-pp-pd-btn:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 3px; }\n  html.hc-ns #hc-pp-pd-btn { font-size: 16px !important; background: #c0c0c0 !important; color: #000 !important; border: 2px solid !important;\n    border-color: #fff #404040 #404040 #fff !important; border-radius: 0; box-shadow: none !important; font-family: Arial, Helvetica, sans-serif !important; }\n  html.hc-ns #hc-pp-pd-btn[aria-expanded=\"true\"] { border-color: #404040 #fff #fff #404040 !important; }\n  html.hc-gc #hc-pp-pd-btn { background: #ff00ff !important; color: #ffff00 !important; border: 3px outset #ff99ff !important; box-shadow: none !important; }\n  html.hc-gc #hc-pp-pd-btn[aria-expanded=\"true\"] { border-style: inset !important; }\n\n  #hc-pp-pd-panel { position: fixed; left: 16px; right: 16px; bottom: 72px; z-index: 1001; box-sizing: border-box; max-width: 780px; margin: 0 auto;\n    padding: 12px 14px 14px; border: 0; background: #fff; color: #492E46; border-radius: 6px 6px 16px 16px;\n    font: 15px/1.3 Allo, sans-serif; letter-spacing: .04em; text-align: left; text-transform: none;\n    box-shadow: 0 1px 1px rgba(73, 46, 70, .12), 0 14px 30px -10px rgba(73, 46, 70, .45); transform: rotate(-.3deg); transform-origin: 50% 100%;\n    max-height: calc(100vh - 120px); overflow-y: auto; overscroll-behavior: contain; }   /* desktop: only a safety net; the layout is compact enough that nothing scrolls at 1280x680 and up */\n  #hc-pp-pd-panel[hidden], html:not(.hc-pp-on) #hc-pp-pd-panel { display: none !important; }\n  #hc-pp-pd-panel * { box-sizing: border-box; }\n  #hc-pp-pd-panel div, #hc-pp-pd-panel span, #hc-pp-pd-panel label { margin: 0; padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-transform: none; }\n  #hc-pp-pd-panel button, #hc-pp-pd-panel select, #hc-pp-pd-panel input { margin: 0; padding: 1px 6px; border: 0; background: none; box-shadow: none; text-transform: none;\n    font: inherit; letter-spacing: .04em; color: inherit; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }\n  #hc-pp-pd-panel button:focus, #hc-pp-pd-panel select:focus { outline: none; }\n  #hc-pp-pd-panel button:focus-visible, #hc-pp-pd-panel input:focus-visible, #hc-pp-pd-panel select:focus-visible { outline: 3px solid #3BBFC9; outline-offset: 2px; }\n  #hc-pp-pd-panel .hc-pp-pd-top { position: sticky; top: -12px; z-index: 1; display: flex; align-items: center; gap: 10px; margin: -12px -14px 10px; padding: 12px 14px 0; background: #fff; }\n  #hc-pp-pd-panel .hc-pp-pd-go, #hc-pp-pd-panel .hc-pp-pd-shuf, #hc-pp-pd-panel .hc-pp-pd-clear, #hc-pp-pd-panel .hc-pp-pd-x { min-height: 40px; border: 0; border-radius: 999px; padding: 0 16px; }\n  /* one rule for the toggles (Play, Shuffle, Sound): filled dark = on, light with an outline = off; one-shot actions (Clear, Done) are plain underlined text, never filled */\n  #hc-pp-pd-panel .hc-pp-pd-go, #hc-pp-pd-panel .hc-pp-pd-shuf, #hc-pp-pd-panel .hc-pp-pd-snd { background: #fff; color: #492E46; box-shadow: inset 0 0 0 2px #492E46; }\n  #hc-pp-pd-panel .hc-pp-pd-go[aria-pressed=\"true\"], #hc-pp-pd-panel .hc-pp-pd-shuf[aria-pressed=\"true\"], #hc-pp-pd-panel .hc-pp-pd-snd[aria-pressed=\"true\"] { background: #492E46; color: #F3DCDF; }\n  #hc-pp-pd-panel .hc-pp-pd-go { min-width: 84px; }\n  #hc-pp-pd-panel .hc-pp-pd-go::before { content: \"▶ \"; font-size: .8em; }\n  #hc-pp-pd-panel .hc-pp-pd-go[aria-pressed=\"true\"]::before { content: \"■ \"; }\n  #hc-pp-pd-panel .hc-pp-pd-clear, #hc-pp-pd-panel .hc-pp-pd-x { background: none; box-shadow: none; color: rgba(73, 46, 70, .8); text-decoration: underline; text-underline-offset: 3px; }\n  #hc-pp-pd-panel .hc-pp-pd-x { margin-left: auto; min-width: 40px; padding: 0 10px; }\n  #hc-pp-pd-panel .hc-pp-pd-speed { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0; max-width: 300px; }\n  #hc-pp-pd-panel .hc-pp-pd-speed label { color: rgba(73, 46, 70, .66); font-size: 14px; }\n  #hc-pp-pd-panel .hc-pp-pd-num { min-width: 2.2em; text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; }\n  #hc-pp-pd-panel .hc-pp-pd-speed input { flex: 1; min-width: 0; width: auto; height: 28px; padding: 0; accent-color: #492E46; margin: 0; }\n  #hc-pp-pd-panel .hc-pp-pd-main { display: block; }\n  #hc-pp-pd-panel .hc-pp-pd-rows { display: grid; gap: 5px; }\n  #hc-pp-pd-panel .hc-pp-pd-row { display: grid; grid-template-columns: 126px 1fr; align-items: center; gap: 6px; }\n  #hc-pp-pd-panel .hc-pp-pd-name { font-size: 14px; color: rgba(73, 46, 70, .66); }\n  #hc-pp-pd-panel .hc-pp-pd-pname { display: flex; align-items: center; gap: 4px; min-width: 0; }\n  #hc-pp-pd-panel .hc-pp-pd-pick { flex: 1; min-width: 0; height: 30px; padding: 0 4px; border: 0; border-radius: 5px; background: rgba(73, 46, 70, .09); color: #492E46; font: inherit; font-size: 13px; letter-spacing: .02em; cursor: pointer; text-overflow: ellipsis; }\n  #hc-pp-pd-panel .hc-pp-pd-steps { display: grid; grid-template-columns: repeat(16, 1fr); gap: 4px; }\n  #hc-pp-pd-panel .hc-pp-pd-step { height: 30px; min-width: 0; padding: 0; border: 0; border-radius: 5px; background: rgba(73, 46, 70, .09); }\n  #hc-pp-pd-panel .hc-pp-pd-step.hc-pp-pd-b { background: rgba(73, 46, 70, .17); }\n  #hc-pp-pd-panel .hc-pp-pd-step[aria-pressed=\"true\"] { background: #492E46; }\n  #hc-pp-pd-panel .hc-pp-pd-step.hc-pp-pd-now { transform: translateY(-2px); background: rgba(73, 46, 70, .4); }\n  #hc-pp-pd-panel .hc-pp-pd-step.hc-pp-pd-now[aria-pressed=\"true\"] { background: #8d6a89; }\n  #hc-pp-pd-panel .hc-pp-pd-left > .hc-pp-pd-grp { margin-top: 12px; }\n  #hc-pp-pd-panel .hc-pp-pd-pads { display: grid; gap: 8px; margin-top: 12px; }\n  #hc-pp-pd-panel .hc-pp-pd-grp { min-width: 0; }\n  #hc-pp-pd-panel .hc-pp-pd-duo { display: flex; flex-wrap: wrap; gap: 6px 16px; }   /* Pads and Bass share a row (it wraps if it must) */\n  #hc-pp-pd-panel .hc-pp-pd-cap { display: block; margin: 0 0 4px; font-size: 13px; color: rgba(73, 46, 70, .66); }\n  #hc-pp-pd-panel .hc-pp-pd-fills { display: flex; gap: 8px; }\n  #hc-pp-pd-panel .hc-pp-pd-fill { flex: 1; min-width: 72px; height: 50px; border: 0; border-radius: 10px; background: #F3DCDF; font-weight: 700; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: none; box-shadow: 0 2px 0 rgba(73, 46, 70, .25); }\n  #hc-pp-pd-panel .hc-pp-pd-fill.hc-pp-pd-on { transform: translateY(2px); box-shadow: none; background: #492E46; color: #F3DCDF; }\n  #hc-pp-pd-panel .hc-pp-pd-says { display: flex; flex-wrap: wrap; gap: 6px 5px; }\n  #hc-pp-pd-panel .hc-pp-pd-say { min-width: 0; min-height: 44px; padding: 0 8px; border: 0; border-radius: 10px; background: #F3DCDF; font-size: 14px; letter-spacing: .005em; user-select: none; -webkit-user-select: none; box-shadow: 0 2px 0 rgba(73, 46, 70, .25); }\n  #hc-pp-pd-panel .hc-pp-pd-say:active, #hc-pp-pd-panel .hc-pp-pd-say.hc-pp-pd-on { transform: translateY(2px); box-shadow: none; }\n  #hc-pp-pd-panel .hc-pp-pd-say.hc-pp-pd-on { background: #492E46; color: #F3DCDF; }\n  #hc-pp-pd-panel .hc-pp-pd-say[aria-disabled=\"true\"] { opacity: .42; cursor: default; box-shadow: none; background: rgba(73, 46, 70, .07); }\n  #hc-pp-pd-panel .hc-pp-pd-say[aria-disabled=\"true\"]:active { transform: none; }\n  @media (min-width: 1000px) {   /* wide screens: the step grid left, fills and pads in a column right, so the panel is short and nothing scrolls */\n    #hc-pp-pd-panel { max-width: 1200px; padding: 10px 16px 12px; }\n    #hc-pp-pd-panel .hc-pp-pd-top { top: -10px; margin: -10px -16px 8px; padding: 10px 16px 0; }\n    #hc-pp-pd-panel .hc-pp-pd-main { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 0 26px; align-items: start; }\n    #hc-pp-pd-panel .hc-pp-pd-rows { gap: 4px; }\n    #hc-pp-pd-panel .hc-pp-pd-step { height: 28px; }\n    #hc-pp-pd-panel .hc-pp-pd-left > .hc-pp-pd-grp { margin-top: 10px; }\n    #hc-pp-pd-panel .hc-pp-pd-pads { margin-top: 0; gap: 6px; }\n    #hc-pp-pd-panel .hc-pp-pd-fill { height: 40px; }\n    #hc-pp-pd-panel .hc-pp-pd-say { min-height: 36px; }\n  }\n  #hc-pp-pd-panel .hc-pp-pd-snd { display: none; }\n  /* below 1000 px (phones, tablets, narrow windows): the beat maker fills the whole visible screen; the height is measured and set by fitFull() (100dvh until then);\n     one row of 16 steps per instrument, a compact top bar, chips for the pads; the page behind is locked (see lock()) */\n  @media (max-width: 999.98px) {\n    #hc-pp-pd-panel { top: 0; left: 0; right: 0; bottom: auto; width: auto; height: 100vh; height: 100dvh; max-width: none; max-height: none; margin: 0; transform: none; border-radius: 0; z-index: 100000;\n      padding: 8px 12px calc(10px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; overflow-y: auto; overscroll-behavior: contain; box-shadow: none; }\n    #hc-pp-pd-panel[hidden], html:not(.hc-pp-on) #hc-pp-pd-panel { display: none !important; }\n    #hc-pp-pd-panel:focus { outline: none; }\n    #hc-pp-pd-panel .hc-pp-pd-top { position: static; flex: none; flex-wrap: wrap; margin: 0 0 4px; padding: 0; gap: 6px; row-gap: 2px; }\n    #hc-pp-pd-panel .hc-pp-pd-go, #hc-pp-pd-panel .hc-pp-pd-shuf, #hc-pp-pd-panel .hc-pp-pd-clear, #hc-pp-pd-panel .hc-pp-pd-x { min-height: 44px; min-width: 44px; padding: 0 12px; font-size: 14px; }\n    #hc-pp-pd-panel .hc-pp-pd-go { min-width: 68px; }\n    #hc-pp-pd-panel .hc-pp-pd-x { font-weight: bold; padding: 0 18px; }\n    #hc-pp-pd-panel .hc-pp-pd-speed label { display: none; }\n    #hc-pp-pd-panel .hc-pp-pd-speed { order: 9; flex: 1 0 100%; max-width: none; gap: 8px; }\n    #hc-pp-pd-panel .hc-pp-pd-speed input { height: 44px; }\n    #hc-pp-pd-panel .hc-pp-pd-snd { display: inline-flex; align-items: center; justify-content: center; flex: none; min-height: 44px; padding: 0 12px; border-radius: 999px; font-size: 14px; white-space: nowrap; }\n    #hc-pp-pd-panel .hc-pp-pd-main { display: flex; flex-direction: column; flex: 1 0 auto; justify-content: space-between; gap: 8px; }\n    #hc-pp-pd-panel .hc-pp-pd-rows { gap: 5px; }\n    #hc-pp-pd-panel .hc-pp-pd-row { grid-template-columns: 1fr; gap: 1px; }\n    #hc-pp-pd-panel .hc-pp-pd-name { font-size: 13px; line-height: 1.1; }\n    #hc-pp-pd-panel .hc-pp-pd-pname { gap: 8px; }\n    #hc-pp-pd-panel .hc-pp-pd-pick { flex: none; max-width: 60%; height: 24px; padding: 0 8px; font-size: 13px; }\n    #hc-pp-pd-panel .hc-pp-pd-steps { grid-template-columns: repeat(16, 1fr); gap: 2px; }\n    #hc-pp-pd-panel .hc-pp-pd-step { height: 30px; height: clamp(30px, calc(30px + (100dvh - 667px) * .124), 56px); border-radius: 3px; }\n    #hc-pp-pd-panel .hc-pp-pd-left > .hc-pp-pd-grp { margin-top: 8px; }\n    #hc-pp-pd-panel .hc-pp-pd-pads { margin-top: 0; gap: 6px; }\n    #hc-pp-pd-panel .hc-pp-pd-cap { margin-bottom: 3px; font-size: 12px; }\n    #hc-pp-pd-panel .hc-pp-pd-fill { height: 44px; min-width: 0; }\n    #hc-pp-pd-panel .hc-pp-pd-says { gap: 5px; }\n    #hc-pp-pd-panel .hc-pp-pd-say { min-height: 36px; min-height: clamp(36px, calc(36px + (100dvh - 667px) * .045), 44px); padding: 0 10px; font-size: 13px; }\n  }\n  @media (max-width: 999.98px) and (max-height: 700px) {   /* short phones (375 x 667): the five pads need a little room, so the chips and fills are a little lower and tighter */\n    #hc-pp-pd-panel .hc-pp-pd-say { min-height: 32px; padding: 0 8px; }\n    #hc-pp-pd-panel .hc-pp-pd-says { gap: 4px; }\n    #hc-pp-pd-panel .hc-pp-pd-fill { height: 40px; }\n    #hc-pp-pd-panel .hc-pp-pd-left > .hc-pp-pd-grp { margin-top: 6px; }\n    #hc-pp-pd-panel .hc-pp-pd-cap { margin-bottom: 2px; }\n  }\n  html.hc-pp-pd-full button.hc-pp-quiet, html.hc-pp-pd-full .hc-pause, html.hc-pp-pd-full .hc-back, html.hc-pp-pd-full .hc-ns-bar { visibility: hidden !important; }\n  @media (prefers-reduced-motion: reduce) {\n    #hc-pp-pd-panel *, #hc-pp-pd-btn { transition: none !important; animation: none !important; }\n    #hc-pp-pd-panel .hc-pp-pd-step.hc-pp-pd-now, #hc-pp-pd-panel .hc-pp-pd-fill.hc-pp-pd-on, #hc-pp-pd-panel .hc-pp-pd-say:active, #hc-pp-pd-panel .hc-pp-pd-say.hc-pp-pd-on { transform: none; }\n  }\n"; document.head.appendChild(s); })();
 (function () {
   if (window.__hcPalettePiano) return;
   window.__hcPalettePiano = true;
@@ -209,7 +209,110 @@
              events: events, total: end, gesture: gesture, extras: extras, say: say, chord: chord, bass: bass,
              bandMidi: cols.map(function (c) { return degMidi(c.deg); }), bandVel: cols.map(function (c) { return Math.min(1, 0.55 + 0.4 * Math.sqrt(c.share) + 0.15 * c.c); }) };
     plan.bassNotes = bassLine(plan, 1, ownS16(plan));
+    // the jazz and house basses (2026-11-18): a chord strip (the recording alone until now) gets layers over it; some of the other
+    // strips get a bass of their own under their notes. Drawn from their own seeds, so nothing above this line changed.
+    plan.layers = null; plan.bass2 = null;
+    if (chord && chord.kind === 'A') {
+      var Ly = plan.layers = layersFor(plan, p, hv); if (Ly.say) plan.say = Ly.say;
+      // chord-1 stays in at most four of the nine (K1SALT picks them), as a short keyboard press: 1.5 s, 0.3 s let-go, a second stab later, quiet;
+      // the others sit on one 0.6 s slice of HalliChord 2 instead
+      if (mix(hash(p.url) ^ K1SALT) % 100 < 45) Ly.base = [{ s: 0, gain: 0.25, len: 1.5, fade: 0.3 }, { s: Math.round(Ly.n16 * 0.55 / 4) * 4, gain: 0.2, len: 1.5, fade: 0.3 }];
+      else { plan.chord = { kind: 'S', names: [CHORD2[(hv >>> 10) % 4]], offset: 0, slice: 0.6 }; Ly.base = [{ s: 0, gain: 0.3, len: 0.6, fade: 0.2 }]; }
+    }
+    else if (!chord && voice !== 'italo' && !drone) {
+      var h3 = mix(hash(p.url + '~bass2'));
+      if (h3 % 100 < 24) plan.bass2 = bass2For(plan, STRICT[voice] || (h3 >>> 8) % 3 === 0 ? 'house' : 'jazz', rng(h3));
+    }
     return plan;
+  }
+  // ---- the two new basses as lines (the sound is VOICES.jazzbass and VOICES.housebass); every note is in sixteenths of the strip's own pace
+  var CHS = [11, 1, 3, 6, 8, 10], CHTUNE = 0.3, HIRA = [2, 4, 5, 9, 10];   // B C# D# F# G# A# (HalliChord 1 is B maj7 over F#, 30 cents sharp); D hirajoshi
+  var CHSEQ = [[35, 42], [35, 30, 39, 42], [35, 35, 30, 42], [42, 35], [35, 39, 42, 30], [30, 35]];   // bar by bar: B1 F#1 D#2 F#2
+  var HOUSE = ['l.hl..h.l.hl..hh', '..h...h...h...h.', 'l..hl..hl..hl.h.', '.lh..lh..lh..lh.', 'l.h.l.hl..h.l.h.', '..hl..hl..hl..h.', 'lg.h..hlg.h..hl.'];
+  var ARPV = ['kraft', 'italo', 'acid', 'numan', 'boc', 'hopkins'];
+  // what a chord strip adds over the recording (one per strip, drawn from the name): [own notes, an arpeggio, trills, a bass, a voice sample, a joke]
+  var RECIPES = [
+    { n: 'walk', own: 1, bass: 'jazz' },                            { n: 'offbeat', arp: 'up', bass: 'house' },
+    { n: 'sparkle', arp: 'down', hit: 1 },                          { n: 'walk+arp', arp: 'updown', bass: 'jazz' },
+    { n: 'trills', own: 1, trill: 1, hit: 1 },                      { n: 'house+own', own: 1, bass: 'house' },
+    { n: 'jazz+voice', arp: 'random', bass: 'jazz', hit: 1 },       { n: 'house+joke', bass: 'house', jokes: 1 },
+    { n: 'machine', arp: 'updown', fast: 1 },                       { n: 'dream', own: 1, arp: 'up', slow: 1, hit: 1 },
+    { n: 'walk+trills', bass: 'jazz', trill: 1 },                   { n: 'house+arp', arp: 'down', bass: 'house', hit: 1 }
+  ], LSALT = 49, K1SALT = 4;   // picked so today's nine chord strips get nine different recipes
+  function pcIn(m, pcs) { return pcs.indexOf(((m % 12) + 12) % 12) >= 0; }
+  function snapPc(m, pcs) { for (var k = 0; k < 7; k++) { if (pcIn(m - k, pcs)) return m - k; if (pcIn(m + k, pcs)) return m + k; } return m; }
+  function scaleStep(m, k, pcs) { var d = k < 0 ? -1 : 1; for (var n = Math.abs(k); n; n--) { do { m += d; } while (!pcIn(m, pcs)); } return m; }
+  function lowFit(m) { while (m > 50) m -= 12; while (m < 29) m += 12; return m; }
+  // a walking line, four to the bar: the root, a step or two up, the fifth (or a step down), and a note that leans into the next root;
+  // now and then a rest, or beat three split into a swung pair; the last bar ends on the root, held
+  function walkNotes(roots, pcs, bars, r) {
+    var out = [], prev = null;
+    function add(s, m, vel, len) { m = lowFit(m); out.push({ s: s, midi: m, vel: vel, len: len, from: prev }); prev = m; }
+    for (var b = 0; b < bars; b++) {
+      var root = roots[b % roots.length], nxt = roots[(b + 1) % roots.length], last = b === bars - 1, o = b * 16;
+      var up = scaleStep(root, 1 + Math.floor(r() * 2), pcs), fifth = scaleStep(root, 3, pcs), app = scaleStep(nxt, r() < 0.5 ? -1 : 1, pcs);
+      add(o, root, 0.88, 3.4);
+      if (r() > 0.12 || last) add(o + 4, r() < 0.7 ? up : fifth, 0.66, 3.2);
+      if (r() < 0.3 && !last) { add(o + 8, fifth, 0.76, 2.4); add(o + 10.67, scaleStep(fifth, -1, pcs), 0.55, 1.8); }
+      else add(o + 8, r() < 0.5 ? fifth : scaleStep(root, -2, pcs), 0.76, 3.2);
+      if (last) add(o + 12, root, 0.8, 8); else add(o + 12, app, 0.7, 3.2);
+    }
+    return out;
+  }
+  function houseNotes(roots, pat, bars) {
+    var out = [];
+    for (var b = 0; b < bars; b++) for (var k = 0; k < 16; k++) {
+      var c = pat.charAt(k); if (c === '.') continue;
+      out.push({ s: b * 16 + k, midi: lowFit(roots[b % roots.length]) + (c === 'h' ? 12 : 0), vel: c === 'l' ? 0.88 : c === 'h' ? 0.74 : 0.5, len: c === 'h' ? 0.85 : c === 'g' ? 0.5 : 1.05, from: null });
+    }
+    return out;
+  }
+  function bassNotes2(kind, roots, pcs, bars, r) { return kind === 'jazz' ? walkNotes(roots, pcs, bars, r) : houseNotes(roots, HOUSE[Math.floor(r() * HOUSE.length)], bars); }
+  // a bass under a strip's own notes: it follows them bar by bar, in D hirajoshi
+  function bass2For(pl, kind, r) {
+    var s16 = ownS16(pl), bar = 16 * s16, bars = Math.max(1, Math.min(5, Math.ceil(pl.total / bar - 0.05))), ev = pl.events, roots = [], j = 0;
+    for (var b = 0; b < bars; b++) { while (j + 1 < ev.length && ev[j + 1].at <= b * bar + 0.5) j++; roots.push(snapPc(lowFit(ev[j].midi), HIRA)); }
+    return { kind: kind, bars: bars, notes: bassNotes2(kind, roots, HIRA, bars, r) };
+  }
+  // the layers over a chord strip's recording: all in B major (the chord's key; the strip's own notes are moved to the nearest of its notes)
+  // and tuned up 30 cents to the recording, spread over the recording's five seconds
+  function layersFor(pl, p, hv) {
+    var q = rng(hash(p.url) ^ 0x2c1b3c6d), s16 = ownS16(pl), N = Math.max(8, Math.floor(4400 / s16)), rc = RECIPES[mix(hash(p.url) ^ LSALT) % RECIPES.length];
+    var L = { recipe: rc.n, own: !!rc.own, ownVel: 0.55, jokes: !!rc.jokes, tune: CHTUNE, level: 1, hit: 0.4, base: [], n16: N, parts: [], say: null };
+    var ai = (hv >>> 5) % ARPV.length, av = ARPV[ai] === pl.voice ? ARPV[(ai + 1) % ARPV.length] : ARPV[ai], pool = [], band = {};
+    pl.bandMidi.forEach(function (m, i) {
+      m = snapPc(m, CHS); while (m < 57) m += 12; while (m > 81) m -= 12;
+      if (pool.indexOf(m) < 0) { pool.push(m); band[m] = i; }
+    });
+    pool.sort(function (a, b) { return a - b; });
+    while (pool.length < 3) { var nm = snapPc(pool[pool.length - 1] + 5, CHS); if (pool.indexOf(nm) >= 0) nm += 12; pool.push(nm); band[nm] = pl.bandMidi.length - 1; }
+    var bn = function (m) { return band[m] != null ? band[m] : 0; };
+    if (rc.arp) {
+      var step = rc.fast ? 1 : rc.slow ? 4 : [1, 2, 2][Math.floor(q() * 3)], n = pool.length, seq = [], k, prev = -1;
+      if (av === 'italo' && step < 2) step = 2;
+      for (k = 0; k < 64; k++) {
+        var i = rc.arp === 'up' ? k % n : rc.arp === 'down' ? n - 1 - k % n : rc.arp === 'updown' ? (function (c) { return c < n ? c : 2 * n - 2 - c; })(k % (2 * n - 2)) : (function () { var x; do { x = Math.floor(q() * n); } while (x === prev && n > 1); return x; })();
+        prev = i; seq.push(i);
+      }
+      for (k = 0; (2 + k) * step < N - 2; k++) {
+        var m = pool[seq[k]];
+        L.parts.push({ s: (rc.own ? 4 : 2) + k * step, voice: av, midi: m, vel: +(0.42 + (k % 4 === 0 ? 0.12 : 0) + 0.06 * q()).toFixed(3), len: step * 0.9, band: bn(m) });
+      }
+    }
+    if (rc.trill) [0.34, 0.7].forEach(function (x, ti) {
+      var i = Math.min(pool.length - 2, Math.floor(q() * (pool.length - 1))), s0 = Math.round(N * x / 2) * 2;
+      for (var k = 0; k < 8; k++) {
+        var m = pool[i + k % 2], lastN = k === 7;
+        L.parts.push({ s: s0 + k * 0.5, voice: av, midi: m, vel: +(lastN ? 0.5 : 0.3 + 0.25 * Math.sin(Math.PI * (k + 0.5) / 8)).toFixed(3), len: lastN ? 2 : 0.45, short: !lastN, band: bn(m) });
+      }
+    });
+    if (rc.bass) {
+      var bars = Math.max(1, Math.min(4, Math.round(N / 16))), roots = CHSEQ[Math.floor(q() * CHSEQ.length)];
+      bassNotes2(rc.bass, roots, CHS, bars, q).forEach(function (b) { L.parts.push({ s: b.s, voice: rc.bass === 'jazz' ? 'jazzbass' : 'housebass', midi: b.midi, vel: b.vel, len: b.len, from: b.from, bass: true }); });
+    }
+    if (rc.hit) { var mo = q() < 0.5 ? 0.45 : 0.7; L.say = { name: SAYS[(hv >>> 13) % SAYS.length], moment: 'gap', at: Math.round(N * mo * s16), len: null }; }
+    L.parts.sort(function (a, b) { return a.s - b.s; });
+    return L;
   }
   var GESTURES = ['boing', 'whistle', 'trombone', 'tada', 'quack', 'pew', 'clonk', 'cowbell', 'hiccup', 'yoy'];
   var ENDINGS = { boing: 1, whistle: 1, trombone: 1, tada: 1, quack: 1, yoy: 1 };
@@ -222,7 +325,7 @@
   function inOct(d, lo, hi) { while (degMidi(d) < lo) d += 5; while (degMidi(d) > hi) d -= 5; return d; }
   // the octave bass, note by note: sc stretches the strip's own timing (to lock it to the drums), s16 is the length of a sixteenth (ms)
   var BASSROOT = { 2: 38, 4: 40, 5: 41, 9: 33, 10: 34 };      // D2 E2 F2 A1 Bb1
-  function ownS16(pl) { return pl.unit * (pl.bass ? pl.bass.k16 : 1); }
+  function ownS16(pl) { return pl.unit * (pl.unit >= 90 ? 1 : 2); }      // the same k16 as the Italo bass uses; the other bass lines and the layers count in these too
   function bassLine(pl, sc, s16) {
     var b = pl.bass; if (!b) return [];
     var step = s16 * (b.eighths ? 2 : 1), beat = b.eighths ? 2 : 4, ev = pl.events, bar = step * beat * 4, out = [], j = 0, root = 38;
@@ -273,7 +376,7 @@
   /* ---------- sound: analog-style synths built from scratch, no samples ---------- */
   // Saw and pulse oscillators, two or three a hair apart and drifting a little differently on every note, through resonant filters
   // whose cutoff moves with each note; a soft saturation over everything. Every source stops (and lets go of its wiring) when its note ends.
-  var ctx = null, master, verbSend, delaySend, hallSend, NOISE, PW = {}, CURVES = {}, volume = 0.7, muted = false, timers = [], holding = [], lastNote = 0, SRC = null;
+  var BUS = {}, ctx = null, master, verbSend, delaySend, hallSend, NOISE, PW = {}, CURVES = {}, volume = 0.7, muted = false, timers = [], holding = [], lastNote = 0, SRC = null;
   function mtof(m) { return 440 * Math.pow(2, (m - 69) / 12); }
   // a reverb's impulse: noise fading out; dark = the tail loses its highs as it goes, like a big soft room
   function impulse(secs, shape, dark) {
@@ -299,6 +402,22 @@
     delaySend.connect(delay); delay.connect(tone); tone.connect(fb); fb.connect(delay); tone.connect(master);
     NOISE = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
     var nd = NOISE.getChannelData(0); for (var k = 0; k < nd.length; k++) nd[k] = Math.random() * 2 - 1;
+    // the two new basses each have an effect, built once here (not per note): the jazz bass a gentle chorus (the low end stays dry and mono),
+    // the house bass a 90s flanger
+    function lfo(rate, depth, to) { var o = ctx.createOscillator(), g = ctx.createGain(); o.frequency.value = rate; g.gain.value = depth; o.connect(g); g.connect(to); o.start(); }
+    BUS = {};
+    var jin = ctx.createGain(), jdry = amp(0.85, master), jhp = filt('highpass', 180, 0.7);
+    jin.connect(jdry); jin.connect(jhp);
+    [[0.0135, 0.0025, 0.7, -0.55], [0.022, 0.003, 1.0, 0.55]].forEach(function (c) {
+      var d = ctx.createDelay(0.05), pn = ctx.createStereoPanner ? ctx.createStereoPanner() : ctx.createGain();
+      d.delayTime.value = c[0]; lfo(c[2], c[1], d.delayTime); if (pn.pan) pn.pan.value = c[3];
+      jhp.connect(d); d.connect(pn); pn.connect(amp(0.3, master));
+    });
+    BUS.jazzbass = jin;
+    var hin = ctx.createGain(), fd = ctx.createDelay(0.05), fb = amp(0.58, fd), fhp = filt('highpass', 120, 0.7, fb);
+    hin.connect(amp(0.75, master)); hin.connect(fd); fd.delayTime.value = 0.0042; lfo(0.3, 0.0016, fd.delayTime);
+    fd.connect(fhp); fd.connect(amp(0.5, master));
+    BUS.housebass = hin;
   }
   function initAudio() { var AC = window.AudioContext || window.webkitAudioContext; if (AC) setup(new AC()); }
 
@@ -482,6 +601,38 @@
       osc('sawtooth', f, t, end, mix, drift(-4, 2)); osc(pulse(0.5), f, t, end, amp(0.6, mix), drift(5, 2));
       return [0.02, 0, 0];
     },
+    // an upright (double) bass, plucked: a woody finger attack, a short pitched thump, strings that die away fast over a soft body
+    // resonance (two low wood modes); every note bends up into pitch a hair (from the last note when it is near), then a low-pass closes as it fades
+    jazzbass: function (t, f, out, o) {
+      var v = o.vel, out0 = out, len = Math.max(0.12, o.len || 0.4), end = t + len + 0.4, tau = Math.max(0.16, Math.min(0.5, 14 / f)), P = 0.2; out = amp(0.34, out0);
+      var g = ctx.createGain(); g.gain.value = 0; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(P, t + 0.004);
+      g.gain.setTargetAtTime(P * 0.5, t + 0.006, 0.045); g.gain.setTargetAtTime(0, t + 0.07, tau); g.gain.setTargetAtTime(0, t + len, 0.045); g.connect(out);
+      var lp = filt('lowpass', 1000, 0.7, g), str = ctx.createGain(); str.connect(lp);
+      sweep(lp.frequency, t, Math.min(4200, f * 14 + 1200 * v), f * 3 + 200, 0.14);
+      var near = o.from && o.from > f * 0.7 && o.from < f * 1.45, r0 = near ? 1 + (o.from / f - 1) * 0.3 : 0.972;
+      var os = [osc('triangle', f, t, end, str, drift(0, 3)), osc('sine', f * 2, t, end, amp(0.28, str), drift(4, 3)), osc('sine', f * 3, t, end, amp(0.1, str), drift(-4, 3))];
+      os.forEach(function (x, i) { var k = i + 1; x.frequency.setValueAtTime(f * r0 * k, t); x.frequency.setTargetAtTime(f * k, t + 0.003, 0.03); });
+      // the thump: a sine falling onto the note, gone in a few hundredths of a second
+      var th = env(t, 0.5 + 0.2 * v, 0.002, 0.07); th.connect(out);
+      var ts = osc('sine', f, t, t + 0.12, th); ts.frequency.setValueAtTime(f * 2.2, t); ts.frequency.exponentialRampToValueAtTime(f, t + 0.03);
+      // the finger: a tick of band-passed noise; the body: the string and the tick ring two soft wood modes
+      var fg = env(t, 0.35 * (0.5 + 0.5 * v), 0.001, 0.016); fg.connect(out); noise(t, 0.05, filt('bandpass', Math.min(2200, f * 20 + 300), 1.4, fg));
+      var bo = ctx.createGain(); bo.gain.value = 0.55; bo.connect(out);
+      [[98, 9, 0.7], [205, 7, 0.4]].forEach(function (m) { var b = filt('bandpass', m[0], m[1], amp(m[2], bo)); str.connect(b); noise(t, 0.03, amp(0.5, b)); });
+      return [0.03, 0, 0];
+    },
+    // the early-90s house bass, Korg M1 style: a sine, a saw and an organ's popping second and third harmonic under a low-pass whose
+    // envelope snaps shut, so each short note is a punch; saturated, a tiny click on the front
+    housebass: function (t, f, out, o) {
+      var v = o.vel, len = Math.max(0.06, Math.min(0.5, o.len || 0.11)), end = t + len + 0.12;
+      var g = vca(t, 0.15, 0.002, 0.6, 0.05, t + len, 0.014, out), mix = ctx.createGain();
+      var lp = filt('lowpass', 500, 4.5, shaper(1.7, g)); mix.connect(lp);
+      sweep(lp.frequency, t, Math.min(5000, f * 14 + 900 + 700 * v), f * 2.2 + 140, 0.04);
+      osc('sine', f, t, end, mix); osc('sawtooth', f, t, end, amp(0.5, mix), drift(-3, 2)); osc('sine', f / 2, t, end, amp(0.3, mix));
+      var pg = env(t, 0.34, 0.002, 0.08); pg.connect(lp); osc('sine', f * 2, t, t + 0.12, pg); osc('sine', f * 3, t, t + 0.1, amp(0.4, pg));
+      var ck = env(t, 0.07, 0.0005, 0.008); ck.connect(out); noise(t, 0.02, filt('highpass', 2500, 0.7, ck));
+      return [0.02, 0, 0];
+    },
 
     /* ---- the jokes: one-off goofy gestures, synthesis only ---- */
     // a spring: up into the note from far below, then a rubbery wobble that dies away
@@ -570,14 +721,14 @@
   // returns the note's own gain (carrying its sources), so a held note can be faded and stopped early
   function play(voice, midi, pan, vel, o) {
     if (!ctx || muted) return null;
-    o = o || {}; o.vel = vel; o.midi = midi; if (o.fromMidi != null) o.from = mtof(o.fromMidi);
+    o = o || {}; o.vel = vel; o.midi = midi; var tn = o.tune || 0; if (o.fromMidi != null) o.from = mtof(o.fromMidi + tn);
     // start on a whole sample, and every envelope's gain sits at zero before its note (a gain left at its default of 1 lets a
     // source starting a hair early through at full level: an audible click)
     var t = Math.ceil((o.t != null ? o.t : ctx.currentTime + 0.01) * ctx.sampleRate) / ctx.sampleRate, out = ctx.createGain(), node = out;
-    out.gain.value = 0.35 + 0.65 * vel;
+    out.gain.value = (0.35 + 0.65 * vel) * (o.level || 1);
     if (ctx.createStereoPanner) { var pn = ctx.createStereoPanner(); pn.pan.value = pan; out.connect(pn); node = pn; }
-    SRC = []; var sends = VOICES[voice](t, mtof(midi), out, o); out._srcs = SRC; SRC = null;
-    node.connect(master);
+    SRC = []; var sends = VOICES[voice](t, mtof(midi + tn), out, o); out._srcs = SRC; SRC = null;
+    node.connect(BUS[voice] || master);
     if (sends[0]) node.connect(amp(sends[0], verbSend));
     if (sends[1]) node.connect(amp(sends[1], delaySend));
     if (sends[2]) node.connect(amp(sends[2], hallSend));
@@ -613,22 +764,33 @@
   }
   // everything a press plays, in order of the strip's own time (ms): its notes, the Italo bass line and claps, the joke.
   // sc stretches the time of the strict voices to the drums' grid (1 without drums); s16 is the bass line's sixteenth (ms)
-  function parts(pl, still, sc, s16) {
-    var out = [];
+  function parts(pl, still, sc, s16, over) {      // over: the strip is on top of its recording, so the layers sound (chord strips)
+    var out = [], L = over && pl.layers;
     function st(ms) { return pl.strict ? Math.round(ms * 4 / pl.unit) * pl.unit / 4 * sc : ms * sc; }   // the plan's times are rounded to whole ms: snap back onto the grid
     expand(pl, still).forEach(function (it) {
-      out.push({ note: true, ms: st(it.at), voice: pl.voice, midi: it.midi, vel: it.vel, band: it.band, lit: it.lit, silent: it.silent,
-                 hold: !!it.legato, quick: it.quick, o: noteOpts(pl, it, sc) });
+      var x = { note: true, ms: st(it.at), voice: pl.voice, midi: it.midi, vel: it.vel, band: it.band, lit: it.lit, silent: it.silent,
+                hold: !!it.legato, quick: it.quick, o: noteOpts(pl, it, sc) };
+      if (L && L.own) { x.play = true; x.midi = snapPc(x.midi, CHS); x.vel = x.vel * L.ownVel; x.o.tune = L.tune; x.o.level = L.level; }
+      out.push(x);
     });
-    bassLine(pl, sc, s16).forEach(function (b) {
+    if (!over) bassLine(pl, sc, s16).forEach(function (b) {
       out.push({ ms: b.at, voice: 'octbass', midi: b.midi, vel: b.vel, o: { len: b.len } });
       if (b.clap) out.push({ ms: b.at, voice: 'clap', midi: 62, vel: 0.8, o: {} });
     });
     pl.extras.forEach(function (x) {
-      var self = x.voice === 'self';
-      out.push({ ms: st(x.at), voice: self ? pl.voice : x.voice, midi: x.midi, vel: x.vel, band: x.band, lit: 300,
-                 o: { len: (x.len || 0.3) * (self ? 1 : sc), short: x.short, to: x.to, stab: x.stab, fall: x.fall, saw: pl.saw, eighth: pl.eighth * sc } });
+      var self = x.voice === 'self', y = { ms: st(x.at), voice: self ? pl.voice : x.voice, midi: x.midi, vel: x.vel, band: x.band, lit: 300,
+                 o: { len: (x.len || 0.3) * (self ? 1 : sc), short: x.short, to: x.to, stab: x.stab, fall: x.fall, saw: pl.saw, eighth: pl.eighth * sc } };
+      if (over) { if (!L || !L.jokes) return; y.play = true; y.lite = true; y.midi = snapPc(y.midi, CHS); y.o.tune = L.tune; y.o.level = L.level; if (x.to) y.o.to = snapPc(x.to, CHS); }
+      out.push(y);
     });
+    function line(notes, voiceOf, tune, lite, lv) {
+      notes.forEach(function (b) {
+        out.push({ ms: b.s * s16, voice: voiceOf(b), midi: b.midi, vel: b.vel, band: lite ? b.band : null, lit: 260, play: true, lite: lite && b.band != null, bass: !!b.bass,
+                   o: { len: b.len * s16 / 1000, short: b.short, fromMidi: b.from, tune: tune, level: lv, saw: pl.saw, eighth: s16 * 2 / 1000 } });
+      });
+    }
+    if (L) line(L.parts, function (b) { return b.voice; }, L.tune, true, L.level);
+    if (pl.bass2) line(pl.bass2.notes, function () { return pl.bass2.kind === 'jazz' ? 'jazzbass' : 'housebass'; }, 0, false, 1);
     return out;
   }
   function heldOpts(pl, sc, clk16) { return { len: pl.total * sc / 1000 + 0.6, eighth: clk16 ? clk16 * 2 / 1000 : pl.eighth, beat: clk16 ? clk16 * 4 / 1000 : pl.beat }; }
@@ -653,9 +815,9 @@
   var sounding = [];
   function voices() { var V = window.PPVoices; return V && typeof V.has === 'function' && typeof V.say === 'function' ? V : null; }
   function hasAll(names) { var V = voices(); try { return !!V && names.every(function (n) { return V.has(n); }); } catch (e) { return false; } }
-  function sample(name, t, gain, offset, length) {
+  function sample(name, t, gain, offset, length, fade) {
     var V = voices(); if (!ctx || muted || !V) return;
-    try { if (!V.has(name)) return; var h = V.say(name, t, gain, offset, length); if (h && typeof h.stop === 'function') sounding.push(h); } catch (e) {}
+    try { if (!V.has(name)) return; var h = V.say(name, t, gain, offset, length, fade); if (h && typeof h.stop === 'function') sounding.push(h); } catch (e) {}
   }
   // the drums' clock, when drums.js is there and playing (see drums.js): strips then start on its next sixteenth
   function clock() {
@@ -685,9 +847,18 @@
     }
     function later(ms, fn) { timers.push(setTimeout(fn, Math.max(0, lead + ms))); }
     var ch = pl.chord && hasAll(pl.chord.names) ? pl.chord : null;
-    if (ch && ch.kind === 'A') {        // "HalliChord 1" under the whole strip; the bands light in the strip's own rhythm, silently
-      later(-AHEAD - LAG, function () { sample(ch.names[0], when(0), 0.7, ch.offset); });
-      parts(pl, reduce, sc, s16).forEach(function (x) { if (x.note) later(x.ms, function () { lastNote = Date.now(); light(spans[x.band], x.lit); }); });
+    if (ch && pl.layers) {              // a short keyboard press of the recording (chord-1: two stabs) or one slice, and the strip's layers over it; the bands light in the strip's own rhythm
+      pl.layers.base.forEach(function (b) { var bm = b.s * s16; later(bm - AHEAD - LAG, function () { sample(ch.names[0], when(bm), b.gain, ch.offset, b.len, b.fade); }); });
+      parts(pl, reduce, sc, s16, true).forEach(function (x) {
+        if (x.note) later(x.ms, function () { lastNote = Date.now(); light(spans[x.band], x.lit); });
+        else if (x.lite) later(x.ms, function () { light(spans[x.band], x.lit); });
+        if (x.play && !x.silent) later(x.ms - AHEAD - LAG, function () {      // the strip's layers over the recording, at their own (lower) level
+          if (!ctx) return; x.o.t = when(x.ms);
+          var h = play(x.voice, x.midi, pan, Math.min(1, x.vel * (pl.strict && x.note ? 0.97 + Math.random() * 0.06 : 1)), x.o);
+          if (h && x.hold) holding.push(h);
+        });
+      });
+      if (pl.say) { var sm = pl.say.at * sc; later(sm - AHEAD - LAG, function () { sample(pl.say.name, when(sm), pl.layers.hit, 0, pl.say.len || undefined); }); }
       return;
     }
     if (ch) {                           // 0.6 s of each "HalliChord 2", in the strip's own order; on the drums, a whole number of sixteenths
@@ -762,9 +933,9 @@
 
   // for checking: every strip's plan, and a strip (or several, pressed in quick succession and never cut short) rendered silently
   function offline(secs, fn) {
-    var keep = [ctx, master, verbSend, delaySend, hallSend, NOISE, PW, CURVES, muted];
+    var keep = [ctx, master, verbSend, delaySend, hallSend, NOISE, PW, CURVES, muted, BUS];
     muted = false; setup(new (window.OfflineAudioContext || window.webkitOfflineAudioContext)(2, Math.ceil(44100 * secs), 44100)); var oc = ctx;
-    try { fn(); } finally { ctx = keep[0]; master = keep[1]; verbSend = keep[2]; delaySend = keep[3]; hallSend = keep[4]; NOISE = keep[5]; PW = keep[6]; CURVES = keep[7]; muted = keep[8]; }
+    try { fn(); } finally { ctx = keep[0]; master = keep[1]; verbSend = keep[2]; delaySend = keep[3]; hallSend = keep[4]; NOISE = keep[5]; PW = keep[6]; CURVES = keep[7]; muted = keep[8]; BUS = keep[9]; }
     return oc.startRendering();
   }
   function stats(buf, upto) {
@@ -782,7 +953,34 @@
     },
     plans: function () { return keys.map(function (k) { return k.plan; }); },
     expand: function (i) { return expand(keys[i].plan, false); },
-    parts: function (i) { var pl = keys[i].plan; return parts(pl, false, 1, ownS16(pl)); },
+    parts: function (i, over) { var pl = keys[i].plan; return parts(pl, false, 1, ownS16(pl), over !== false); },   // with the layers a chord strip adds over its recording, unless over === false
+    // everything one press sounds, as plain data (what the recording, the drone, the notes, the layers and the voice sample are): two strips with the same string sound the same
+    signature: function (i) {
+      var pl = keys[i].plan, over = !!pl.layers;
+      return JSON.stringify({ chord: pl.chord, say: pl.say && { n: pl.say.name, at: pl.say.at }, drone: over ? null : pl.drone, voice: over ? null : pl.voice,
+        parts: (pl.chord && !over ? [] : parts(pl, false, 1, ownS16(pl), true)).filter(function (x) { return !over || x.play; }).map(function (x) { return [x.voice, Math.round(x.midi), Math.round(x.ms), +x.vel.toFixed(2)]; }) });
+    },
+    // the beat maker's bass pads (and tests): one synth note at an audio-clock time (o.t), through the master
+    synth: function (voice, midi, vel, o) {
+      if (!ctx) initAudio(); if (!ctx || !VOICES[voice]) return null;
+      if (ctx.state === 'suspended') ctx.resume();
+      return play(voice, midi, 0, vel, Object.assign({}, o || {}));
+    },
+    // notes [{ voice, midi, vel, t, len, fromMidi }] rendered silently (for listening to a voice or a line)
+    renderNotes: function (list, secs) {
+      return offline(secs, function () { list.forEach(function (n) { play(n.voice, n.midi, 0, n.vel, { t: n.t, len: n.len, fromMidi: n.fromMidi }); }); });
+    },
+    // a strip rendered silently like a press (for listening); add(ctx, master, t0, plan) puts the recordings in
+    renderStrip: function (i, secs, add) {
+      return offline(secs, function () {
+        var pl = keys[i].plan, t0 = 0.05, over = !!(pl.layers && add);
+        if (add) add(ctx, master, t0, pl);
+        if (!over && pl.drone) { var ho = heldOpts(pl, 1, 0); ho.t = t0; play(pl.drone.voice, pl.drone.midi, 0, 0.8, ho); }
+        parts(pl, false, 1, ownS16(pl), over).forEach(function (x) {
+          if (x.silent || (over && !x.play)) return; x.o.t = t0 + x.ms / 1000; play(x.voice, x.midi, 0, x.vel, x.o);
+        });
+      });
+    },
     render: function (list, every, secs) {
       return offline(secs, function () {
         list.forEach(function (idx, m) {
@@ -1194,6 +1392,18 @@
     get bpm() { return bpm; },
     set bpm(v) { setBpm(v); },
     sixteenth: sixteenth,
+    // the next beat line (a step 0, 4, 8 or 12), at least 30 ms ahead: where a bass riff starts so its pattern sits right against the kick
+    nextBeat: function () {
+      if (!audio) return 0;
+      var now = audio.ctx.currentTime + 0.03;
+      if (!T.timer || T.paused) return now;
+      for (var i = 0; i < T.queue.length; i++) if (T.queue[i].t >= now && T.queue[i].s % 4 === 0) return T.queue[i].t;
+      var n = T.n, t = T.next;
+      for (var g = 0; g < 8 && (n % 4 !== 0 || swung(n, t) < now); g++) { n++; t += sixteenth(); }
+      return swung(n, t);
+    },
+    // the time of sixteenth k after t0 (a beat line), with shuffle if it is on
+    at: function (t0, k) { return t0 + k * sixteenth() + (shuffleOn && Math.round(k) % 2 === 1 && Math.abs(k - Math.round(k)) < 1e-6 ? SWING * sixteenth() : 0); },
     nextGrid: function () {
       if (!audio) return 0;
       var now = audio.ctx.currentTime;
@@ -1282,7 +1492,7 @@
     has: function (name) { var v = voices[vkey(name)]; return !!(v && v.buf); },
     duration: function (name) { var v = voices[vkey(name)]; return v && v.buf ? v.dur : 0; },
     /* play name at AudioContext time `when`; offset/length are seconds into the trimmed recording; returns { stop(when), end } */
-    say: function (name, when, gain, offset, length) {
+    say: function (name, when, gain, offset, length, fadeOut) {
       var v = voices[vkey(name)];
       if (!v || !v.buf) return { stop: function () {}, end: 0, ok: false };
       var a = getAudio(), c = a.ctx, now = c.currentTime;
@@ -1290,7 +1500,7 @@
       var off = Math.max(0, Number(offset) || 0), left = Math.max(0, v.dur - off);
       var len = length == null || !isFinite(length) ? left : Math.max(0.01, Math.min(length, left));
       var cutIn = off > 0 || v.base > 0, cutOut = len < left - 1e-6;
-      var fin = Math.min(cutIn ? EDGE : 0.002, len / 2), fout = Math.min(cutOut ? EDGE : 0.02, len / 2);
+      var fin = Math.min(cutIn ? EDGE : 0.002, len / 2), fout = Math.min(fadeOut > 0 ? fadeOut : cutOut ? EDGE : 0.02, len / 2);
       var g0 = (gain == null ? SAY_GAIN : gain) * v.lvl;
       var s = c.createBufferSource(), g = c.createGain();
       s.buffer = v.buf;
@@ -1331,6 +1541,35 @@
     if (live) h.stop(when);
     h = padHit[m.name] = PPVoices.say(m.name, when, PAD_GAIN[m.group]);
     lightPad(m, Math.max(0, (h.end - now) * 1000));
+  }
+  /* bass pads: a short riff in time with the beat when it runs (from the next beat line, one bar of sixteenths, shuffle as the drums), one note otherwise.
+     The sound is the piano's own synthesis (window.PalettePiano.synth): jazz bass (an upright, walking) and house bass (an M1-style punch, offbeat octaves). */
+  var BASSPADS = [{ name: 'jazz-bass', label: 'jazz', voice: 'jazzbass', full: 'jazz bass' }, { name: 'house-bass', label: 'house', voice: 'housebass', full: 'house bass' }];
+  var WALKS = [[38, 41, 45, 40], [38, 40, 45, 46], [38, 45, 41, 40], [38, 41, 46, 45]];   // D2 and D hirajoshi (D E F A Bb), one note a beat
+  var HOUSES = ['l.hl..h.l.hl..hh', '..h...h...h...h.', 'l..hl..hl..hl.h.', '.lh..lh..lh..lh.', 'l.h.l.hl..h.l.h.'];
+  var bassCount = {}, bassLog = null;
+  function bassRiff(m, k) {    // [{ k (sixteenths), midi, vel, len (sixteenths) }]
+    var out = [], i;
+    if (m.voice === 'jazzbass') { var w = WALKS[k % WALKS.length]; for (i = 0; i < 4; i++) out.push({ k: i * 4, midi: w[i], vel: i === 0 ? 0.88 : 0.7, len: 3.4, from: i ? w[i - 1] : null }); }
+    else { var pt = HOUSES[k % HOUSES.length]; for (i = 0; i < 16; i++) { var c = pt.charAt(i); if (c !== '.') out.push({ k: i, midi: c === 'h' ? 50 : 38, vel: c === 'h' ? 0.74 : 0.88, len: c === 'h' ? 0.85 : 1.05 }); } }
+    return out;
+  }
+  function bassPress(m) {
+    var a = getAudio(), P = window.PalettePiano, now = a.ctx.currentTime, riff = null, ms = 0;
+    if (!P || typeof P.synth !== 'function') return;
+    var C = window.PPClock, running = !!C.running, t0 = running ? C.nextBeat() : 0;
+    if (running) {
+      var sx = C.sixteenth();
+      var k = bassCount[m.name] = (bassCount[m.name] || 0) + 1;   // each press plays the next riff of the pad
+      riff = bassRiff(m, k - 1);
+      riff.forEach(function (n) { var t = C.at(t0, n.k); n.t = t; P.synth(m.voice, n.midi, n.vel, { t: t, len: n.len * sx, fromMidi: n.from }); });
+      ms = (t0 - now + 16 * sx) * 1000;
+    } else {
+      riff = [{ k: 0, midi: 38, vel: 0.88, len: m.voice === 'jazzbass' ? 1.1 : 0.2, t: null }];
+      P.synth(m.voice, 38, 0.88, { len: riff[0].len }); ms = 700;
+    }
+    if (bassLog) bassLog.push({ name: m.name, running: running, t0: t0, notes: riff.map(function (n) { return { k: n.k, midi: n.midi, t: n.t }; }) });
+    lightPad(m, ms);
   }
   function lightPad(m, ms) {
     var u = ui.says && ui.says[m.name];
@@ -1479,8 +1718,22 @@
       g.appendChild(box);
       return g;
     }
-    var g2 = padGroup('Voices', 'voice'), g3 = padGroup('Chords', 'chord'), g4 = padGroup('Pads', 'pad');
-    pads.appendChild(g2); pads.appendChild(g3); pads.appendChild(g4);
+    function bassGroup() {
+      var g = el('div', 'hc-pp-pd-grp', null, { role: 'group', 'aria-label': 'Bass' });
+      g.appendChild(el('span', 'hc-pp-pd-cap', 'Bass', { 'aria-hidden': 'true' }));
+      var box = el('div', 'hc-pp-pd-says');
+      BASSPADS.forEach(function (m) {
+        var b = el('button', 'hc-pp-pd-say', m.label, { type: 'button', 'aria-label': m.full + ', a riff with the beat, one note without' });
+        ui.says[m.name] = { b: b, m: m };
+        b.addEventListener('click', function () { bassPress(m); });
+        box.appendChild(b);
+      });
+      g.appendChild(box);
+      return g;
+    }
+    var g2 = padGroup('Voices', 'voice'), g3 = padGroup('Chords', 'chord'), g4 = padGroup('Pads', 'pad'), g5 = bassGroup();
+    var duo = el('div', 'hc-pp-pd-duo'); duo.appendChild(g4); duo.appendChild(g5);
+    pads.appendChild(g2); pads.appendChild(g3); pads.appendChild(duo);
     left.appendChild(g1); main.appendChild(left); main.appendChild(pads); p.appendChild(main);
 
     ui.btn.addEventListener('click', function () { openPanel(p.hidden); });
@@ -1652,10 +1905,12 @@
     _stepEvents: stepEvents,
     _log: function (a) { logTimes = a || null; },
     _state: function () { return { n: T.n, next: T.next, timer: !!T.timer, queue: T.queue.slice(), fillName: fillName, patOn: T.patOn }; },
-    _busGain: BUS_GAIN
+    _busGain: BUS_GAIN,
+    bassPads: function () { return BASSPADS.map(function (m) { return m.name; }); },
+    _bassLog: function (a) { bassLog = a || null; }
   };
 
   /* ---------------------------------------------------------------- go: built the first time the piano page is shown; hc-palette-piano's check() calls check() on every change */
   check();
 })();
-window.__hcBuild = "2026-11-17 23:56";
+window.__hcBuild = "2026-11-18 01:01";

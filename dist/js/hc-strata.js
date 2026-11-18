@@ -174,4 +174,4 @@
   window.__hcStrata = { el: el, info: function () { return { on: on, sda: SDA, r: r, d: d, H: H, maxY: maxY }; } };
   if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
 })();
-window.__hcBuild = "2026-11-17 23:56";
+window.__hcBuild = "2026-11-18 01:01";

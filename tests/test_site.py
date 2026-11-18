@@ -817,6 +817,49 @@ async def main(base):
         await page.click('#hc-pp-pd-panel .hc-pp-pd-go'); await page.wait_for_timeout(300)
         r = await page.evaluate("[window.PPClock.running, window.PPDrums._state().timer, document.querySelector('#hc-pp-pd-panel .hc-pp-pd-go').textContent]")
         check('beat maker: Stop ends the clock', r == [False, False, 'Play'], str(r))
+        # ---- 2026-11-18: no two strips sound alike (the chord-1 strips used to play the recording alone); the jazz and house basses; the Bass pads
+        r = await page.evaluate("""() => { const P = window.PalettePiano, pl = P.plans(), tags = [...document.querySelectorAll('#hc-pp a.hc-pp-tag')].map(a => a.getAttribute('href').slice(1));
+          return { sigs: pl.map((_, i) => P.signature(i)), plans: pl.map(x => JSON.stringify(x)), tags,
+            a: pl.map((x, i) => [i, x.chord && x.chord.kind, x.layers && x.layers.recipe, x.layers ? P.parts(i).filter(q => q.play).length : 0, x.layers ? P.parts(i).filter(q => q.bass).map(q => q.voice)[0] || '' : '',
+              x.bass2 ? x.bass2.kind : '']) }; }""")
+        check('strips: no two plans are the same, and no two strips sound the same (the whole press: recording, layers, voice sample, notes)',
+              len(set(r['sigs'])) == len(r['sigs']) == n_pal and len(set(r['plans'])) == n_pal, f"{len(set(r['sigs']))} of {len(r['sigs'])}")
+        ca = [x for x in r['a'] if x[2]]
+        check('strips: every strip that had the chord-1 recording alone (nine today) now has layers over its base, each with its own recipe',
+              len(ca) >= 9 and all(x[3] >= 3 for x in ca) and len({x[2] for x in ca}) == len(ca), str(ca))
+        pl2 = await page.evaluate("window.PalettePiano.plans().filter(x => x.layers).map(x => [x.chord.kind, x.chord.names[0], x.layers.base.map(b => [b.len, b.fade, b.gain])])")
+        c1 = [x for x in pl2 if x[1] == 'chord-1']
+        check('chord-1 is in at most four of the nine strips, each a short press (no sample longer than 1.6 s, 0.3 s let-go, gain at most 0.26); the others use a chord-2 slice',
+              0 < len(c1) <= 4 and all(b[0] <= 1.6 and b[1] >= 0.3 and b[2] <= 0.26 for x in c1 for b in x[2]) and all(x[0] == 'S' and x[1].startswith('chord-2') for x in pl2 if x[1] != 'chord-1'), str(pl2))
+        named = {r['tags'][x[0]]: x for x in ca}
+        check('strips: "Í barnastærðum", "Hey" and "6 train" (the three Halli heard alike) all have layers and differ',
+              all(k in named and named[k][3] >= 3 for k in ('I-barnastardum', 'Hey', '6-train-head')) and len({named[k][2] for k in ('I-barnastardum', 'Hey', '6-train-head')}) == 3, str({k: named.get(k) for k in ('I-barnastardum', 'Hey', '6-train-head')}))
+        check('strips: both new basses are used (under chord strips, and as the bass of some other strips)',
+              {x[4] for x in ca} >= {'jazzbass', 'housebass'} and {x[5] for x in r['a']} >= {'jazz', 'house'}, str([x[4] for x in ca]) + str(sorted({x[5] for x in r['a']})))
+        n = await page.evaluate("""async () => { const P = window.PalettePiano, o = {}; for (const [v, m] of [['jazzbass', 38], ['jazzbass', 45], ['housebass', 38], ['housebass', 50], ['octbass', 38], ['hopkins', 62]]) o[v + m] = (await P.note(v, m, 0.8)).peak; return o; }""")
+        check('new voices: jazz bass and house bass sound (not silent) and are no louder than the loudest existing voice (hopkins)',
+              all(n[k] > 0.01 for k in n) and max(n['jazzbass38'], n['jazzbass45'], n['housebass38'], n['housebass50']) <= n['hopkins62'] + 1e-6, str(n))
+        # the Bass pads: a single note without the beat, a riff on the clock's grid with it
+        await page.evaluate("() => { window.__syn = []; const P = window.PalettePiano, s = P.synth; P.synth = function (v, m, vel, o) { window.__syn.push([v, m, o && o.t != null ? o.t : null, o && o.len]); return s.apply(P, arguments); }; }")
+        r = await page.evaluate("""() => { const p = document.getElementById('hc-pp-pd-panel'), g = [...p.querySelectorAll('.hc-pp-pd-grp')].find(x => x.getAttribute('aria-label') === 'Bass');
+          return g && { cap: g.querySelector('.hc-pp-pd-cap').textContent, btns: [...g.querySelectorAll('button')].map(b => [b.textContent, b.getAttribute('aria-label')]), names: window.PPDrums.bassPads() }; }""")
+        check('beat maker: a "Bass" group with a jazz and a house pad', r and r['cap'] == 'Bass' and [b[0] for b in r['btns']] == ['jazz', 'house'] and r['btns'][0][1].startswith('jazz bass') and r['btns'][1][1].startswith('house bass'), str(r))
+        await page.click('#hc-pp-pd-panel .hc-pp-pd-grp[aria-label="Bass"] button >> nth=0'); await page.wait_for_timeout(200)
+        await page.click('#hc-pp-pd-panel .hc-pp-pd-grp[aria-label="Bass"] button >> nth=1'); await page.wait_for_timeout(200)
+        r = await page.evaluate('window.__syn.slice()')
+        check('beat maker: without the beat each bass pad plays one note (jazz bass D2, house bass D2)', [x[:2] for x in r] == [['jazzbass', 38], ['housebass', 38]], str(r))
+        await page.evaluate("window.__syn.length = 0")
+        await page.click('#hc-pp-pd-panel .hc-pp-pd-go'); await page.wait_for_timeout(500)
+        sx = await page.evaluate('window.PPClock.sixteenth()')
+        await page.click('#hc-pp-pd-panel .hc-pp-pd-grp[aria-label="Bass"] button >> nth=0'); await page.wait_for_timeout(100)
+        await page.click('#hc-pp-pd-panel .hc-pp-pd-grp[aria-label="Bass"] button >> nth=1'); await page.wait_for_timeout(100)
+        r = await page.evaluate("[window.__syn.slice(), window.PPDrums._state().n]")
+        jz = [x for x in r[0] if x[0] == 'jazzbass']; hs = [x for x in r[0] if x[0] == 'housebass']
+        gaps = lambda L: [round((b[2] - a[2]) / sx, 3) for a, b in zip(L, L[1:])]
+        check('beat maker: with the beat running a jazz pad plays a four-note walking bar (a note a beat), a house pad an offbeat pattern with octaves, all on the clock\'s sixteenths',
+              len(jz) == 4 and gaps(jz) == [4, 4, 4] and len(hs) >= 4 and all(abs(g - round(g)) < 0.02 for g in gaps(hs)) and {x[1] for x in hs} <= {38, 50} and 50 in {x[1] for x in hs}
+              and all(x[2] is not None for x in jz + hs), f'{jz} {hs} sx={sx}')
+        await page.click('#hc-pp-pd-panel .hc-pp-pd-go'); await page.wait_for_timeout(300)
         # ---- perc row (the fourth row, empty by default, its picker chooses the sound), shuffle
         r = await page.evaluate("""() => { const p = document.getElementById('hc-pp-pd-panel'), sel = p.querySelector('select'), pat = window.PPDrums.pattern();
           return { rows: pat.length, percEmpty: pat[3].every(x => x === 0), selects: p.querySelectorAll('select').length, opts: [...sel.options].map(o => o.value + '|' + o.textContent), val: sel.value,
@@ -904,9 +947,9 @@ async def main(base):
         one = next(n for n, x in enumerate(plans) if x['chord'] and x['chord']['kind'] == 'A')
         await page.evaluate('window.__says.length = 0'); await page.evaluate(PRESS, one); await page.wait_for_timeout(600)
         says1 = await page.evaluate('window.__says.slice()')
-        check('recordings: a "HalliChord 2" strip plays 0.6 s of each of 2a-2d in its own order, a "HalliChord 1" strip plays chord-1',
+        check('recordings: a "HalliChord 2" strip plays 0.6 s of each of 2a-2d in its own order, a "HalliChord 1" strip plays a 1.5 s press of chord-1',
               says2 == [[nm, 0.6] for nm in plans[two]['chord']['names']] and sorted(nm for nm, _ in says2) == ['chord-2a', 'chord-2b', 'chord-2c', 'chord-2d']
-              and says1 == [['chord-1', None]], f'{says2} / {says1}')
+              and says1 == [['chord-1', 1.5]], f'{says2} / {says1}')
         # leaving the page (Cargo changes pages without reloading) with the beat playing and the panel open, then coming back
         await page.click('#hc-pp-pd-panel .hc-pp-pd-go'); await page.wait_for_timeout(300)
         await page.evaluate("() => { history.pushState({}, '', '/Cheerios/'); document.querySelector('.project_content').innerHTML = '<p>a project</p>'; }")

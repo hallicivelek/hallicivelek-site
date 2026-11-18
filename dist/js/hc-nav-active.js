@@ -92,4 +92,4 @@
   }, true);
   addEventListener('popstate', function () { wait(location.pathname); });
 })();
-window.__hcBuild = "2026-11-17 23:56";
+window.__hcBuild = "2026-11-18 01:01";
